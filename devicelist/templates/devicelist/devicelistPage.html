@@ -1,0 +1,133 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+
+<link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@19.4.2/dist/css/suggestions.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/suggestions-jquery@19.4.2/dist/js/jquery.suggestions.min.js"></script>
+
+
+<div class="scrolltop row align-items-end mx-0">
+	<a><img src="{% static 'scroll_to_top.png' %}" width="18" height="18"></a>
+</div>
+
+{% if request.user.groups.all.0.name == 'admins' or request.user.groups.all.0.name == 'engineers'%}
+<div class="ew_device">
+	<a id="add_new_device"><img src="{% static 'add.png' %}" width="40" height="40">
+</div>
+{% endif %}
+<!-- <img src="{% static 'gear.png' %}" width="0" height="0"> -->
+<!-- <img src="{% static 'geolocation.png' %}" width="0" height="0"> -->
+
+<div class="spinner-border text-danger spinner_load_update d-none" role="status">
+	<span class="sr-only">Loading...</span>
+</div>
+
+<div class="container-fluid" id="main_div">
+	<table>
+		<thead>
+			<tr>
+				<form id="form_devicelist" onsubmit="return false;">
+					<th style="width: 4%"><input class="btn btn-dark" id="clear" type="reset" onClick="clear_devicelist()" value="CLEAR"></td>
+					{% for r, i in request_column.items %}
+						{% if r == 'status' %}
+							<th style="width: {{ i.column_size_head }}"><select id="{{ r }}" class="custom-select" onchange="SetCard(this)">
+								<option>Все</option>
+								<option>Эксплуатация</option>
+								<option class="table-warning">Монтаж</option>
+								<option class="table-secondary">Выведен</option>
+								<option class="table-info">Проект</option>
+							</select></td>
+						{% elif r == 'date' or r == 'serial'%}
+						{% elif r == 'addres' %}
+							<th style="width: {{ i.column_size_head }}"><input class="form-control address_dadata" placeholder="{{ i.html_name }}" type="search" maxlength="150" id="{{ r }}"></td>
+						{% else %}
+							<th style="width: {{ i.column_size_head }}"><input class="form-control" placeholder="{{ i.html_name }}" type="search" maxlength="150" id="{{ r }}"></td>
+						{% endif %}
+					{% endfor %}
+					<th style="width: 6%"><input class="form-control" placeholder="limit" type="search" maxlength="8" id="limit" value="1000"></td>
+					<th style="width: 3%"><input class="btn btn-dark" id="devicelist_submit" type="submit" value="FIND"></td>
+				</form>
+			</tr>
+		</thead>
+	</table>
+	<!-- <hr class="hr_patterns"> -->
+<!-- 	<style>
+		h6 {
+		font-family: 'Times New Roman', Times, serif; /* Гарнитура текста */ 
+		font-size: 20%%; /* Размер шрифта в процентах */ 
+		}
+	</style> -->
+	
+	<table class="table table-sm" id="mytable">
+		<thead class="thead-light">
+			<tr>
+				{% for r, i in request_column.items %}
+					{% if r == 'status' or r == 'date' or r == 'serial' or r == 'description'%}
+						<th class="disable_display" id="h_{{ r }}" style="width: {{ i.column_size }}">{{ i.html_name }}</th>
+					{% else %}
+						<th id="h_{{ r }}" style="width: {{ i.column_size }}">{{ i.html_name }}</th>
+					{% endif %}
+				{% endfor %}
+				<th id="h_edit" style="width: 2%">edit</th>
+			</tr>
+		</thead>
+		<tbody id="data">
+		</tbody>
+	</table>
+	<!-- <input id="show_more" class="btn btn-dark" type="button" value="show 1000 more"> -->
+</div>
+
+<div class="modal fade" id="edit_device" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="idPattern"></h5>
+				<div id="device_id"></div>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-4 align-self-center">IP</div><div class="col-8"><input id="ip_modal" class="form-control form-control-sm" type="text" placeholder="IP"></div>
+						<div class="col-4 align-self-center">Hostname</div><div class="col-8"><input id="hostname_modal" class="form-control form-control-sm" type="text" placeholder="Hostname"></div>
+						<div class="col-4 align-self-center">Model</div><div class="col-8 model_autocomplete"><input id="model_modal" class="form-control form-control-sm models" type="text" placeholder="Model"></div>
+						<div class="col-4 align-self-center">Описание</div><div class="col-8"><input id="description_modal" class="form-control form-control-sm" type="text" placeholder="description"></div>
+						<div class="col-1 align-self-center">Адрес</div>
+							<div class="col-3 mx-0"><button id="check_argus" type="button" class="btn btn-primary btn-sm btn-block" data-dismiss="modal">Сравнить с Аргусом</button></div>
+							<div class="col-8"><input id="addres_modal" class="form-control form-control-sm address_dadata" type="text" placeholder="addres"></div>
+
+						<div class="col-4 align-self-center">Дополнительная информация</div><div class="col-8"><input id="info_modal" class="form-control form-control-sm" type="text" placeholder="info"></div>
+						<div class="col-4 align-self-center">Дата последнего изменения</div><div class="col-8"><input id="date_modal" class="form-control form-control-sm" type="text" placeholder="date" disabled></div>
+						<div class="col-4 align-self-center">Статус</div><div class="col-8"><select id="status_modal" class="custom-select custom-select-sm">
+																							  <option>Эксплуатация</option>
+																							  <option class="table-warning">Монтаж</option>
+																							  <option class="table-secondary">Выведен</option>
+																							  <option class="table-info">Проект</option>
+																							</select></div>
+						<div class="col-4 align-self-center">Uplink</div><div class="col-8"><input id="uplink_modal" class="form-control form-control-sm" type="text" placeholder="uplink"></div>
+						<div class="col-4 align-self-center">Port</div><div class="col-8"><input id="port_modal" class="form-control form-control-sm" type="text" placeholder="port"></div>
+						<div class="col-4 align-self-center">Port_uplink</div><div class="col-8"><input id="portuplink_modal" class="form-control form-control-sm" type="text" placeholder="port"></div>
+						<div class="col-4 align-self-center">Mac</div><div class="col-8"><input id="mac_modal" class="form-control form-control-sm" type="text" placeholder="mac"></div>
+						<div class="col-4 align-self-center">S/N</div><div class="col-8"><input id="serial_modal" class="form-control form-control-sm" type="text" placeholder="S/N"></div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer justify-content-between">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+				<button id="clear_forms" type="button" class="btn btn-warning" data-dismiss="modal">Clear</button>
+				{% if request.user.groups.all.0.name == 'admins' or request.user.groups.all.0.name == 'engineers' or equest.user.groups.all.1.name == 'admins' or request.user.groups.all.1.name == 'engineers' %}
+				<button id="save_data_device" type="button" class="btn btn-danger deletePattrnYes" data-dismiss="modal">Save</button>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+<br>
+
+
+
+<script src="{% static 'devicelist/scripts/devicelist.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,51 @@
+configure terminal
+
+management ip {{ ip }} {{ mask }}
+management gateway {{ gw }}
+management vlan {{ vlan_mng }}
+
+port-channel load-balance mac
+
+interface port-channel 1
+ mode lacp
+ flow-control off
+ pvid 1
+ frame-types all
+ ingress-filtering
+ no spanning-tree enable
+  spanning-tree priority 128
+  spanning-tree pathcost 0
+  spanning-tree auto-edge
+  spanning-tree admin-p2p auto
+exit
+
+vlan {{ vlan_mng }}
+  name MNG
+  tagged front-port 1/0
+  tagged front-port 1/1
+  tagged front-port 1/2
+  tagged port-channel 1
+exit
+
+interface front-port 1/2
+  speed 10G 
+  channel-group 1 force
+  lldp optional-tlv sys-name
+exit
+interface front-port 2/2
+  speed 10G 
+  channel-group 1 force
+  lldp optional-tlv sys-name
+exit
+
+exit
+
+commit
+
+confirm
+
+
+copy tftp://10.228.63.237/FTP/FTTh/firmware.3.26.2.49.ma4k fs://firmware
+# новое ПО. если загрузиться на новом ПО, то после перезагрузки необходимо прописать команду: 
+copy tftp://10.228.63.237/FTP/license_ma4000.lic fs://license   # для того что бы работали стороннии ONT
+

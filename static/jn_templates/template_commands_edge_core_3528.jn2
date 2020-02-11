@@ -1,0 +1,110 @@
+configure
+
+snmp-server
+snmp-server community inity2016 ro
+
+snmp-server enable traps
+snmp-server host 10.184.88.169 public version 2c
+
+username admin access-level 15
+username admin password 7 406224c30ac5300532f96af50190f0d8
+authentication login tacacs local
+authentication enable tacacs local
+	tacacs-server 1 host 10.184.121.4
+tacacs-server key wpS29slv
+no aaa accounting update
+line VTY
+ authorization exec default
+ accounting exec default
+ accounting commands 0 default
+ accounting commands 1 default
+ accounting commands 8 default
+ accounting commands 15 default
+exit
+
+prompt {{ hostname }}
+hostname {{ hostname }}
+
+protocol-vlan protocol-group 1 add protocol-type 8863 frame-type ethernet
+protocol-vlan protocol-group 2 add protocol-type 8864 frame-type ethernet
+
+protocol-vlan protocol-group 1 add frame-type ethernet protocol-type pppoe
+
+vlan database
+vlan {{ ims['vlan'] }}  name {{ ims['name'] }} media ethernet state active
+vlan {{ pppoe['vlan'] }} name {{ pppoe['name'] }} media ethernet state active
+vlan {{ iptv['vlan'] }} name {{ iptv['name'] }} media ethernet state active
+vlan {{ tr069['vlan'] }} name {{ tr069['name'] }} media ethernet state active
+
+exit
+
+interface ethernet 1/{{ port_uplink }}
+  description {{ uplink_and_port }}
+  switchport allowed vlan add {{ ims['vlan'] }} tagged
+  switchport allowed vlan add {{ pppoe['vlan'] }} tagged
+  switchport allowed vlan add {{ iptv['vlan'] }} tagged
+  switchport allowed vlan add {{ tr069['vlan'] }} tagged
+exit
+
+ip dhcp snooping
+ip dhcp snooping vlan {{ ims['vlan'] }}
+ip dhcp snooping information option
+ip dhcp snooping information option encode no-subtype
+ip dhcp snooping information policy keep
+ip dhcp snooping information option tr101 board-id 0
+ 
+interface vlan {{ iptv['vlan'] }}
+ip igmp snooping immediate-leave
+exit
+
+map ip dscp
+queue mode strict
+jumbo frame
+no spanning-tree 
+lldp
+
+ip igmp snooping vlan {{ iptv['vlan'] }} mrouter ethernet {{ port_uplink }}
+
+sntp client 
+sntp server {{ gw }}
+clock timezone UTC hour 5 minute 0 after-utc
+
+logging history flash 4
+logging trap 6
+logging host 10.228.60.12
+logging trap
+
+pppoe intermediate-agent
+pppoe intermediate-agent format-type access-node-identifier {{ hostname }}
+
+
+pvlan session 1 uplink ethernet 1/{{ port_uplink }} downlink ethernet 1/{{ port_downlink }}
+pvlan
+
+interface ethernet 1/{{ port_uplink }}
+ip dhcp snooping trust
+
+lldp basic-tlv management-ip-address
+lldp basic-tlv  port-description  
+lldp basic-tlv system-capabilities
+lldp basic-tlv system-description
+lldp basic-tlv system-name
+pppoe intermediate-agent port-enable
+pppoe intermediate-agent trust 
+
+exit
+
+interface ethernet 1/{{ port_downlink }}
+auto-traffic-control broadcast
+auto-traffic-control broadcast action shutdown
+auto-traffic-control multicast
+auto-traffic-control multicast action shutdown
+lldp admin-status tx-rx
+ip dhcp snooping information option circuit-id tr101 node-identifier sysname
+ip igmp query-drop vlan {{ iptv['vlan'] }}
+pppoe intermediate-agent port-enable 
+switchport allowed vlan remove 1
+exit
+exit
+
+copy running-config  startup-config

@@ -1,0 +1,1051 @@
+
+scroll 512
+undo smart
+undo interactive
+enable
+
+config
+///  профили скорости на трафик. аналог rate limit,   policy-map  думаю не нужно их использовать в ОЛТ
+//priority 1 это соотносится с внутренними буферами ОЛТ 0-7 очередей в железе и относится к юникаст трафику
+
+traffic table ip index 7 name "IPTV" cir 65536 cbs 2099152 pir 131072 pbs  4196304 priority 1 priority-policy local-setting
+ 
+traffic table ip index 8 name "VPN" cir off priority 3 priority-policy local-setting
+
+traffic table ip index 9 name "SIP" cir 512 cbs 18384 pir 1024 pbs 34768 priority 5 priority-policy local-setting 
+
+traffic table ip index 10 name "Internet" cir off priority 0 priority-policy tag-in-package
+
+
+
+
+//  link-aggregation 0/9 0 egress-ingress workmode lacp-static 
+// link-aggregation add-member 0/9/0 0/10 0
+//link-aggregation lacp-key 0/9/0 1
+[lacp-config]
+  <lacp-config>
+
+link-aggregation 0/9 0 egress-ingress workmode lacp-static 
+link-aggregation add-member 0/9/0 0/10 0
+
+
+
+// аналог грантов в Эрикссоне, в элтексе аналог профиля dba 
+
+//типы скоростных профилей взяты из рекомендаций в доках
+dba-profile add profile-id 10 profile-name "OMCI" type2 assure 1024
+
+dba-profile add profile-id 11 profile-name "Internet" type4 max 1024000
+
+dba-profile add profile-id 12 profile-name "IPTV" type3 assure 6144 max 65536
+
+dba-profile add profile-id 13 profile-name "SIP" type1 fix 1024
+
+dba-profile add profile-id 14 profile-name "TR069" type2 assure 1024
+
+gpon dba bandwidth-assignment-mode max-bandwidth-usage
+
+// for interoperability
+xpon ont-interoperability-mode gpon vendor "CIGG" eci multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag
+xpon ont-interoperability-mode gpon vendor "RONT" eric v2 multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag
+xpon ont-interoperability-mode gpon vendor "ERSN" eric v1 multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag         
+xpon ont-interoperability-mode gpon vendor "ERSN" equipment hex "4154524F4E2D5246543632302D33385820202020" eric v2 multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag                        
+xpon ont-interoperability-mode gpon vendor "ERSN" equipment hex "5053472D35393020202020202020202020202020" eric v2 multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag                        
+xpon ont-interoperability-mode gpon vendor "ERSN" equipment hex "5256363639392020202020202020202020202020" itu-t multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag                        
+xpon ont-interoperability-mode gpon vendor "ERSN" equipment hex "5256363639392020202020202020202020202020" itu-t activemode immediate
+gpon ont home-gateway config-method omci
+
+///
+ ont-srvprofile gpon profile-id 1 profile-name "Default"
+  ont-port pots adaptive 32 eth adaptive 8 catv adaptive 8 
+  multicast-forward untag
+  multicast mode igmp-snooping 
+  port vlan eth 1 translation 20 user-vlan 20
+  port vlan eth 1 translation 40 user-vlan 40
+  port vlan eth 2 translation 20 user-vlan 20
+  port vlan eth 2 translation 40 user-vlan 40
+  port vlan eth 3 translation 20 user-vlan 20
+  port vlan eth 3 translation 40 user-vlan 40
+  port vlan eth 4 translation 20 user-vlan 20
+  port vlan eth 4 translation 40 user-vlan 40
+  commit
+  quit
+  
+  //For Chelyabinsk
+ ont-srvprofile gpon profile-id 2 profile-name "ECI"
+  ont-port pots 2 eth 4 
+  port vlan eth 1 translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+  port vlan eth 2 translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+  port vlan eth 3 translation 50 user-vlan 50
+  port vlan eth 3 translation 51 user-vlan 51
+  port vlan eth 3 translation {{iptv['vlan']}} user-vlan {{iptv['vlan']}}
+  port vlan eth 4 translation 50 user-vlan 50
+  port vlan eth 4 translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+  port vlan eth 4 translation {{iptv['vlan']}} user-vlan {{iptv['vlan']}}
+  commit
+  quit
+
+ont-srvprofile gpon profile-id 3 profile-name "Default_TR069"
+  ont-port pots adaptive eth adaptive catv adaptive 
+  multicast-forward tag translation 40 
+  multicast mode igmp-snooping 
+  port vlan iphost translation 20 user-vlan 20
+  port vlan iphost translation 30 user-vlan 30
+  port vlan iphost translation 40 user-vlan 40
+  port vlan iphost translation 50 user-vlan 50
+  port vlan iphost translation 51 user-vlan 51
+  port vlan iphost translation 52 user-vlan 52
+  port vlan iphost translation 53 user-vlan 53
+  port vlan iphost translation 69 user-vlan 69
+  commit
+quit
+
+
+// на элтексе аналог   template "template-01"
+
+ ont-lineprofile gpon profile-id 0 profile-name "line-profile_default_0"
+  tcont 0 dba-profile-id 2
+  tcont 1 dba-profile-id 0
+  commit
+  quit
+ ont-lineprofile gpon profile-id 1 profile-name "Default_TR069"
+  qos-mode gem-car
+  tcont 0 dba-profile-id 10
+  tcont 1 dba-profile-id 11
+  tcont 2 dba-profile-id 12
+  tcont 3 dba-profile-id 13
+  gem add 0 eth tcont 1
+  gem add 1 eth tcont 2
+  gem add 2 eth tcont 3
+  gem add 3 eth tcont 1
+  gem add 5 eth tcont 1
+  gem add 6 eth tcont 1
+  gem mapping 0 0 vlan 20
+  gem mapping 1 0 vlan 40
+  gem mapping 2 0 vlan 30
+  gem mapping 3 0 vlan 50
+  gem mapping 5 0 vlan 51
+  gem mapping 6 0 vlan 52
+  commit
+  quit
+  
+ont-lineprofile gpon profile-id 2 profile-name "ECI"
+  mapping-mode port-vlan
+  tcont 0 dba-profile-id 10
+  tcont 1 dba-profile-id 11
+  tcont 2 dba-profile-id 12
+  tcont 3 dba-profile-id 13
+  port-bundle eth 0 port 1,2
+  port-bundle eth 1 port 3,4
+  gem add 0 eth tcont 1
+  gem add 1 eth tcont 2
+  gem add 2 eth tcont 3
+  gem add 3 eth tcont 1
+  gem mapping 0 0 eth-bundle 0 vlan {{pppoe['vlan']}}
+  gem mapping 1 0 eth-bundle 1 vlan {{iptv['vlan']}}
+  gem mapping 2 0 ippath 0 vlan {{ims['vlan']}}
+  gem mapping 3 0 eth-bundle 1 vlan 50
+  gem mapping 3 1 eth-bundle 1 vlan {{pppoe['vlan']}}
+  gem mapping 3 2 eth-bundle 1 vlan 51
+  multicast gemport tcont 2 port-bundle 1
+  commit
+  quit
+  
+  
+ont-lineprofile gpon profile-id 3 profile-name "Default_TR069"
+  tr069-management enable
+  tcont 0 dba-profile-id 10
+  tcont 1 dba-profile-id 11
+  tcont 2 dba-profile-id 12
+  tcont 3 dba-profile-id 13
+  tcont 4 dba-profile-id 14
+  gem add 0 eth tcont 1
+  gem add 1 eth tcont 2
+  gem add 2 eth tcont 3
+  gem add 3 eth tcont 1
+  gem add 4 eth tcont 4
+  gem add 5 eth tcont 1
+  gem add 6 eth tcont 1
+  gem add 7 eth tcont 1
+  gem mapping 0 0 vlan 20   // dba 11   inet
+  gem mapping 1 0 vlan 40   // dba 12  IPTV
+  gem mapping 2 0 vlan 30   // dba 13  sip
+  gem mapping 3 0 vlan 50   // dba 11  inet for vpn
+  gem mapping 5 0 vlan 51   // dba 11  inet for vpn
+  gem mapping 6 0 vlan 52   // dba 11  inet for vpn
+  gem mapping 7 0 vlan 53   // dba 11  inet for vpn
+  gem mapping 4 0 vlan 69    //dba 14  tr069
+  commit
+  quit
+  
+
+// "RON:TR+L3_HSI_1+IPTV_2,3,4+VOIP / ID 100"
+
+ont-srvprofile gpon profile-id 100 profile-name "RON:TR+L3_HSI_1+IPTV_2,3,4+VOIP"
+ont-port pots 2 eth 4
+port vlan iphost translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+port vlan iphost translation {{tr069['vlan']}} user-vlan {{tr069['vlan']}}
+commit
+quit
+
+ont-lineprofile gpon profile-id 100 profile-name "RON:TR+L3_HSI_1+IPTV_2,3,4+VOIP"
+  mapping-mode port-vlan
+  tcont 1 dba-profile-id 11
+  tcont 2 dba-profile-id 12
+  tcont 3 dba-profile-id 13
+  port-bundle eth 1 port 2,3,4
+  gem add 0 eth tcont 1
+  gem add 1 eth tcont 2
+  gem add 2 eth tcont 3
+  gem mapping 0 0 iphost
+  gem mapping 1 1 eth-bundle 1
+  gem mapping 2 2 ippath 0
+  multicast gemport tcont 2 port-bundle 1
+  commit
+  quit
+
+"RON:L2_HSI_1+IPTV_2,3,4+VOIP / ID 101"
+
+ont-srvprofile gpon profile-id 101 profile-name "RON:TR+L2_HSI_1+IPTV_2,3,4+VOIP"
+ont-port pots 2 eth 4
+port vlan iphost translation {{tr069['vlan']}} user-vlan {{tr069['vlan']}}
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 101 profile-name "RON:TR+L2_HSI_1+IPTV_2,3,4+VOIP"
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 2,3,4
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 0 0 eth 1
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 iphost
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+"RON:TR+IPTV_1,2,3,4+VOIP / ID 102"
+
+ont-srvprofile gpon profile-id 102 profile-name "RON:TR+IPTV_1,2,3,4+VOIP"
+ont-port pots 2 eth 4
+port vlan iphost translation {{tr069['vlan']}} user-vlan {{tr069['vlan']}}
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 102 profile-name "RON:TR+IPTV_1,2,3,4+VOIP"
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+port-bundle eth 1 port 1,2,3,4
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem mapping 0 0 iphost
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+  
+  
+"RON:TR+L3_HSI_1+IPTV_2,3+VOIP+VPN_4 / ID 103"
+
+ont-srvprofile gpon profile-id 103 profile-name "RON:TR+0MMV+VOIP"
+ont-port pots 2 eth 4
+port vlan iphost translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+port vlan iphost translation {{tr069['vlan']}} user-vlan {{tr069['vlan']}}
+commit
+quit
+
+ont-lineprofile gpon profile-id 103 profile-name "RON:TR+0MMV+VOIP"
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 2,3
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 0 0 iphost
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 4
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+"RON:TR+VPN_1,2,3,4 / ID 104"
+
+ont-srvprofile gpon profile-id 104 profile-name "RON:TR+VPN_1,2,3,4"
+ont-port pots 2 eth 4
+port vlan iphost translation {{tr069['vlan']}} user-vlan {{tr069['vlan']}}
+commit
+quit
+
+ont-lineprofile gpon profile-id 104 profile-name "RON:TR+VPN_1,2,3,4"
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 4 dba-profile-id 11
+port-bundle eth 2 port 1,2,3,4
+gem add 0 eth tcont 1
+gem add 3 eth tcont 4
+gem mapping 0 0 iphost
+gem mapping 3 3 eth-bundle 2
+commit
+quit
+
+
+ont-srvprofile gpon profile-id 106 profile-name "RON:TR+L3_HSI_1,4+IPTV_2,3+VOIP"
+ont-port pots 2 eth 4
+port vlan iphost translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+port vlan iphost translation {{tr069['vlan']}} user-vlan {{tr069['vlan']}}
+commit
+quit
+  
+ont-lineprofile gpon profile-id 106 profile-name "RON:TR+L3_HSI_1,4+IPTV_2,3+VOIP"
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+port-bundle eth 1 port 2,3
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem mapping 0 0 iphost
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+"ERIC:L2_HSI_1+IPTV_2,3,4+VOIP / ID 200"
+
+ont-srvprofile gpon profile-id 200 profile-name "ERIC:common"
+ont-port pots 2 eth 4 
+port q-in-q eth 1 enable 
+port q-in-q eth 2 enable 
+port q-in-q eth 3 enable 
+port q-in-q eth 4 enable 
+commit
+quit
+
+ont-lineprofile gpon profile-id 200 profile-name "ERIC:L2_HSI_1+IPTV_2,3,4+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+port-bundle eth 1 port 2,3,4
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem mapping 0 0 eth 1
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+"ERIC:L2_HSI_1,4+IPTV_2,3+VOIP / ID 201"
+
+ont-srvprofile gpon profile-id 200 profile-name "ERIC:common"
+ont-port pots 2 eth 4 
+port q-in-q eth 1 enable 
+port q-in-q eth 2 enable 
+port q-in-q eth 3 enable 
+port q-in-q eth 4 enable 
+commit
+quit
+
+ont-lineprofile gpon profile-id 201 profile-name "ERIC:L2_HSI_1,4+IPTV_2,3+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+port-bundle eth 0 port 1,4
+port-bundle eth 1 port 2,3
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem mapping 0 0 eth-bundle 0
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+"ERIC:L2_HSI_1+IPTV_2,3+VOIP+VPN_4 / ID 202"
+
+ont-srvprofile gpon profile-id 200 profile-name "ERIC:common"
+ont-port pots 2 eth 4 
+port q-in-q eth 1 enable 
+port q-in-q eth 2 enable 
+port q-in-q eth 3 enable 
+port q-in-q eth 4 enable 
+commit
+quit
+
+ont-lineprofile gpon profile-id 202 profile-name "ERIC:IMMV+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 3 dba-profile-id 11
+port-bundle eth 1 port 2,3
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 3
+gem mapping 0 0 eth 1
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 4
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+"ERIC:TR+L3_HSI_1+IPTV_2,3,4+VOIP / ID 203"
+
+ont-srvprofile gpon profile-id 200 profile-name "ERIC:common"
+ont-port pots 2 eth 4 
+port q-in-q eth 1 enable 
+port q-in-q eth 2 enable 
+port q-in-q eth 3 enable 
+port q-in-q eth 4 enable 
+commit
+quit
+
+ont-lineprofile gpon profile-id 203 profile-name "ERIC:TR+0MMM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+port-bundle eth 1 port 2,3,4
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem mapping 0 0 iphost vlan {{pppoe['vlan']}}
+gem mapping 0 1 iphost vlan {{tr069['vlan']}}
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit   
+
+
+"ERIC:VOIP+VPN_1,2,3,4 / ID 204"
+
+ont-srvprofile gpon profile-id 200 profile-name "ERIC:common"
+ont-port pots 2 eth 4 
+port q-in-q eth 1 enable 
+port q-in-q eth 2 enable 
+port q-in-q eth 3 enable 
+port q-in-q eth 4 enable 
+commit
+quit
+
+ont-lineprofile gpon profile-id 204 profile-name "ERIC:VOIP+VPN_1,2,3,4"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 1 dba-profile-id 13
+tcont 2 dba-profile-id 11
+port-bundle eth 2 port 1,2,3,4
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem mapping 0 0 ippath 0
+gem mapping 1 1 eth-bundle 2
+commit
+quit
+
+"ERIC:TR+L3_HSI_1+IPTV_2,3+VOIP+VPN_4 / ID 205"
+
+ont-srvprofile gpon profile-id 200 profile-name "ERIC:common"
+ont-port pots 2 eth 4 
+port q-in-q eth 1 enable 
+port q-in-q eth 2 enable 
+port q-in-q eth 3 enable 
+port q-in-q eth 4 enable 
+commit
+quit
+
+ont-lineprofile gpon profile-id 205 profile-name "ERIC:TR+0MMV+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 2,3
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 0 0 iphost vlan {{pppoe['vlan']}}
+gem mapping 0 1 iphost vlan {{tr069['vlan']}}
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 4
+multicast gemport tcont 2 port-bundle 1
+commit
+quit   
+
+
+//"ERIC:TR+L3_HSI_1,3,4+IPTV_2+VOIP / ID 208"
+ont-lineprofile gpon profile-id 208 profile-name "ERIC:TR+0MOO+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 0 port 1,3,4
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 0 0 iphost vlan {{pppoe['vlan']}}
+gem mapping 0 1 iphost vlan {{tr069['vlan']}}
+gem mapping 1 1 eth 2 vlan {{iptv['vlan']}}
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 eth 2
+commit
+quit   
+
+//"ERIC:TR+L3_HSI_1,4+IPTV_2,3+VOIP / ID 209"
+ont-lineprofile gpon profile-id 209 profile-name "ERIC:TR+0MMO+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 0 port 1,4
+port-bundle eth 1 port 2,3
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 0 0 iphost vlan {{pppoe['vlan']}}
+gem mapping 0 1 iphost vlan {{tr069['vlan']}}
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit   
+
+
+"ECI:L2_HSI_1,2+IPTV_3,4+VOIP/ ID 300"
+
+ont-srvprofile gpon profile-id 300 profile-name "ECI:common"
+ont-port pots 2 eth 4 
+port vlan eth 1 translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+port vlan eth 2 translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+port vlan eth 3 translation 50 user-vlan 50
+port vlan eth 3 translation 51 user-vlan 51
+port vlan eth 3 translation {{iptv['vlan']}} user-vlan {{iptv['vlan']}}
+port vlan eth 4 translation 50 user-vlan 50
+port vlan eth 4 translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+port vlan eth 4 translation {{iptv['vlan']}} user-vlan {{iptv['vlan']}}
+port vlan eth 4 translation 1154 user-vlan 1154
+commit   
+quit
+
+ont-lineprofile gpon profile-id 300 profile-name "ECI:IIMM+VOIP"
+mapping-mode port-vlan
+tcont 0 dba-profile-id 10
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 12
+port-bundle eth 0 port 1,2
+port-bundle eth 1 port 3,4
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 1
+gem mapping 0 0 eth-bundle 0 vlan {{pppoe['vlan']}}
+gem mapping 1 0 eth-bundle 1 vlan {{iptv['vlan']}}
+gem mapping 2 0 ippath 0 vlan 1955
+gem mapping 3 0 eth-bundle 1 vlan 50
+gem mapping 3 1 eth-bundle 1 vlan {{pppoe['vlan']}}
+gem mapping 3 2 eth-bundle 1 vlan 51
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+
+  
+"ECI:L2_HSI_1,2+IPTV_3+VPN_4+VOIP/ ID 301"
+ 
+ont-srvprofile gpon profile-id 300 profile-name "ECI:common"
+ont-port pots 2 eth 4 
+port vlan eth 1 translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+port vlan eth 2 translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+port vlan eth 3 translation 50 user-vlan 50
+port vlan eth 3 translation 51 user-vlan 51
+port vlan eth 3 translation {{iptv['vlan']}} user-vlan {{iptv['vlan']}}
+port vlan eth 4 translation 50 user-vlan 50
+port vlan eth 4 translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+port vlan eth 4 translation {{iptv['vlan']}} user-vlan {{iptv['vlan']}}
+port vlan eth 4 translation 1154 user-vlan 1154
+commit   
+quit
+
+  
+ont-lineprofile gpon profile-id 301 profile-name "ECI:L2_HSI_1,2+IPTV_3+VPN_4+VOIP"
+mapping-mode port-vlan
+tcont 0 dba-profile-id 10
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 0 port 1,2
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 1
+gem add 4 eth tcont 4
+gem mapping 0 0 eth-bundle 0 vlan {{pppoe['vlan']}}
+gem mapping 1 0 eth 3 vlan {{iptv['vlan']}}
+gem mapping 2 0 ippath 0 vlan 1955
+gem mapping 3 0 eth 3 vlan 50
+gem mapping 3 1 eth 3 vlan {{pppoe['vlan']}}
+gem mapping 3 2 eth 3 vlan 51
+gem mapping 4 0 eth 4 vlan 1154
+multicast gemport tcont 2 eth 3
+commit
+quit
+  
+"RV6699:L3_HSI_+IPTV+VOIP/ ID 400"
+
+ont-srvprofile gpon profile-id 400 profile-name "RV6699-no_ACS"
+ont-port pots adaptive eth adaptive catv adaptive
+multicast-forward tag translation 40
+multicast mode igmp-snooping
+port vlan iphost translation {{pppoe['vlan']}} user-vlan {{pppoe['vlan']}}
+port vlan iphost translation {{ims['vlan']}} user-vlan {{ims['vlan']}}
+port vlan iphost translation {{iptv['vlan']}} user-vlan {{iptv['vlan']}}
+port vlan iphost translation 50 user-vlan 50
+port vlan iphost translation 51 user-vlan 51
+port vlan iphost translation 52 user-vlan 52
+port vlan iphost translation 53 user-vlan 53
+port vlan iphost translation {{tr069['vlan']}} user-vlan {{tr069['vlan']}}
+commit
+quit
+
+ont-lineprofile gpon profile-id 400 profile-name " RV6699-no_ASC"
+tr069-management enable
+tcont 0 dba-profile-id 10
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 14
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 1
+gem add 4 eth tcont 4
+gem add 5 eth tcont 1
+gem add 6 eth tcont 1
+gem add 7 eth tcont 1
+gem mapping 0 0 vlan {{pppoe['vlan']}} // dba 11   inet
+gem mapping 1 0 vlan {{iptv['vlan']}} // dba 12  IPTV
+gem mapping 2 0 vlan {{ims['vlan']}} // dba 13  sip
+gem mapping 3 0 vlan 50   // dba 11  inet for vpn
+gem mapping 5 0 vlan 51   // dba 11  inet for vpn
+gem mapping 6 0 vlan 52   // dba 11  inet for vpn
+gem mapping 7 0 vlan 53   // dba 11  inet for vpn
+gem mapping 4 0 vlan {{tr069['vlan']}} //dba 14  tr069
+commit
+quit
+
+
+
+sysname {{ hostname }}
+
+
+
+terminal user name 
+test123
+test12345
+test12345
+root
+1
+5
+test
+n
+
+
+
+terminal session max-number 15
+sysman service telnet enable
+idle-timeout  15
+telnet server dscp 3
+system lock condition 10
+system lock interval 3
+system lock type user 
+
+monitor uplink-port traffic disable
+monitor uplink-port pppoe disable
+monitor uplink-port non-unicast disable
+monitor multicast traffic disable
+monitor uplink-port igmp disable
+monitor multicast traffic vlan {{iptv['vlan']}} disable
+
+undo monitor uplink-port igmp port 0/9/0
+undo monitor uplink-port igmp port 0/9/1
+undo monitor uplink-port igmp port 0/9/2
+undo monitor uplink-port igmp port 0/9/3
+undo monitor uplink-port traffic port 0/9/0
+undo monitor uplink-port traffic port 0/9/1
+undo monitor uplink-port traffic port 0/9/2
+undo monitor uplink-port traffic port 0/9/3
+undo monitor uplink-port non-unicast port 0/9/0
+undo monitor uplink-port non-unicast port 0/9/1
+undo monitor uplink-port non-unicast port 0/9/2
+undo monitor uplink-port non-unicast port 0/9/3
+undo monitor uplink-port pppoe port 0/9/0
+undo monitor uplink-port pppoe port 0/9/1
+undo monitor uplink-port pppoe port 0/9/2
+undo monitor uplink-port pppoe port 0/9/3
+
+
+
+
+  <platform-config>
+autosave time on
+autosave time 04:00:00              
+autosave type all
+
+//не понятно стоит ли менять этот таймаут по умолчанию 300
+ont autofind timeout 120  
+
+
+sysman source trap vlanif {{ mgmvlan }}
+ 
+vlan-config
+
+vlan {{pppoe['vlan']}} smart
+vlan desc {{pppoe['vlan']}} description {{pppoe['name']}}
+
+vlan {{iptv['vlan']}} smart 
+vlan desc  {{iptv['vlan']}} description IPTV
+
+vlan {{ims['vlan']}} smart
+vlan desc {{ims['vlan']}} description {{ims['name']}}
+
+vlan {{tr069['vlan']}} smart
+vlan desc {{tr069['vlan']}} description {{tr069['name']}}
+
+
+port vlan {{pppoe['vlan']}} 0/9 0
+
+port vlan {{iptv['vlan']}} 0/9 0
+
+port vlan {{ims['vlan']}} 0/9 0
+
+port vlan {{tr069['vlan']}} 0/9 0
+
+display port vlan 0/9/0
+
+port vlan {{pppoe['vlan']}} 0/10 0
+
+port vlan {{iptv['vlan']}} 0/10 0
+
+port vlan {{ims['vlan']}} 0/10 0
+
+port vlan {{tr069['vlan']}} 0/10 0
+
+display port vlan 0/10/0
+
+vlan packet-policy {{pppoe['vlan']}} multicast discard
+vlan packet-policy {{iptv['vlan']}} multicast discard
+vlan packet-policy {{iptv['vlan']}} unicast discard
+vlan packet-policy {{ims['vlan']}} multicast discard
+vlan packet-policy {{tr069['vlan']}} multicast discard
+
+
+
+Профиль для влана с опцией 82
+
+dhcp option82 enable
+
+vlan service-profile profile-id 1 profile-name "dhcp"
+  pitp disable
+  dhcp mode layer-2
+  commit
+  quit
+vlan service-profile profile-id 2 profile-name "pppoe"
+  dhcp option82 disable
+  commit
+  quit
+vlan service-profile profile-id 3 profile-name "no-opt82"
+  dhcp option82 disable
+  commit
+  quit
+vlan service-profile profile-id 4 profile-name "Option82"
+  dhcp option82 enable
+commit
+quit
+
+
+vlan service-profile profile-id 5 profile-name "No_Option82"
+  vmac disable ipoe                  
+  vmac disable pppoe
+  forwarding vlan-mac
+  packet-policy broadcast forward
+  packet-policy multicast forward
+  packet-policy unicast forward
+  bpdu tunnel disable
+  rip tunnel disable
+  vtp-cdp tunnel disable
+  pppoe mac-mode multi-mac
+  dhcp option82 disable
+  security anti-macspoofing disable
+  commit
+  quit
+
+
+vlan bind service-profile {{iptv['vlan']}} profile-id 3
+vlan bind service-profile {{pppoe['vlan']}} profile-id 2
+vlan bind service-profile {{ims['vlan']}} profile-id 1
+vlan bind service-profile {{tr069['vlan']}} profile-id 1
+ 
+ 
+// ont tr069-server-profile add profile-id 1 profile-name TR069_axiros url "http://10.184.89.35:80/" user rtk rtk
+
+board confirm 0
+ 
+{%- for slot_num in [1,2,3,4,5,6,7,8,11,12,13,14,15,16,17] %}
+
+ interface gpon 0/{{slot_num}}
+ port 0 ont-auto-find enable
+ port 1 ont-auto-find enable
+ port 2 ont-auto-find enable
+ port 3 ont-auto-find enable
+ port 4 ont-auto-find enable
+ port 5 ont-auto-find enable
+ port 6 ont-auto-find enable
+ port 7 ont-auto-find enable
+ port 8 ont-auto-find enable
+ port 9 ont-auto-find enable
+ port 10 ont-auto-find enable
+ port 11 ont-auto-find enable
+ port 12 ont-auto-find enable
+ port 13 ont-auto-find enable
+ port 14 ont-auto-find enable
+ port 15 ont-auto-find enable
+ quit
+ 
+{%- endfor %}
+
+
+
+ raio-format pitp-pmode cid xpon "anid:"ONT"-slot-port-ontid"
+ raio-format dhcp-option82 cid xpon "anid:"ONT"-slot-port-ontid"
+ raio-format dhcp-option82 rid eth "splabel"
+ raio-mode user-defined pitp-pmode
+ raio-mode user-defined dhcp-option82
+ raio-anid "{{ hostname }}"
+ pitp enable pmode
+ 
+ 
+ntp-service source-interface vlanif{{ mgmvlan }}
+ntp-service unicast-server {{ default_gateway }}
+timezone GMT+ 05:00
+
+ntp-service unicast-server {{ default_gateway }} source-interface vlanif{{ mgmvlan }}
+
+
+
+[security-config]
+  <security-config>
+ security anti-macduplicate enable
+
+btv
+
+multicast-vlan {{iptv['vlan']}}
+  igmp priority 4
+  // igmp ipv6 mode   // check mld
+  igmp match group ip 224.0.2.0 to-ip 239.255.255.0
+  igmp uplink-port 0/9/0
+  igmp match mode disable
+  igmp mode proxy
+  igmp version v2
+
+  quit
+
+-------------------------------------------
+[vomci-voip-config]
+  <vomci-voip-config>
+ont-sipagent-profile modify profile-id 1 proxy-server {{ ims['server'] }} outbound-server {{ ims['server'] }} auth-realm {{ ims['domain'] }} home-domain {{ ims['domain'] }} media port 40000 65535 signal signal-port 5060 signal-dscp 40
+ont-sipagent-profile modify profile-id 1 registration server-uri {{ ims['server'] }} expiration 3600 rereg-head-start-time 90
+ont-digitmap-profile modify profile-id 1 critical-dial-time 5 partial-dial-time 10 roh-time 10
+ont-digitmap-profile token add profile-id 1 dial-plan-id 2 dial-plan-token *xx*x.#
+ont-digitmap-profile token add profile-id 1 dial-plan-id 3 dial-plan-token *#xx#
+ont-digitmap-profile token add profile-id 1 dial-plan-id 4 dial-plan-token #xx#
+ont-digitmap-profile token add profile-id 1 dial-plan-id 5 dial-plan-token *xx*x.#
+ont-digitmap-profile token add profile-id 1 dial-plan-id 6 dial-plan-token *xx#
+ont-digitmap-profile token add profile-id 1 dial-plan-id 7 dial-plan-token *xxx*x.#
+ont-digitmap-profile token add profile-id 1 dial-plan-id 8 dial-plan-token x.T
+ont-digitmap-profile token add profile-id 1 dial-plan-id 9 dial-plan-token #xx*x.#
+ont-digitmap-profile token add profile-id 1 dial-plan-id 10 dial-plan-token *xx#
+ont-digitmap-profile token add profile-id 1 dial-plan-id 11 dial-plan-token *#xx*xxxx*x#
+ont-digitmap-profile token add profile-id 1 dial-plan-id 12 dial-plan-token *xx*xxxx*x.T
+ont-digitmap-profile token add profile-id 1 dial-plan-id 13 dial-plan-token #xx*xxxx#
+ont-mg-attribute-profile modify profile-id 1 codec-selection order3 0 20ms off order4 0 20ms off
+ont-mg-attribute-profile modify profile-id 1 jitter-buffer max 150 min 5
+ont-mg-attribute-profile modify profile-id 1 pstn-protocol-variant 7
+
+ont-sipagent-profile add profile-id 10 profile-name Erics_ONT
+ont-sipagent-profile modify profile-id 10 proxy-server {{ ims['server'] }} home-domain {{ ims['domain'] }} media port 40000 65535 signal signal-port 5060 registration expiration 3600 rereg-head-start-time 600
+ont-sipagent-profile add profile-id 15 profile-name RONT
+ont-sipagent-profile modify profile-id 15 proxy-server {{ ims['domain'] }} signal signal-port 5060 registration expiration 3600 rereg-head-start-time 600
+
+lldp enable
+lldp enable port 0/9/0
+lldp enable port 0/9/1
+lldp enable port 0/10/0
+lldp enable port 0/10/1
+lldp management-address {{ ipaddmgm }}
+
+
+syslog enable alarm-event
+loghost add 10.184.88.169 Central_EKB
+loghost activate ip 10.184.88.169
+syslog priority log facility local0
+syslog priority alarm-event facility local0
+undo syslog output all
+syslog version rfc5424 
+
+hwtacacs-server template "hw"
+hwtacacs-server authentication 10.184.121.4
+hwtacacs-server authentication 10.178.199.4 secondary
+hwtacacs-server authorization 10.184.121.4
+hwtacacs-server authorization 10.178.199.4 secondary
+hwtacacs-server accounting 10.184.121.4
+hwtacacs-server accounting 10.178.199.4 secondary
+hwtacacs-server shared-key wpS29slv
+hwtacacs-server source-interface Vlanif{{ mgmvlan }}
+//hwtacacs-server source interface meth0  // for Yamal 
+undo hwtacacs-server user-name domain-included
+quit
+
+hwtacacs-server accounting-stop-packet resend disable
+
+aaa
+authentication-scheme "default"
+authentication-mode hwtacacs local 
+quit
+
+authorization-scheme "default"
+authorization-mode  hwtacacs  local 
+quit
+
+accounting-scheme "default"
+accounting-mode hwtacacs  
+quit
+
+domain "default"
+hwtacacs-server "hw"
+
+quit
+quit
+
+terminal user authentication-mode AAA default
+
+
+snmp-agent trap enable standard
+undo system snmp-user password security
+snmp-agent sys-info version v2c
+//snmp-agent sys-info contact rcuss-chel@ural.rt.ru
+//snmp-agent sys-info location "g. Miass, ul. Romanenko, d.44"
+
+
+snmp-agent community read inity2016
+snmp-agent target-host trap-hostname hpsa1 address 10.184.86.27 udp-port 162 trap-paramsname Default
+snmp-agent target-host trap-paramsname Default v2C securityname HTRAP
+
+snmp-agent community write U2000
+
+snmp-agent target-host trap-hostname U2000 address 10.228.14.90 udp-port 162 trap-paramsname U2000 
+snmp-agent target-host trap-paramsname U2000 v2c securityname U2000_TRAP 
+
+
+
+queue-scheduler wrr 36 20 2 10 2 20 5 5 
+queue-buffer 45 10 5 10 5 10 10 5
+
+acl 4000                             
+description "QoS"
+rule 0 permit
+rule 20 permit source {{pppoe['vlan']}}
+rule 30 permit source {{iptv['vlan']}}
+rule 40 permit source {{ims['vlan']}}
+rule 50 permit source {{tr069['vlan']}}
+quit
+
+traffic-priority inbound link-group 4000 rule 0 acl-index 1 cos excellent-effort port 0/9/0
+traffic-priority inbound link-group 4000 rule 20 acl-index 2 cos best-effort port 0/9/0
+traffic-priority inbound link-group 4000 rule 30 acl-index 3 cos video port 0/9/0
+traffic-priority inbound link-group 4000 rule 40 acl-index 4 cos voice port 0/9/0
+traffic-priority inbound link-group 4000 rule 50 acl-index 5 cos network-management port 0/9/0
+
+
+
+
+ 
+//включение igmp на абонента - кроссконнект
+
+// igmp user add service-port 1061 no-auth max-program 8
+// igmp user add service-port 2137 no-auth max-program 8
+// igmp user add service-port 1189 no-auth max-program 8
+
+  
+//  igmp multicast-vlan member service-port-list 1,5,13
+  
+  
+
+bbs-config
+
+// Сервисные порты, аналог кроссконнектов  на Эрикссоне и аналог скроссконнект профилей Элтекса
+
+// service-port 1988 vlan 3284 gpon 0/1/7 ont 50 gemport 1 multi-service user-vlan 10 user-encap pppoe tag-transform translate inbound traffic-table index 10 outbound traffic-table index 10
+
+// service-port 1989 vlan 3304 gpon 0/1/7 ont 50 gemport 2 multi-service user-vlan 20 tag-transform translate inbound traffic-table index 7 outbound traffic-table index 7
+
+// service-port 1990 vlan 3324 gpon 0/1/7 ont 50 gemport 3 multi-service user-vlan 30 tag-transform translate inbound traffic-table index 9 outbound traffic-table index 9
+
+// service-port 1991 vlan 3364 gpon 0/1/7 ont 50 gemport 69 multi-service user-vlan 69 tag-transform translate inbound traffic-table index 69 outbound traffic-table index 69
+
+// service-port 1992 vlan 3284 gpon 0/1/7 ont 51 gemport 0 multi-service user-vlan 10 user-encap pppoe tag-transform translate inbound traffic-table index 10 outbound traffic-table index 10
+
+// service-port 1993 vlan 3304 gpon 0/1/7 ont 51 gemport 1 multi-service user-vlan 20 tag-transform translate inbound traffic-table index 7 outbound traffic-table index 7
+
+// service-port 1994 vlan 3324 gpon 0/1/7 ont 51 gemport 2 multi-service user-vlan 30 tag-transform translate inbound traffic-table index 9 outbound traffic-table index 9
+ 
+ 
+ 
+// ont tr069-server-profile add profile-id 3 profile-name "tr069-server-profile_3" url "http://10.184.89.35:80/" user "rtk" "%E_HAP#GG.K'E(EFA'<WPK1!!B#A8&)VAB']]F;U$19'2_1!!%"
+
+
+
+
+
+

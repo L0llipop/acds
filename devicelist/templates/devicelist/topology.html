@@ -1,0 +1,46 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div id="topology" class="row col-xl-6 col-lg-8 col-12">
+        <div id="forma" class="row col-12 align-items-center my-2">
+            <div class="col-4"><input class="form-control" type="search" id="ip_address" placeholder="10.228.130.130" required></div>
+            <div class="col-2"><input class="btn btn-dark" id="topology_submit" type="submit" value="FIND" disabled></div>
+            <div class="col-1"><input class="form-check-input" type="checkbox" id="online" value="option1">Online</div>
+            <div class="col-3" id="error"></div>
+        </div>
+        <div class="row col-12" id="result">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">IP</th>
+                        <th scope="col">Hostname</th>
+                        <th scope="col">model</th>
+                        <th scope="col">VRF</th>
+                        <th scope="col">mac</th>
+                        <th scope="col">vlan</th>
+                        <th scope="col">tunnel_vlan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="ipaddress" scope="row"></td>
+                        <td id="hostname" scope="row"></td>
+                        <td id="model" scope="row"></td>
+                        <td id="vrf" scope="row"></td>
+                        <td id="mac" scope="row"></td>
+                        <td id="vlan" scope="row"></td>
+                        <td id="tunnel_vlan" scope="row"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'devicelist/scripts/topology.js' %}"></script>
+
+{% endblock %}

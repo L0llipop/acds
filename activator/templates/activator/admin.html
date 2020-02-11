@@ -1,0 +1,113 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+<table class="table table-bordered table-sm" id="tickets_table" cellpadding="0" cellspacing="0">
+	<thead>
+		<tr>
+			<th class="text-center" scope="col">#</th>
+			<!-- <th class="text-center" scope="col">sd</th> -->
+			<th class="text-center" scope="col">hostname</th>
+			<th class="text-center" scope="col">ip</th>
+			<th class="text-center" scope="col">model</th>
+			<th class="text-center" scope="col">address</th>
+			<th class="text-center" scope="col">uplink</th>
+			<th class="text-center" scope="col">network</th>
+			<th class="text-center" scope="col">HSI;IPTV;IMS;TR</th>
+			<th class="text-center" scope="col">status</th>
+			<th class="text-center" scope="col">create</th>
+			<!-- <th class="text-center" scope="col">report</th> -->
+			{% if request.user.groups.all.0.name == 'admins' %}
+				<th class="text-center" scope="col">freeip</th>
+				<th class="text-center" scope="col">config</th>
+			{% elif request.user.groups.all.0.name == 'argus' or request.user.groups.all.1.name == 'argus' %}
+				<th class="text-center" scope="col">argus</th>
+			{% elif request.user.groups.all.0.name == 'engineers' %}
+				<th class="text-center" scope="col">config</th>
+			{% endif %}
+
+		</tr>
+	</thead>
+	<tbody>
+	{% for key, value in tickets.items %}
+		<tr class="table-{{ value.online }}" id="str_{{ key }}" value="{{ value.online }}">
+			<td class="text-center align-middle" style="width: 3%"><div><button type="button" style="width: 60px" class="btn btn-info modalwin" id="{{ key }}" data-toggle="modal" data-target="#myModal">{{ key }}</button></div></td>
+			<!-- <td class="text-center align-middle" style="width: 4%"  id="sd_{{ key }}"><a target="_blank" href="http://10.180.5.39/sd/claim.php?ser_id={{ value.sd }}">{{ value.sd }}</td> -->
+			<td class="text-center align-middle" style="width: 13%"  id="hostname_{{ key }}">{{ value.hostname }}</td>
+			<td class="text-center align-middle" style="width: 7%"  id="ip_{{ key }}"><a target="_blank" href="http://10.180.7.34:8080/topology/topology.pl?ip={{ value.ip }}&submit=Submit">{{ value.ip }}</td>
+			<td class="text-center align-middle" style="width: 7%"  id="model_{{ key }}" value="{{ value.model }}">{{ value.model }}</td>
+			<td class="text-center align-middle" style="width: 15%" id="address_{{ key }}">{{ value.address }}</td>
+			<td class="text-center align-middle" style="width: 6%"  id="uplink_{{ key }}">{{ value.uplink }}</td>
+			<td class="text-center align-middle" style="width: 9%"  id="network_{{ key }}">{{ value.network }}</td>
+			<td class="text-center align-middle" style="width: 7%"  id="vlans_{{ key }}">{{ value.vlans }}</td>
+			<td class="text-center align-middle" style="width: 2%"  id="status_{{ key }}"><span class="badge badge-{{ value.badge }}" title="{{ value.report }}" id="badge_{{ key }}">{{ value.status }}</span></td>
+			<td class="text-center align-middle" style="width: 7%">{{ value.create }}</td>
+			{% if request.user.groups.all.0.name == 'admins' %}
+				<td class="text-center align-middle" style="width: 4%">	<div><button type="button" style="width: 75px" class="btn btn-primary getip"  id="getip_{{ key }}"  value="{{ key }}">getip</button></div></td>
+				<td class="text-center align-middle" style="width: 4%">	<div><button type="button" style="width: 75px" class="btn btn-{{ value.btn_conf }} config" id="config_{{ key }}" value="{{ key }}">{{ value.config }}</button></div></td>
+			{% elif request.user.groups.all.0.name == 'argus' or request.user.groups.all.1.name == 'argus' %}
+				<td class="text-center align-middle" style="width: 4%">	<div><button type="button" style="width: 100px" class="btn btn-{{ value.btn_argus }} argus" id="argus_{{ key }}" value="{{ key }}">{{ value.argus }}</button></div></td>
+			{% elif request.user.groups.all.0.name == 'engineers' or request.user.groups.all.1.name == 'engineers' %}
+				<td class="text-center align-middle" style="width: 4%">	<div><button type="button" style="width: 75px" class="btn btn-{{ value.btn_conf }} config" id="config_{{ key }}" value="{{ key }}">{{ value.config }}</button></div></td>
+			{% endif %}
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ModalLabel"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        	<span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      	<div class="row">
+      		<div class="col-md-4"><p>office:</p></div>
+    		<div class="col-md-8"><p id="modal-add"></p></div>
+      	</div>
+      	<div class="row">
+      		<div class="col-md-4"><p>serial:</p></div>
+    		<div class="col-md-8"><p id="modal-ser"></p></div>
+    	</div>
+    	<div class="row">
+      		<div class="col-md-4"><p>reason:</p></div>
+    		<div class="col-md-8"><p id="modal-rea"></p></div>
+    	</div>
+    	<div class="row">
+      		<div class="col-md-4"><p>e-mail:</p></div>
+    		<div class="col-md-8"><p id="modal-mail"></p></div>
+    	</div>
+    	<div class="row">
+      		<div class="col-md-4"><p>терминация:</p></div>
+    		<div class="col-md-8"><p id="modal-term"></p></div>
+    	</div>
+    	<div class="row">
+      		<div class="col-md-4"><p>комментарий:</p></div>
+    		<!-- <div class="col-md-8"><p id="modal-comm"></p></div> -->
+    		<div class="col-md-8"><textarea style="height: 100px; padding: 2px" class="col-md-8" type="comment" class="textarea" id="comment"></textarea></div>
+    	</div>    	
+    	{% if request.user.groups.all.0.name == 'admins' %}
+    		<div id="select_templates">	
+			</div>
+		{% endif %}
+		<div class="modal-footer">
+        	<div class="col-sm-10"><input type="button" class="btn ml-auto btn-danger delete_ticket" data-dismiss="modal" value="Delete ticket"></div>
+        	<button type="button" class="btn btn-primary insert_template" data-dismiss="modal">Ok</button>
+        	<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script src="{% static 'activator/scripts/admin.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'js/tablefilter/tablefilter.js' %}"></script>  
+{% endblock %}
+

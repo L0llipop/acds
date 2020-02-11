@@ -1,0 +1,119 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-xl-5 col-7">
+			<form id="generator" class="needs-validation" method="GET" novalidate>
+				<div class="d-flex align-items-center my-2">
+					<div class="col-5">
+						<label for="ip_uplink">MODEL:</label>
+					</div>
+					<div class="col-7 px-0">
+						<!-- <input class="form-control" type="text" id="model" placeholder="MES2324"> -->
+						<select id="models" name="model" class="form-control">
+							{% for m, i in models.items %}
+								<option>{{ m }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+				<div class="d-flex align-items-center my-2">
+					<div class="col-3">
+						<label for="ip_uplink">IP/MASK:</label>
+					</div>
+					<div class="col-2 px-0"><button class="btn btn-primary btn-sm" id="get_data_device_submit" type="submit">dw data</button></div>
+					<div class="col-5 px-0">
+						<input class="form-control" type="text" id="ip" placeholder="10.228.130.6">
+					</div>
+					<div class="col-2 px-0"><input class="form-control" type="text" id="mask" placeholder="24"></div>
+				</div>					
+				<div class="d-flex align-items-center my-2">
+					<div class="col-5">
+						<label for="ip_uplink">GATEWAY:</label>
+					</div>
+					<div class="col-7 px-0">
+						<input class="form-control" type="text" id="gateway" placeholder="10.228.130.254">
+					</div>
+				</div>				
+				<div class="d-flex align-items-center my-2">
+					<div class="col-5">
+						<label for="ip_uplink">HOSTNAME:</label>
+					</div>
+					<div class="col-7 px-0">
+						<input class="form-control" type="text" id="hostname" placeholder="72-TUMEN-AGG035-O6">
+					</div>
+				</div>				
+				<div class="d-flex align-items-center my-2">
+					<div class="col-5">
+						<label for="ip_uplink">UPLINK's HOSTNAME/PORT:</label>
+					</div>
+					<div class="col-5 px-0">
+						<input class="form-control" type="text" id="uplink_hostname" placeholder="72-TUMEN-AGG035-BBAGG-1">
+					</div>
+					<div class="col-2 px-0">
+						<input class="form-control" type="text" id="uplink_port" placeholder="Gi0/5">
+					</div>
+				</div>					
+				<div class="d-flex align-items-md-end my-2">
+					<div class="col-2">
+						<label for="ip_uplink">VLANS:</label>
+					</div>
+					<div class="col-2 px-0"><input class="form-control" type="text" id="MGM" placeholder="MNG"></div>
+					<div class="col-2 px-0"><input class="form-control" type="text" id="HSI" placeholder="HSI"></div>
+					<div class="col-2 px-0"><input class="form-control" type="text" id="IPTV" placeholder="IPTV"></div>
+					<div class="col-2 px-0"><input class="form-control" type="text" id="IMS" placeholder="IMS"></div>
+					<div class="col-2 px-0"><input class="form-control" type="text" id="TR069" placeholder="TR069"></div>
+				</div>
+				<div class="d-flex align-items-center my-2">
+					<div class="col-3 offset-10"><button class="btn btn-primary" id="generator_submit" type="submit">Submit form</button></div>
+					<!-- <div class="col-2 offset-3"><input type="submit" value="Отправить данные" class="btn btn-primary"></div> -->
+				</div>				
+			</form>
+
+				<div class="form-group-lite">
+					<label for="text">Конфиг для настройки управления</label>
+					<textarea class="form-control" id="setting_mng" rows="5" placeholder="MNG"></textarea>
+				</div>
+				
+				<div class="form-group-lite">
+					<label for="text">Конфиг вышестоящего коммутатора</label>
+					<textarea class="form-control" id="setting_uplink" rows="5" placeholder="Config Uplink"></textarea>
+				</div>
+
+				<div class="form-group-lite">
+					<label for="text">Загрузка ПО</label>
+					<textarea class="form-control" id="download_software" rows="4" placeholder="Download software"></textarea>
+				</div>
+
+		</div>
+	
+		<div class="col-xl-7 col-5">
+			<div class="offset-1">
+				<div class="form-group">
+					<label for="text">Основной конфиг</label>
+					<textarea class="form-control" id="setting_all" rows="10" placeholder="Config"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- <form id="search_test"> -->
+<!--   <p id="test_p">test123123</p>
+  <input type="text" id="test_text">
+  <button type="button" class="btn btn-primary" id="test_b" onClick="test()">getip</button> -->
+<!-- </form> -->
+
+<!-- Enter your name: <input type="text" id="fname" onkeyup="myFunction()">
+<p>My name is: <span id="demo"></span></p>
+<script>
+function myFunction() {
+  var x = document.getElementById("fname").value;
+  document.getElementById("demo").innerHTML = x;}
+</script> -->
+
+<script src="{% static 'activator/scripts/generator.js' %}"></script>
+
+{% endblock %}

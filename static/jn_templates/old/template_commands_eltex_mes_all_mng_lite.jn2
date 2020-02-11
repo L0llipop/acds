@@ -1,0 +1,49 @@
+enable
+configure
+vlan database
+vlan {{ vlan_mng }} name MNG
+exit
+
+interface vlan {{ vlan_mng }}
+ip address {{ ip }} /{{ mask }}
+exit
+ip default-gateway {{ gw }}
+
+interface {{ port_uplink }}
+  switchport mode trunk
+  switchport trunk allowed vlan add {{ vlan_mng }}
+exit
+exit
+
+copy running-config startup-config
+Y
+
+
+10.224.81.251 - сервер tftp
+10.228.63.237 - сервер tftp
+Для серии mes3000
+	copy tftp://10.228.63.237/FTP/FTTb/mes3000-25482.ros image 
+	
+	copy tftp://10.221.0.3/FTP/FTTb/mes3300-4012-R183.ros image 
+	
+	copy tftp://10.224.81.251/FTP/mes3000-2546.ros image 
+
+Для серии mes2000
+	copy tftp://10.224.81.251/FTP/mes3000-2546.ros image 
+	
+MES2308P 
+boot system   tftp://10.224.62.2/FTP/FTTb/mes3300-4012-R183.ros 
+
+MES1124M
+
+
+copy tftp://10.224.81.251/FTP/FTTb/mes2000-11482.ros image
+
+copy tftp://10.228.63.237/FTP/FTTb/mes2000-11482.ros image
+
+ 
+boot system 1 image	
+or	
+boot system image-2
+
+

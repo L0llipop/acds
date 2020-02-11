@@ -1,0 +1,154 @@
+config terminal 
+ip dhcp snooping
+no spanning-tree
+
+snooping multicast-forwarding-mode ip
+snooping leave-process config-level port
+ip igmp snooping
+
+{%- if pppoe %}
+vlan {{ pppoe['vlan'] }}
+ vlan active
+ name {{ pppoe['name'] }}
+
+ pppoe-ia snooping
+! 
+{%- endif %}
+
+{%- if iptv %}
+vlan {{ iptv['vlan'] }}
+ vlan active
+ name {{ iptv['name'] }}
+ ip dhcp snooping 
+ ip igmp snooping
+ ip igmp snooping version v2
+ ip igmp snooping cos 4  
+! 
+{%- endif %}
+
+{%- if ims %}
+vlan {{ ims['vlan'] }}
+ vlan active
+ name {{ ims['name'] }}
+ ip dhcp snooping 
+! 
+{%- endif %}
+
+{%- if tr069 %}
+vlan {{ tr069['vlan'] }}
+ vlan active
+ name {{ tr069['name'] }}
+ ip dhcp snooping 
+! 
+{%- endif %}
+
+interface range {{ port_downlink }}
+ switchport protected
+ ip binding limit 5
+ storm-control broadcast level pps 100
+ storm-control multicast level pps 100  
+ no lldp transmit 
+ no lldp receive   
+ loopback-detection enable
+ ip igmp snooping leavemode fastLeave
+ ip igmp snooping ratelimit 30
+ dcs agent-circuit-identifier "%h eth %u/%s/%i:%v"
+ dcs remote-agent-identifier "%M"
+ spanning-tree disable
+ spanning-tree bpdu-receive disabled
+ spanning-tree bpdu-transmit disabled
+!
+
+interface {{ port_uplink }}
+ description ${{ uplink_and_port }}$
+ switchport mode trunk
+ port-security-state trusted 
+ no shutdown
+  set port-role uplink 
+ storm-control broadcast level pps 1000
+ storm-control multicast level pps 100000    
+ lldp tlv-select basic-tlv port-descr
+ lldp tlv-select basic-tlv sys-name
+ lldp tlv-select basic-tlv sys-descr
+ lldp tlv-select basic-tlv sys-capab
+ lldp tlv-select basic-tlv mgmt-addr ipv4 {{ ipaddmgm }}
+ lldp tlv-select dot3tlv max-framesize
+  qos trust cos-dscp
+ spanning-tree disable
+ spanning-tree bpdu-receive disabled
+ spanning-tree bpdu-transmit disabled
+!
+
+logging buffered 200
+logging severity debugging
+debug-logging flash:/mnt/
+user-defined offset 2 ethtype 0  
+
+
+set lldp version v2
+set lldp enable  
+loopback-detection enable
+loopback-detection interval 10
+
+snmp-server enable traps cpu rate-limit 1
+snmp-server enable traps cpu rate-limit 2
+snmp-server enable traps cpu rate-limit 3
+snmp-server enable traps cpu rate-limit 4
+snmp-server enable traps cpu rate-limit 5
+snmp-server enable traps cpu rate-limit 6
+snmp-server enable traps cpu rate-limit 7
+snmp-server enable traps cpu rate-limit 8
+
+sntp
+set sntp client enabled
+set sntp client time-zone +05:00
+set sntp unicast-poll-interval 4096
+set sntp unicast-server ipv4 {{ default_gateway }}
+!
+
+snmp-server enable traps snmp authentication  
+snmp user inity2016
+snmp community index 1 name encrypted ub8mdlYzKWRWKNbKCaluwg== security inity2016
+snmp group inity2016 user inity2016 security-model v2c
+snmp access inity2016 v2c read iso
+snmp view iso 1 included
+snmp targetaddr inity2016 param inity2016 10.184.88.169 taglist inity2016Tag
+snmp targetparams inity2016 user inity2016 security-model v2c message-processing v2c
+snmp notify 1 tag inity2016 type Trap
+no ip routing
+
+set switch maximum RAM threshold     95
+set switch maximum CPU threshold     95
+set ip http disable
+!
+
+errdisable recovery interval 30
+errdisable recovery cause storm-control
+errdisable recovery cause loopback-detection
+errdisable recovery cause udld
+
+pppoe-ia snooping
+pppoe-ia snooping session timeout 120  
+pppoe passthrough  
+
+tacacs-server host 10.178.199.4 timeout 3 key wpS29slv
+tacacs-server host 10.184.121.4 timeout 3 key wpS29slv
+enable authentication tacacs local
+line console
+ login authentication local
+!
+line telnet
+ login authentication tacacs local
+!
+line ssh
+ login authentication tacacs local
+!
+password validate symbols 0
+username admin password Cdbnx0AA privilege 15
+dcs information option enable
+dcs agent-circuit-id default-config enable
+dcs agent-circuit-id format-type identifier-string "" option sp delimiter slash 
+
+hostname {{ hostname }}
+end
+copy running-config startup-config 

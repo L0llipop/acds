@@ -1,0 +1,334 @@
+configure terminal
+
+no service pad
+service timestamps debug datetime localtime
+service timestamps log datetime localtime
+service password-encryption
+platform bfd allow-svi
+
+hostname {{ hostname }}
+
+logging buffered 65535
+logging rate-limit console 10
+logging console critical
+enable secret 5 $1$54J9$IygTzIh0WQYVEAaD1cM8U/
+
+aaa new-model
+
+aaa group server tacacs+ MFIST_TACACS
+ server 10.60.0.146
+ server 10.60.0.147
+
+aaa group server tacacs+ SIC_TACACS
+ server 10.184.121.4
+ server 10.178.199.4
+
+aaa authentication password-prompt Password:
+aaa authentication username-prompt login:
+aaa authentication login default group SIC_TACACS group MFIST_TACACS local enable
+aaa authentication login console local
+aaa authentication enable default enable
+aaa authentication ppp default none
+aaa authorization config-commands
+aaa authorization exec default group SIC_TACACS group MFIST_TACACS local 
+aaa authorization commands 1 default group SIC_TACACS group MFIST_TACACS none 
+aaa authorization commands 15 default group SIC_TACACS group MFIST_TACACS none 
+aaa authorization network default local 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group SIC_TACACS group MFIST_TACACS
+aaa accounting commands 0 default start-stop group tacacs+
+aaa accounting commands 1 default start-stop group SIC_TACACS group MFIST_TACACS
+aaa accounting commands 15 default start-stop group SIC_TACACS group MFIST_TACACS
+aaa accounting system default start-stop group SIC_TACACS group MFIST_TACACS
+aaa session-id common
+
+clock timezone YEKST 5 0
+
+no ip dhcp snooping information option
+no ip domain lookup
+ip domain name ural.rt.ru
+ipv6 multicast rpf use-bgp
+
+mac access-list extended PPPOE
+ permit any any 0x8863 0x0
+ permit any any 0x8864 0x0
+exit
+mac access-list extended PPPOE_INCOM
+ deny   any host ffff.ffff.ffff 0x8863 0x0
+ permit any any
+exit
+
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+no spanning-tree optimize bpdu transmission
+spanning-tree extend system-id
+
+diagnostic bootup level minimal
+
+errdisable recovery cause udld
+errdisable recovery cause bpduguard
+errdisable recovery cause security-violation
+errdisable recovery cause channel-misconfig
+errdisable recovery cause pagp-flap
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause gbic-invalid
+errdisable recovery cause psecure-violation
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause mac-limit
+errdisable recovery cause vmps
+errdisable recovery cause storm-control
+errdisable recovery cause arp-inspection
+errdisable recovery cause link-monitor-failure
+errdisable recovery cause oam-remote-failure critical-event
+errdisable recovery cause oam-remote-failure dying-gasp
+errdisable recovery cause oam-remote-failure link-fault
+errdisable recovery cause loopback
+errdisable recovery cause mlacp-minlink
+errdisable recovery interval 30
+
+username cisco privilege 15 password 7 110A1016141D
+username mgm privilege 15 secret 5 $1$Fy3F$nq/C9O3xrdlsxdjZg1Yp50
+username oerms privilege 15 secret 5 $1$Cz6E$yOZ00hsabmnMgmOEsqaDj0
+
+transceiver type all
+ monitoring
+
+service unsupported-transceiver
+no errdisable detect cause sfp-config-mismatch
+no errdisable detect cause gbic-invalid 
+
+
+vlan access-map PPPOE_FILTER 10
+ action forward
+ match mac address PPPOE
+vlan access-map PPPOE_FILTER 20
+ action drop
+vlan internal allocation policy ascending
+
+vlan {{ pppoe['vlan'] }}
+ name {{ pppoe['name'] }}
+exit
+
+vlan {{ iptv['vlan'] }}
+ name {{  iptv['name']  }}
+exit
+
+vlan {{ ims['vlan'] }}
+ name {{ ims['name'] }}
+exit
+vlan {{ tr069['vlan'] }}
+ name {{ tr069['name'] }}
+exit      
+
+interface {{port_uplink}}
+description ${{uplink}}$
+mac access-group PPPOE_INCOM in
+service-policy input INGRESS
+service-policy output OUT_TRUNK_10G
+exit
+
+lldp run
+
+class-map match-any DEFAULT
+ match ip dscp default 
+ match cos  0 
+class-map match-any REAL_TIME
+ match ip dscp cs3  25  af31  27  af32  29  af33  31 
+ match ip dscp cs5  41  42  43  44  45  ef  47 
+ match ip dscp cs6  49  50  51  52  53  54  55 
+ match ip dscp cs7  57  58  59  60  61  62  63 
+ match cos  3 
+ match cos  5 
+ match cos  6 
+ match cos  7 
+class-map match-any BUSINESS_CRITICAL
+ match ip dscp cs1  9  af11  11  af12  13  af13  15 
+ match ip dscp cs2  17  af21  19  af22  21  af23  23 
+ match cos  2 
+ match cos  1 
+class-map match-any STREAMING_VIDEO
+ match ip dscp cs4  33  af41  35  af42  37  af43  39 
+ match cos  4 
+class-map match-all EG-DEFAULT
+ match qos-group 4
+class-map match-all EG-BUSINESS_CRITICAL
+ match qos-group 2
+class-map match-all EG-STREAMING_VIDEO
+ match qos-group 3
+class-map match-all EG-REAL_TIME
+ match qos-group 1
+!
+policy-map INGRESS
+ class REAL_TIME
+  set qos-group 1
+ class BUSINESS_CRITICAL
+  set qos-group 2
+ class STREAMING_VIDEO
+  set qos-group 3
+ class DEFAULT
+  set qos-group 4
+
+policy-map OUT_TRUNK
+ class EG-REAL_TIME
+  priority
+  police cir 142857000
+  queue-limit 4480 bytes
+ class EG-STREAMING_VIDEO
+  bandwidth percent 20 
+  queue-limit 390000 bytes
+ class EG-BUSINESS_CRITICAL
+  bandwidth percent 30 
+  queue-limit 128000 bytes
+ class EG-DEFAULT
+  bandwidth percent 35 
+  queue-limit 390000 bytes
+
+policy-map OUT_TRUNK_100M
+ class EG-REAL_TIME
+  priority
+  police cir 14285500
+  queue-limit 4480 bytes
+ class EG-STREAMING_VIDEO
+  bandwidth percent 20 
+  queue-limit 139264 bytes
+ class EG-BUSINESS_CRITICAL
+  bandwidth percent 30 
+  queue-limit 139264 bytes
+ class EG-DEFAULT
+  bandwidth percent 35 
+  queue-limit 139264 bytes
+
+policy-map OUT_TRUNK_10M
+ class EG-REAL_TIME
+  priority
+  police cir 1428500
+  queue-limit 4480 bytes
+ class EG-STREAMING_VIDEO
+  bandwidth percent 20 
+  queue-limit 139264 bytes
+ class EG-BUSINESS_CRITICAL
+  bandwidth percent 30 
+  queue-limit 139264 bytes
+ class EG-DEFAULT
+  bandwidth percent 35 
+  queue-limit 139264 bytes
+
+policy-map OUT_TRUNK_10G
+ class EG-REAL_TIME
+  priority
+  police cir 1428568000
+  queue-limit 4480 bytes
+ class EG-STREAMING_VIDEO
+  bandwidth percent 20 
+  queue-limit 139264 bytes
+ class EG-BUSINESS_CRITICAL
+  bandwidth percent 30 
+  queue-limit 139264 bytes
+ class EG-DEFAULT
+  bandwidth percent 35 
+  queue-limit 139264 bytes
+!
+policy-map OUT_TRUNK_FTTX
+ class EG-REAL_TIME
+  priority
+  police cir 50000000
+  queue-limit 4480 bytes
+ class EG-STREAMING_VIDEO
+  bandwidth percent 60 
+  queue-limit 512000 bytes
+ class EG-DEFAULT
+  bandwidth percent 35 
+  queue-limit 512000 bytes
+  
+interface range gigabitEthernet {{ port_downlink }}
+ load-interval 30
+ storm-control broadcast level pps 1k
+ storm-control multicast level pps 1k
+ no cdp enable
+ spanning-tree bpdufilter enable
+ spanning-tree bpduguard enable
+ service-policy input INGRESS
+ service-policy output OUT_TRUNK
+ switchport trunk allowed vlan none
+ switchport mode trunk
+ service instance 1 ethernet
+  encapsulation untagged
+  l2protocol peer cdp lldp
+  bridge-domain 1
+ exit
+exit
+
+interface Vlan1
+ no ip address
+ shutdown
+
+ip forward-protocol nd
+
+no ip http server
+ip http secure-server
+ip tacacs source-interface Vlan {{ vlan_mng }}
+
+ip sla enable reaction-alerts
+logging facility local2
+logging host 10.224.78.253
+logging host 10.224.100.80
+access-list 10 permit 10.0.0.0 0.255.255.255
+access-list 10 deny   any
+access-list 70 permit 10.224.100.80
+access-list 75 permit 10.184.78.30
+access-list 75 permit 10.250.111.0 0.0.0.15
+access-list 80 permit 10.184.88.160 0.0.0.31
+access-list 90 permit 10.200.124.20
+access-list 90 permit 10.200.124.2
+access-list 90 permit 10.200.124.3
+
+
+ip access-list extended block_qr
+deny   ip any host 224.0.0.1
+deny   ip any host 224.0.0.251
+deny   ip any host 224.0.0.252
+permit ip any any
+
+
+
+snmp-server community pUrEZBJK RO 90
+snmp-server community 2FKZT&OM RW 70
+snmp-server community sevone RO 75
+snmp-server community inity2016 RO 80
+snmp-server trap-source Vlan {{vlan_mng}}
+snmp-server enable traps snmp linkdown linkup
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server host 10.224.100.80 2FKZT&OM 
+snmp-server host 10.200.124.20 pUrEZBJK 
+snmp-server host 10.200.124.3 pUrEZBJK 
+
+tacacs-server host 10.184.121.4 key wpS29slv
+tacacs-server host 10.178.199.4 key wpS29slv
+tacacs-server host 10.60.0.147 key wpS29slv
+tacacs-server host 10.60.0.146 key wpS29slv 
+tacacs-server directed-request
+
+control-plane
+
+line con 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ access-class 10 in vrf-also
+ exec-timeout 0 0
+ password 7 094F471A1A0A
+ logging synchronous
+ transport input telnet
+line vty 5 15
+ access-class 10 in vrf-also
+ logging synchronous
+
+exception crashinfo file flash:crashinfo
+ntp server 10.212.64.1
+ntp server 10.212.64.1
+
+exit
+
+copy running-config startup-config

@@ -1,0 +1,41 @@
+
+
+configure terminal
+
+interface {{ downlink }}
+description ${{ hostname }}$
+
+ switchport trunk allowed vlan none
+ switchport mode trunk
+
+ service instance {{ mgmvlan }} ethernet
+  encapsulation dot1q {{ mgmvlan }}
+  rewrite ingress tag pop 1 symmetric
+  service-policy input INGRESS
+  bridge-domain {{ mgmvlan }}
+
+ service instance {{ pppoe['vlan'] }} ethernet
+  encapsulation dot1q {{ pppoe['vlan'] }}
+  rewrite ingress tag pop 1 symmetric
+  bridge-domain {{ pppoe['vlan'] }}
+ !
+ service instance {{ iptv['vlan'] }} ethernet
+  encapsulation dot1q {{ iptv['vlan'] }}
+  rewrite ingress tag pop 1 symmetric
+  bridge-domain {{ iptv['vlan'] }}
+ !
+ service instance {{ ims['vlan'] }} ethernet
+  encapsulation dot1q {{ ims['vlan'] }}
+  rewrite ingress tag pop 1 symmetric
+  bridge-domain {{ ims['vlan'] }}
+ !
+ service instance {{ tr069['vlan'] }}  ethernet
+  encapsulation dot1q {{ tr069['vlan'] }} 
+  rewrite ingress tag pop 1 symmetric
+  bridge-domain {{ tr069['vlan'] }} 
+ exit
+exit        
+
+copy running-config startup-config
+
+

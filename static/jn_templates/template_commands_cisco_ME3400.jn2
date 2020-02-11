@@ -1,0 +1,247 @@
+configure terminal
+
+no service pad
+service timestamps debug datetime localtime
+service timestamps log datetime localtime
+service password-encryption
+service unsupported-transceiver
+
+hostname {{ hostname }}
+
+logging buffered 65535
+logging rate-limit console 10
+logging console critical
+enable secret 5 $1$tVlr$hYc6NxKVA4bx0CuUgDRWg/
+
+username oerms privilege 15 secret 5 $1$Cz6E$yOZ00hsabmnMgmOEsqaDj0
+username mgm privilege 15 secret 5 $1$GKB9$.d3dwjCz.KXTCZRYRef1S1
+aaa new-model
+
+aaa group server tacacs+ SIC_TACACS
+ server 10.184.121.4
+ server 10.178.199.4
+ 
+!
+aaa authentication login default group SIC_TACACS group MFIST_TACACS local enable
+aaa authentication login console local
+aaa authentication enable default enable
+aaa authentication ppp default none
+aaa authorization exec default group SIC_TACACS group MFIST_TACACS local 
+aaa authorization network default local 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group SIC_TACACS group MFIST_TACACS
+aaa accounting commands 1 default start-stop group SIC_TACACS group MFIST_TACACS
+aaa accounting commands 15 default start-stop group SIC_TACACS group MFIST_TACACS
+aaa accounting system default start-stop group SIC_TACACS group MFIST_TACACS
+aaa session-id common
+!
+tacacs-server host 10.184.121.4 key 7 1059192A574E01071A
+tacacs-server host 10.178.199.4 key 7 001303355602180A19
+tacacs-server directed-request
+aaa authorization commands 1 default group SIC_TACACS group MFIST_TACACS none 
+aaa authorization commands 15 default group SIC_TACACS group MFIST_TACACS none
+
+
+clock timezone YEKST 5
+system mtu routing 1500
+authentication mac-move permit
+no ip source-route
+no ip domain-lookup
+ip domain-name ural.rt.ru
+
+ip dhcp snooping vlan {{ iptv['vlan']}}
+ip dhcp snooping information option allow-untrusted
+no ip dhcp snooping verify mac-address
+ip dhcp snooping
+
+table-map dscp-to-dscp
+ default copy
+ 
+
+no errdisable detect cause gbic-invalid
+no errdisable detect cause sfp-config-mismatch
+errdisable recovery cause udld
+errdisable recovery cause bpduguard
+errdisable recovery cause security-violation
+errdisable recovery cause channel-misconfig (STP)
+errdisable recovery cause pagp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause sfp-config-mismatch
+errdisable recovery cause gbic-invalid
+errdisable recovery cause l2ptguard
+errdisable recovery cause psecure-violation
+errdisable recovery cause port-mode-failure
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause pppoe-ia-rate-limit
+errdisable recovery cause mac-limit
+errdisable recovery cause vmps
+errdisable recovery cause storm-control
+errdisable recovery cause arp-inspection
+errdisable recovery cause link-monitor-failure
+errdisable recovery cause oam-remote-failure
+errdisable recovery cause loopback
+errdisable recovery cause small-frame
+errdisable recovery interval 30
+
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+no spanning-tree etherchannel guard misconfig
+spanning-tree extend system-id
+no spanning-tree vlan {{ vlan_mng}}
+no spanning-tree vlan {{ pppoe['vlan']}}
+no spanning-tree vlan {{ iptv['vlan']}}
+no spanning-tree vlan {{ ims['vlan']}}
+no spanning-tree vlan {{ tr069['vlan']}}
+
+vlan internal allocation policy ascending
+
+vlan {{ pppoe['vlan']}}
+ name {{ pppoe['name']}}
+exit
+
+vlan {{ iptv['vlan']}}
+ name {{ iptv['name']}}
+exit
+
+vlan {{ ims['vlan']}}
+ name {{  ims['name'] }}
+exit
+
+vlan {{ tr069['vlan']}}
+ name {{ tr069['name']}}
+exit
+
+lldp run
+
+class-map match-any REAL_TIME
+ match ip dscp cs3  25  af31  27  af32  29  af33  31 
+ match ip dscp cs5  41  42  43  44  45  ef  47 
+ match ip dscp cs6  49  50  51  52  53  54  55 
+ match ip dscp cs7  57  58  59  60  61  62  63 
+class-map match-any BUSINESS_CRITICAL
+ match ip dscp cs1  9  af11  11  af12  13  af13  15 
+ match ip dscp cs2  17  af21  19  af22  21  af23  23 
+class-map match-any STREAMING_VIDEO
+ match ip dscp cs4  33  af41  35  af42  37  af43  39 
+exit
+ 
+policy-map IN_TRUNK
+ class class-default
+    police cir 10000000000 bc 1000000
+      conform-action set-dscp-transmit dscp table dscp-to-dscp
+      exceed-action drop 
+policy-map OUT_TRUNK
+ class REAL_TIME
+    priority
+    police cir 142857000
+    queue-limit 80
+ class STREAMING_VIDEO
+    bandwidth percent 20
+    queue-limit 544
+ class BUSINESS_CRITICAL
+    bandwidth percent 30
+    queue-limit 544
+ class class-default
+    queue-limit 544
+    bandwidth percent 35
+policy-map OUT_TRUNK_100M
+ class REAL_TIME
+    priority
+    police cir 14285500
+    queue-limit 80
+ class STREAMING_VIDEO
+    bandwidth percent 20
+    queue-limit 544
+ class BUSINESS_CRITICAL
+    bandwidth percent 30
+    queue-limit 544
+ class class-default
+    queue-limit 544
+    bandwidth percent 35
+exit
+exit
+
+interface range gigabitEthernet {{ port_downlink }}
+ port-type eni
+ switchport trunk allowed vlan {{ vlan_mng }},{{ pppoe['vlan'] }},{{ iptv['vlan'] }},{{ ims['vlan'] }},{{ tr069['vlan'] }}
+ switchport mode trunk
+ shutdown
+ storm-control broadcast level pps 1k
+ storm-control multicast level pps 1k
+ cdp enable
+ service-policy input IN_TRUNK
+ service-policy output OUT_TRUNK
+exit
+
+
+interface gigabitEthernet {{ port_uplink }} 
+port-type nni
+switchport mode trunk
+storm-control broadcast level pps 2k
+storm-control multicast level pps 150k
+spanning-tree bpdufilter enable
+ip dhcp snooping trust
+exit
+
+interface Vlan1
+ no ip address
+ no ip route-cache
+ no ip mroute-cache
+ shutdown
+exit
+
+ 
+no ip http server
+ip http secure-server
+ip classless
+
+ip tacacs source-interface Vlan {{ vlan_mng }}
+
+ip sla responder
+ip sla enable reaction-alerts
+logging facility local2
+logging 10.224.78.253
+logging 10.224.100.80
+access-list 10 permit 10.0.0.0 0.255.255.255
+access-list 10 deny   any
+access-list 70 permit 10.224.100.80
+access-list 75 permit 10.184.78.30
+access-list 75 permit 10.250.111.0 0.0.0.15
+access-list 80 permit 10.184.88.160 0.0.0.31
+access-list 90 permit 10.200.124.20
+access-list 90 permit 10.200.124.3
+
+snmp-server community pUrEZBJK RO 90
+snmp-server community 2FKZT&OM RW 70
+snmp-server community sevone RO 75
+snmp-server community inity2016 RO 80
+snmp-server trap-source Vlan11
+snmp-server enable traps snmp coldstart warmstart
+snmp-server enable traps tty
+snmp-server enable traps fru-ctrl
+snmp-server enable traps cpu threshold
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server host 10.224.100.80 2FKZT&OM 
+snmp-server host 10.200.124.20 pUrEZBJK 
+snmp-server host 10.200.124.3 pUrEZBJK 
+
+line con 0
+ privilege level 15
+ logging synchronous
+ login authentication console
+ stopbits 1
+line vty 0 4
+ access-class 10 in
+ exec-timeout 0 0
+ transport input telnet
+line vty 5 15
+ access-class 10 in
+ logging synchronous
+ transport input telnet
+
+ntp clock-period 36029415
+ntp server 10.212.64.1
+ntp server 10.212.64.2
+end
+
+copy running-config startup-config

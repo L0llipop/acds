@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compativle" content="ie=edge">
+	<title>ACDS</title>
+	{% load static %}
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}"/>
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	<!-- <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js" integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk=" crossorigin="anonymous"></script> -->
+	<!-- <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script> -->
+</head>
+<body>
+	<div>
+		<nav class="navbar navbar-expand navbar-light bg-dark text-white">
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav mr-auto text-white" id="menu">
+					<li class="nav-item active mx-1">
+						<a class="nav-link btn btn-primary text-white" href="/devicelist"> Список устройств <span class="sr-only">(current)</span></a>
+					</li>
+					<li class="nav-item active mx-1">
+						<a class="nav-link btn btn-primary text-white" href="/devicelist/wbs"> Wireless <span class="sr-only">(current)</span></a>
+					</li>
+					<li class="nav-item active mx-1">
+						<a class="nav-link btn btn-primary text-white" href="/activator/generator"> Генератор конфига <span class="sr-only">(current)</span></a>
+					</li>
+					<li class="nav-item dropdown mx-1">
+						<a class="nav-link dropdown-toggle btn btn-primary text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Заявки
+						</a>
+						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<a class="dropdown-item" href="/activator">Ввод в эксплуатацию</a>
+							<a class="dropdown-item" href="/activator/deactivator">Вывод из эксплуатации</a>
+							<a class="dropdown-item" href="/activator/other">Прочее</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" href="/activator/history">История</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" href="/activator/admin">Admin</a>
+							<a class="dropdown-item" href="/activator/patterns_checking">Проверка шаблонов</a>
+						</div>
+					</li>
+					<li class="nav-item dropdown mx-1">
+						<a class="nav-link dropdown-toggle btn btn-primary text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Сервисы
+						</a>
+						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<a class="dropdown-item" href="/topology">Топология</a>
+							<a class="dropdown-item" href="/topology">test</a>
+						</div>
+					</li>
+					{% if request.user.groups.all.0.name == 'admins' %}
+					<li class="nav-item active mx-1">
+						<a class="nav-link btn btn-primary text-white" href="/activator/massconfig"> MassConfig <span class="sr-only">(current)</span></a>
+					</li>
+					{% endif %}
+					<li class="nav-item active mx-1">
+						<a class="nav-link btn btn-primary text-white" href="/devicelist/maps"> Карты <span class="sr-only">(current)</span></a>
+					</li>
+				</ul>
+			</div>
+			<!-- <div class="ml-auto p-2"><a href="mailto:yuzhakov-da@ural.rt.ru;kolov-aa@ural.rt.ru; borisov-sv@ural.rt.ru">Проблемы?</a></div> -->
+			<!-- <div id="username" class="ml-auto p-2">{{ user }}</div> -->
+			<!-- <button type="submit" class="btn btn-light" href="mailto:yuzhakov-da@ural.rt.ru;kolov-aa@ural.rt.ru; borisov-sv@ural.rt.ru">Feedback</button> -->
+			<div><button class="btn btn-light mx-2" onclick="location.href='mailto:yuzhakov-da@ural.rt.ru;kolov-aa@ural.rt.ru; borisov-sv@ural.rt.ru';">Отзывы</button></div>
+			<div>
+				<form method="post" action="/accounts/logout/" >
+					{% csrf_token %}
+					<button id="username" type="submit" class="btn btn-light" value="{{ user }}">Sign Out</button>
+				</form>
+			</div>
+		</nav>
+	</div>
+	{% block content %}
+	{% endblock %}
+</body>
+</html>

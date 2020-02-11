@@ -1,0 +1,218 @@
+configure terminal
+hostname {{ hostname }}
+
+user "hpsamain" crypted_password "$1$1gwz8vvF$9Dm8hDqGnKmwhcFoBuD0W/"
+user "techpod" crypted_password "$1$1gwz8vvF$GWoFXCfVlJJAsMEErCVl6."
+user "admin" crypted_password "$1$1gwz8vvF$GWoFXCfVlJJAsMEErCVl6."
+
+ip snmp traps 10.228.130.197 type v1
+ip snmp traps 10.184.86.27 type v2
+
+logging remote "10.228.60.12"
+logging system loglevel "info"
+logging buffer "150000"
+
+ip ntp ip "{{ default_gateway }}"
+ip ntp timezone "5"
+
+alarm ont-config out false
+alarm ont-low-rx-power in false
+alarm ont-low-rx-power out false
+alarm ont-low-rx-power ttl "0"
+alarm system-reboot in false
+alarm system-reboot out false
+alarm system-reboot ttl "0"
+alarm ont-dying-gasp ttl "0"
+alarm load-average level "200"
+alarm ram free-ram "32"
+alarm free-space level "5"
+alarm fan min-rpm "5000"
+
+cli session-timeout "5"
+cli display received-password 
+
+aaa authentication tacacs+
+aaa authorization tacacs+
+tacacs-server host "10.184.121.4"
+tacacs-server timeout "15"
+tacacs-server key "wpS29slv"
+
+cli ont-sn-format "numerical"
+
+gpon network mac-age-time "3600"
+gpon network svlan-ethertype "0x88A8"
+
+profile vlan "vlan-00"
+description "default"
+exit
+
+profile address-table "addresstable-00"
+description "default"
+no discard-pid-unlearned-sa
+s-vlan {{ims['vlan']}}
+exit
+
+profile pppoe-ia "pppoe-ia-00"
+description "PPPoEAgent"
+enable
+format circuit-id "%HOSTNAME%:ONT-0-%GPON-PORT%-%ONTID%:%VLAN0%"
+sessions-limit per-user 4
+exit
+
+profile dhcp-ra "dhcp-ra-01"
+description "OPTIONS82"
+enable
+overwrite-option82 circuit-id "%HOSTNAME%:ONT-0-%GPON-PORT%-%ONTID%"
+overwrite-option82 remote-id "%HOSTNAME%"
+overwrite-option82
+exit
+
+profile cross-connect "crossconnect-01"
+description "ACS"
+bridge
+bridge group "9"
+outer vid {{tr069['vlan']}}
+type "management"
+exit
+profile cross-connect "crossconnect-02"
+description "HSI"
+bridge group "1"
+outer vid {{pppoe['vlan']}}
+user vid "20"
+exit
+profile cross-connect "crossconnect-03"
+description "IMS"
+bridge group "1"
+outer vid {{ims['vlan']}}
+user vid "30"
+exit
+profile cross-connect "crossconnect-04"
+description "TVMC"
+bridge group "1"
+outer vid {{iptv['vlan']}}
+user vid "40"
+type "multicast"
+exit
+profile cross-connect "crossconnect-05"
+description "TVUC"
+bridge group "1"
+outer vid {{iptv['vlan']}}
+user vid "40"
+exit
+profile cross-connect "crossconnect-06"
+description "VPN"
+bridge group "1"
+exit
+
+profile ports "ports-01"
+veip multicast
+veip upstream vid "40"
+veip upstream tag-control replace-tag
+veip downstream vid "40"
+veip downstream tag-control replace-tag
+exit
+
+template "template-01"
+undefine fec
+undefine broadcast-downstream
+undefine ber interval
+undefine ber update-period
+undefine profile shaping
+service 0 profile cross-connect "crossconnect-02"
+service 0 profile dba "dba-00"
+service 1 profile cross-connect "crossconnect-03"
+service 1 profile dba "dba-00"
+service 2 profile cross-connect "crossconnect-04"
+service 2 profile dba "dba-00"
+service 3 profile cross-connect "crossconnect-05"
+service 3 profile dba "dba-00"
+undefine service 4 profile cross-connect
+undefine service 4 profile dba
+service 5 profile cross-connect "crossconnect-06"
+service 5 profile dba "dba-00"
+service 6 profile cross-connect "crossconnect-06"
+service 6 profile dba "dba-00"
+service 7 profile cross-connect "crossconnect-06"
+service 7 profile dba "dba-00"
+undefine profile ports
+undefine profile management
+undefine profile scripting
+undefine rf-port-state
+undefine omci-error-tolerant
+exit
+
+gpon olt unactivated-timout 20
+gpon olt password-in-trap
+gpon olt profile dhcpra dhcp-ra-01 vid {{ims['vlan']}}
+gpon olt model "2"
+
+logging module pmchal-ont loglevel "debug"
+logging module pmchal-pppoeia loglevel "critical"
+logging module alarm loglevel "critical"
+
+exit
+commit
+
+switch
+configure
+
+no spanning-tree enable 
+
+ip igmp snooping
+ip igmp unregistered ip4-mc drop
+qos type 2
+qos map 1 32-39 to 4
+qos map 1 40-47 to 5
+qos map 1 48-63 to 6
+vlan 1
+no ip dhcp relaying
+no ip igmp snooping enable
+exit
+
+
+vlan {{pppoe['vlan']}}
+name PPPoE
+tagged port-channel 1
+tagged front-port 3
+tagged pon-port 0
+tagged pon-port 1
+tagged pon-port 2
+tagged pon-port 3
+no ip igmp snooping enable
+exit
+
+vlan {{iptv['vlan']}}
+name IP-TV
+tagged port-channel 1
+tagged front-port 3
+tagged pon-port 0
+tagged pon-port 1
+tagged pon-port 2
+tagged pon-port 3
+ip igmp snooping querier enable
+exit
+
+vlan {{ims['vlan']}}
+name IMS
+tagged port-channel 1
+tagged front-port 3
+tagged pon-port 0
+tagged pon-port 1
+tagged pon-port 2
+tagged pon-port 3
+no ip igmp snooping enable
+exit
+
+vlan {{tr069['vlan']}}
+name TR069
+tagged port-channel 1
+tagged front-port 3
+tagged pon-port 0
+tagged pon-port 1
+tagged pon-port 2
+tagged pon-port 3
+exit
+commit
+exit
+exit
+save

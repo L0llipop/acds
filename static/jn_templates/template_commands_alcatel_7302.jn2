@@ -1,0 +1,698 @@
+{%- for slot_num in range(1, 20) %}
+configure equipment slot lt:1/1/{{ slot_num }}
+planned-type nalt-c
+exit
+{%- endfor %}
+
+configure system security password min-num-special-char 0
+configure system security operator isadmin password encrypted:15:84:5b:53:e1:b8:0a:cd:d4:d1:02:f2:77:8b:b0:7b:35:72:6d:d9
+configure system security operator isadmin prompt {{ ipaddmgm }}%d%c
+configure system security operator tumsup profile admin password encrypted:31:d0:0c:1d:8d:0b:93:73:1f:e6:b8:39:58:8f:78:c0:b2:3a:43:0f
+configure system security operator tumsup prompt {{ ipaddmgm }}%d%c
+
+show interface shub port 
+
+configure qos shub queue-config {{ port_uplink }}
+dscp2p-enable 
+exit all
+ 
+configure system syslog
+destination guks type udp:10.224.67.251:514:unlimited
+exit
+route guks msg-type all facility local1 emergency
+exit
+route guks msg-type all facility local1 alert
+exit
+route guks msg-type all facility local1 critical
+exit
+route guks msg-type all facility local1 error
+exit
+route guks msg-type all facility local1 warning
+exit
+route guks msg-type all facility local1 notice
+exit
+route guks msg-type all facility local1 information
+exit
+route guks msg-type all facility local1 debug
+exit
+
+configure system id {{ hostname }}
+configure system name {{ hostname }}
+
+configure system location {{ location }}
+configure system security welcome-banner "UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED"
+configure system security login-banner  {{ hostname }}
+
+configure system security snmp community inity2016 host-address 10.184.88.160/27 
+configure system security snmp 
+configure system security snmp community public host-address  0.0.0.0/0
+configure system security snmp community NETMAN host-address 0.0.0.0/0 context shub privilege read-write
+configure system security snmp shub community NETMAN privelege read-write ip-addr 0.0.0.0 contex shub
+
+configure system port-num-in-proto type-based
+
+configure system security profile admin slot-numbering type-based 
+
+configure system loop-id-syntax atm-based-dsl Access_Node_ID_DSL_Rack/Frame/Slot/Port
+configure vlan id {{ ims['vlan'] }} circuit-id-dhcp physical-id
+configure vlan id {{ ims['vlan'] }} dhcp-opt-82
+
+configure system sntp enable server-ip-addr  {{ gw }} timezone-offset 300
+
+configure igmp shub igs-system start-snooping
+
+configure igmp system start
+configure igmp system user-igmp-version 2 
+configure igmp system netw-igmp-version 2
+
+
+configure vlan id {{ pppoe['vlan'] }} mode residential-bridge name {{ pppoe ['name']}}
+broadcast-frames
+pppoe-relay-tag true
+exit all
+configure vlan shub id {{ pppoe['vlan'] }} mode residential-bridge name {{ pppoe ['name']}}
+egress-port network:{{ port_uplink }}
+exit
+{%- for slot_num in range(1, 20) %}
+ egress-port lt:1/1/{{ slot_num }}
+ exit
+{%- endfor %}
+
+configure vlan id {{ iptv['vlan'] }} mode residential-bridge name {{ iptv ['name']}}
+priority 5
+broadcast-frames
+configure vlan shub id {{ iptv['vlan'] }} mode residential-bridge name {{ iptv ['name']}}
+egress-port network:{{ port_uplink }}
+exit
+{%- for slot_num in range(1, 20) %}
+ egress-port lt:1/1/{{ slot_num }}
+ exit
+{%- endfor %}
+
+configure vlan id {{ ims['vlan'] }} mode residential-bridge name {{ ims ['name']}}
+configure vlan shub id {{ ims['vlan'] }} mode residential-bridge name {{ ims ['name']}}
+egress-port network:{{ port_uplink }}
+exit
+{%- for slot_num in range(1, 20) %}
+ egress-port lt:1/1/{{ slot_num }}
+ exit
+{%- endfor %}
+
+configure vlan id {{tr069['vlan']}} mode residential-bridge name {{tr069['name']}}
+configure vlan shub id {{tr069['vlan']}} mode residential-bridge name {{tr069['name']}}
+egress-port network:{{ port_uplink }}
+exit
+{%- for slot_num in range(1, 20) %}
+ egress-port lt:1/1/{{ slot_num }}
+ exit
+{%- endfor %}
+
+configure xdsl 
+
+service-profile 1 name base-1
+  local-profile
+  version 1
+  min-bitrate-down 128
+  plan-bitrate-down 768
+  plan-bitrate-up 288
+  max-bitrate-down 1024
+  max-bitrate-up 384
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 2 name base-2
+  local-profile
+  version 1
+  min-bitrate-down 256
+  plan-bitrate-down 1538
+  plan-bitrate-up 288
+  max-bitrate-down 2048
+  max-bitrate-up 408
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 3 name base-4
+  local-profile
+  version 1
+  min-bitrate-down 384
+  plan-bitrate-down 3072
+  plan-bitrate-up 320
+  max-bitrate-down 4096
+  max-bitrate-up 460
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 4 name base-6
+  local-profile
+  version 1
+  min-bitrate-down 512
+  plan-bitrate-down 4544
+  plan-bitrate-up 352
+  max-bitrate-down 6145
+  max-bitrate-up 480
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 5 name base-8
+  local-profile
+  version 1
+  min-bitrate-down 2048
+  plan-bitrate-down 6144
+  plan-bitrate-up 384
+  max-bitrate-down 8192
+  max-bitrate-up 512
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 6 name base-10
+  local-profile
+  version 1
+  min-bitrate-down 2048
+  plan-bitrate-down 7680
+  plan-bitrate-up 448
+  max-bitrate-down 10240
+  max-bitrate-up 608
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 7 name base-12
+  local-profile
+  version 1
+  min-bitrate-down 4500
+  plan-bitrate-down 9088
+  plan-bitrate-up 480
+  max-bitrate-down 12288
+  max-bitrate-up 641
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+
+service-profile 8 name base-14
+  local-profile
+  version 1
+  min-bitrate-down 4500
+  plan-bitrate-down 10528
+  plan-bitrate-up 512
+  max-bitrate-down 14336
+  max-bitrate-up 704
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 9 name base-16
+  local-profile
+  version 1
+  min-bitrate-down 4500
+  plan-bitrate-down 12032
+  plan-bitrate-up 672
+  max-bitrate-down 16384
+  max-bitrate-up 896
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 10 name base-18
+  local-profile
+  version 1
+  min-bitrate-down 4500
+  plan-bitrate-down 13536
+  plan-bitrate-up 768
+  max-bitrate-down 18432
+  max-bitrate-up 1024
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 11 name base-20
+  local-profile
+  version 1
+  min-bitrate-down 4500
+  plan-bitrate-down 15008
+  plan-bitrate-up 768
+  max-bitrate-down 20480
+  max-bitrate-up 1024
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+
+service-profile 12 name base-2-vpn
+  version 1
+  min-bitrate-down 256
+  min-bitrate-up 256
+  plan-bitrate-down 1538
+  plan-bitrate-up 1538
+  max-bitrate-down 2560
+  max-bitrate-up 2560
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10  
+  active
+exit
+
+service-profile 13 name base-2-m
+  version 1
+  min-bitrate-down 256
+  min-bitrate-up 256
+  plan-bitrate-down 1538
+  plan-bitrate-up 1024
+  max-bitrate-down 2048
+  max-bitrate-up 1536
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10  
+  active
+exit
+
+service-profile 14 name base-3-m
+  version 1
+  min-bitrate-down 256
+  min-bitrate-up 256
+  plan-bitrate-down 2048
+  plan-bitrate-up 1088
+  max-bitrate-down 3072
+  max-bitrate-up 1664
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10  
+  active
+exit
+
+service-profile 15 name base-4-m
+  version 1
+  min-bitrate-down 256
+  min-bitrate-up 256
+  plan-bitrate-down 3072
+  plan-bitrate-up 1152
+  max-bitrate-down 4096
+  max-bitrate-up 1792
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10  
+  active
+exit
+
+service-profile 16 name base-5-m
+  version 1
+  min-bitrate-down 256
+  min-bitrate-up 256
+  plan-bitrate-down 3584
+  plan-bitrate-up 1216
+  max-bitrate-down 5120
+  max-bitrate-up 1920
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10  
+  active
+exit
+
+service-profile 17 name base-6-m
+  version 1
+  min-bitrate-down 256
+  min-bitrate-up 256
+  plan-bitrate-down 4544
+  plan-bitrate-up 1280
+  max-bitrate-down 6145
+  max-bitrate-up 2048
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10  
+  active
+exit
+
+service-profile 18 name base-8-m
+  version 1
+  min-bitrate-down 256
+  min-bitrate-up 256
+  plan-bitrate-down 6145
+  plan-bitrate-up 1280
+  max-bitrate-down 8192
+  max-bitrate-up 2048
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10  
+  active
+exit
+
+service-profile 19 name base-10-m
+  version 1
+  min-bitrate-down 256
+  min-bitrate-up 256
+  plan-bitrate-down 7168
+  plan-bitrate-up 1280
+  max-bitrate-down 10240
+  max-bitrate-up 2048
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10  
+  active
+exit
+
+
+
+service-profile 20 name base-05-hard
+  local-profile
+  version 1
+  min-bitrate-down 96
+  plan-bitrate-down 384
+  plan-bitrate-up 192
+  max-bitrate-down 512
+  max-bitrate-up 256
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+exit
+  
+service-profile 21 name base-1-hard
+local-profile
+  version 1
+  min-bitrate-down 128
+  plan-bitrate-down 768
+  plan-bitrate-up 288
+  max-bitrate-down 1024
+  max-bitrate-up 384
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+exit
+  
+service-profile 22 name base-2-hard
+local-profile
+  version 1
+  min-bitrate-down 256
+  plan-bitrate-down 1538
+  plan-bitrate-up 288
+  max-bitrate-down 2048
+  max-bitrate-up 408
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+exit
+  
+service-profile 23 name base-4-hard
+local-profile
+  version 1
+  min-bitrate-down 384
+  plan-bitrate-down 3072
+  plan-bitrate-up 320
+  max-bitrate-down 4096
+  max-bitrate-up 460
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+exit
+  
+service-profile 24 name base-6-hard
+local-profile
+  version 1
+  min-bitrate-down 512
+  plan-bitrate-down 4544
+  plan-bitrate-up 352
+  max-bitrate-down 6145
+  max-bitrate-up 480
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+exit
+  
+service-profile 25 name base-8-hard
+local-profile
+  version 1
+  min-bitrate-down 2048
+  plan-bitrate-down 6144
+  plan-bitrate-up 384
+  max-bitrate-down 8192
+  max-bitrate-up 512
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+exit
+  
+service-profile 26 name base-10-hard
+local-profile
+  version 1
+  min-bitrate-down 2048
+  plan-bitrate-down 7680
+  plan-bitrate-up 448
+  max-bitrate-down 10240
+  max-bitrate-up 608
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+exit
+  
+service-profile 27 name base-12-hard
+local-profile
+  version 1
+  min-bitrate-down 4096
+  plan-bitrate-down 9088
+  plan-bitrate-up 480
+  max-bitrate-down 12288
+  max-bitrate-up 641
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+exit
+  
+service-profile 28 name base-14-hard
+local-profile
+  version 1
+  min-bitrate-down 4096
+  plan-bitrate-down 10528
+  plan-bitrate-up 512
+  max-bitrate-down 14336
+  max-bitrate-up 704
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+exit
+  
+service-profile 29 name base-16-hard
+  local-profile
+  version 1
+  min-bitrate-down 4096
+  plan-bitrate-down 12032
+  plan-bitrate-up 672
+  max-bitrate-down 16384
+  max-bitrate-up 896
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+exit
+  
+service-profile 30 name base-18-hard
+  local-profile
+  version 1
+  min-bitrate-down 4096
+  plan-bitrate-down 13536
+  plan-bitrate-up 768
+  max-bitrate-down 18432
+  max-bitrate-up 1024
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+exit
+  
+service-profile 31 name base-20-hard
+  local-profile
+  version 1
+  min-bitrate-down 4096
+  plan-bitrate-down 15008
+  plan-bitrate-up 768
+  max-bitrate-down 20480
+  max-bitrate-up 1024
+  imp-noise-prot-dn 20
+  imp-noise-prot-up 20
+  max-delay-down 32
+  max-delay-up 32
+  active
+ exit
+
+
+
+service-profile 32 name base-05-01
+  version 1
+  min-bitrate-down 96
+  min-bitrate-up 68
+  plan-bitrate-down 384
+  plan-bitrate-up 96
+  max-bitrate-down 512
+  max-bitrate-up 128
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 33 name base-1-01
+  version 1
+  min-bitrate-down 128
+  min-bitrate-up 68
+  plan-bitrate-down 768
+  plan-bitrate-up 96
+  max-bitrate-down 1024
+  max-bitrate-up 160
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 34 name base-2-01
+  version 1
+  min-bitrate-down 256
+  min-bitrate-up 68
+  plan-bitrate-down 1538
+  plan-bitrate-up 126
+  max-bitrate-down 2048
+  max-bitrate-up 192
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 35 name base-4-02
+  version 1
+  min-bitrate-down 384
+  min-bitrate-up 68
+  plan-bitrate-down 3072
+  plan-bitrate-up 126
+  max-bitrate-down 4096
+  max-bitrate-up 224
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+service-profile 36 name base-6-02
+  version 1
+  min-bitrate-down 512
+  min-bitrate-up 68
+  plan-bitrate-down 4544
+  plan-bitrate-up 160
+  max-bitrate-down 6145
+  max-bitrate-up 256
+  imp-noise-prot-dn 10
+  imp-noise-prot-up 10
+  active
+exit
+
+
+configure xdsl spectrum-profile 77 name all
+ version 1
+  g992-3-l1
+  g992-3-l2
+  g992-3-am
+  g992-5-a
+  g992-5-b
+  g992-5-am
+ active
+exit
+
+configure xdsl spectrum-profile 78 name no_annex_m
+ version 1
+  g992-3-l1
+  g992-3-l2
+  g992-5-a
+  g992-5-b
+ active
+exit
+
+spectrum-profile 11 name ADSL2_Annex_A_PowerUP_v2
+  version 1
+  dis-ansi-t1413
+  dis-etsi-dts
+  dis-g992-1-b
+  g992-3-am
+  dis-g992-3-b
+  g992-5-a  
+  g992-5-am
+  dis-etsi-ts
+  rad-noise-down 60
+  rad-noise-up 60
+  adsl-adsl2
+    proprietary-feat
+    max-psd-up -400
+    pbo-mode-up
+  exit
+  re-adsl
+    proprietary-feat
+    pbo-mode-up
+  exit
+  adsl2-plus
+    proprietary-feat
+    max-psd-up -400
+    pbo-mode-up
+  exit
+  vdsl
+    vdsl-band-plan band-plan-c3
+    adsl-band allow-adsl
+  exit
+  vdsl2
+    v-noise-psd-down ""
+    v-noise-psd-up ""
+  exit
+  active
+exit
+
+
+{%- for slot_num in range(1, 20) %}
+configure xdsl line 1/1/{{ slot_num }}/[1...48] spectrum-profile 77 service-profile name:base-16 admin-up {%- endfor %}
+
+{%- for slot_num in range(1, 20) %}
+
+configure atm pvc 1/1/{{ slot_num }}/[1...48]:{{ vpi_pppoe }}:{{ vci_pppoe }}
+configure atm pvc 1/1/{{ slot_num }}/[1...48]:{{ vpi_ip_tv }}:{{ vci_ip_tv }}
+configure atm pvc 1/1/{{ slot_num }}/[1...48]:7:49
+
+configure bridge port 1/1/{{ slot_num }}/[1...48]:{{ vpi_pppoe }}:{{ vci_pppoe }}
+configure bridge port 1/1/{{ slot_num }}/[1...48]:{{ vpi_ip_tv }}:{{ vci_ip_tv }}
+configure bridge port 1/1/{{ slot_num }}/[1...48]:7:49
+
+configure bridge port 1/1/{{ slot_num }}/[1...48]:{{ vpi_pppoe }}:{{ vci_pppoe }} vlan-id {{ pppoe['vlan'] }}
+configure bridge port 1/1/{{ slot_num }}/[1...48]:{{ vpi_ip_tv }}:{{ vci_ip_tv }} vlan-id {{ iptv['vlan'] }}
+configure bridge port 1/1/{{ slot_num }}/[1...48]:7:49 vlan-id {{ tr069['vlan'] }}
+
+
+configure bridge port 1/1/{{ slot_num }}/[1...48]:{{ vpi_pppoe }}:{{ vci_pppoe }} pvid {{ pppoe['vlan'] }}
+configure bridge port 1/1/{{ slot_num }}/[1...48]:{{ vpi_ip_tv }}:{{ vci_ip_tv }} pvid {{ iptv['vlan'] }}
+configure bridge port 1/1/{{ slot_num }}/[1...48]:7:49 pvid {{ tr069['vlan'] }}
+
+
+configure bridge port 1/1/{{ slot_num }}/[1...48]:{{ vpi_pppoe }}:{{ vci_pppoe }} max-unicast-mac 4
+configure bridge port 1/1/{{ slot_num }}/[1...48]:{{ vpi_ip_tv }}:{{ vci_ip_tv }} max-unicast-mac 4
+configure bridge port 1/1/{{ slot_num }}/[1...48]:7:49 max-unicast-mac 2
+
+configure igmp channel 1/1/{{ slot_num }}/[1...48]:{{ vpi_ip_tv }}:{{ vci_ip_tv }} perm-pkg-bitmap ff:ff:ff:ff:ff:ff:ff:ff max-num-group 4
+ 
+{%- endfor %}

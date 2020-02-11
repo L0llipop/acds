@@ -1,0 +1,24 @@
+create vlan MNG tag {{ mgmvlan }}
+config vlan MNG add tagged {{ port_uplink }}
+
+
+config ipif System state enable
+config ipif System ipaddress {{ ipaddmgm }}/{{ mask }}
+create iproute default {{ gw }} 1 
+config ipif System vlan MNG ipaddress {{ ipaddmgm }}/{{ mask }} state enable
+
+save
+
+
+-------Для проверки доступности управления  использовать ping---
+
+ping {{ gw }} times 3 
+
+Успешный ответ выглядит так 
+Command: ping {{ gw }} times 3
+Reply from {{ gw }}, time<10ms
+Reply from {{ gw }}, time<10ms
+Reply from {{ gw }}, time<10ms
+ Ping Statistics for {{ gw }}
+ Packets: Sent =3, Received =3, Lost =0
+{{ networkname }}

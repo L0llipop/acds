@@ -1,0 +1,26 @@
+home
+vlan1q
+
+svlan setentry {{ mgmvlan }} 1 fixed tag
+svlan setentry {{ mgmvlan }} 2 forbidden tag
+svlan setentry {{ mgmvlan }} 3 forbidden tag
+svlan setentry {{ mgmvlan }} 4 forbidden tag
+svlan setentry {{ mgmvlan }} 5 forbidden tag
+svlan setentry {{ mgmvlan }} 6 forbidden tag
+svlan setentry {{ mgmvlan }} 7 forbidden tag
+svlan setentry {{ mgmvlan }} 8 forbidden tag
+svlan setentry {{ mgmvlan }} 9 forbidden tag
+
+home
+
+ip
+device add ether      ether  //bridge   mtu 1500  {{ ipaddmgm }} mask  {{ mask }}
+
+# сдесь указывается адрес сети и маска в шестнадцатеричной системе счисления
+# пока что эти параметры необходимо править в ручную
+subnet add ether.home     . 10.201.103.0     ff:ff:ff:00
+
+route add default          0.0.0.0 {{ gw }} 00:00:00:00 15 # MAN
+
+home
+config save

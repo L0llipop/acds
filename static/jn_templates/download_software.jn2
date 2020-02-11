@@ -1,0 +1,52 @@
+{% if model == 'dlink' %}прошивка 3200-28 ревизии C1, если прошивка ниже 4.38 то обновлять через промежуточную прошивку 4.38
+download firmware_fromTFTP {{ ftp_server }} src_file FTP/FTTb/DES3200R_4.38.B000(C1).had boot_up
+download firmware_fromTFTP {{ ftp_server }} src_file FTP/FTTb/DES3200R_4.51.B004(C1).had 
+show boot_file
+dir
+config firmware image c:/DES3200R_4.46.B008_revC1.had boot_up
+
+
+DGS-3120-24SC
+download firmware_fromTFTP {{ ftp_server }}  src_file FTP/FTTb/DGS3120_Run_3_12_R012.had boot_up
+
+
+DES-3200-52  revC
+
+download firmware_fromTFTP {{ ftp_server }} src_file FTP/FTTb/DES3200R_4.38.B000(C1).had boot_up
+download firmware_fromTFTP {{ ftp_server }} src_file FTP/FTTb/DES3200R_4.51.B005.had boot_up
+
+
+DGS-3612g
+сначала  DGS36xxRun_2.52-B45.had
+потом   DGS36xx_Run_3_00_B48.had
+
+download firmware_fromTFTP {{ ftp_server }} FTP/FTTb/DGS36xxRun_2.52-B45.had
+download firmware_fromTFTP {{ ftp_server }} src_file  FTP/FTTb/DGS36xx_Run_3_00_B48.had
+
+{% elif model == '21xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes2000-11485.ros flash://image
+show bootvar 
+boot system image-2
+
+//обновление загрузчика
+copy tftp://{{ ftp_server }}/FTP/FTTb/boot_mes2124m_1_8 boot
+reload
+
+{% elif model == '31xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes3000-25482.ros flash://image
+
+{% elif model == 'x3xx' %}boot system tftp://{{ ftp_server }}/FTP/FTTb/mes3300-4012-R183.ros
+
+{% elif model == 'MA-4000' %}tftp://{{ ftp_server }}/FTP/FTTh/firmware.3.26.3.2.ma4k fs://firmware 
+copy tftp://{{ ftp_server }}/FTP/license_ma4000.lic fs://license 
+show firmware
+firmware select image-alternate
+//after reboot
+firmware confirm
+
+{% elif model == 'LTP' %}copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-8x-revc-3.36.0.822.fw.bin fs://firmware
+copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-4x-revc-3.36.2.57.fw.bin fs://firmware
+copy tftp://{{ ftp_server }}/FTP/FTTh/license/license_for_ltp.lic fs://license
+
+{% elif model == '24xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1018-2R0.boot boot
+copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1018-2R0.iss image
+
+{% endif %}

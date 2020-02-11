@@ -1,0 +1,160 @@
+config snmp system_name {{ hostname }}
+
+create vlan {{ pppoe['name'] }} tag {{ pppoe['vlan'] }}
+config vlan {{ pppoe['name'] }} add tagged {{ port_uplink }}
+
+create vlan {{ iptv['name'] }} tag {{ iptv['vlan'] }}
+config vlan {{ iptv['name'] }} add tagged {{ port_uplink }}
+
+create vlan {{ ims['name'] }} tag {{ ims['vlan'] }}
+config vlan {{ ims['name'] }} add tagged {{ port_uplink }}
+
+create vlan {{ tr069['name'] }} tag {{ tr069['vlan'] }}
+config vlan {{ tr069['name'] }} add tagged {{ port_uplink }}
+
+create dot1v_protocol_group group_id 1 group_name ProtocolGroup1
+create dot1v_protocol_group group_id 2 group_name ProtocolGroup2
+config dot1v_protocol_group group_id 1 add protocol ethernet_2 0x8863
+config dot1v_protocol_group group_id 2 add protocol ethernet_2 0x8864
+
+enable jumbo_frame 
+
+enable loopdetect
+config loopdetect recover_timer 60
+config loopdetect interval 10
+config loopdetect mode port-based
+config loopdetect trap enable
+config loopdetect trap both
+config loopdetect ports {{ port_downlink }} state enabled
+
+config loopdetect ports {{ port_uplink }} state disabled
+
+
+config pppoe circuit_id_insertion state enable
+config pppoe circuit_id_insertion ports {{ port_downlink }} state enable circuit_id ip
+
+
+enable dhcp_local_relay
+config dhcp_local_relay option_82 circuit_id default
+config dhcp_local_relay option_82 circuit_id user_define "{{ hostname }}"
+config dhcp_local_relay option_82 remote_id user_define "{{ hostname }}"
+config dhcp_local_relay vlan vlanid {{ ims['vlan'] }} state enable 
+
+
+enable igmp_snooping
+config igmp_snooping vlan_name {{ iptv['name'] }} state enable fast_leave disable
+config router_ports vlan_name {{ iptv['name'] }} add {{ port_uplink }}
+
+
+config scheduling_mechanism strict
+config scheduling 3 strict
+config scheduling 0 weight 1 
+config scheduling 1 weight 2 
+config scheduling 2 weight 4 
+config scheduling 3 weight 55 
+
+config dscp_mapping dscp_value 32 class 3
+
+
+config traffic control_trap enable
+config traffic control_trap both
+config traffic control {{ port_downlink }} broadcast enable multicast enable unicast enable action drop threshold 64 countdown 0 time_interval 5
+
+enable sntp
+config time_zone operator + hour 5 min 0
+config sntp primary {{default_gateway}} secondary 0.0.0.0 poll-interval 720
+config dst disable
+
+
+enable lldp
+config lldp message_tx_interval 30
+config lldp tx_delay 2
+config lldp message_tx_hold_multiplier 4
+config lldp reinit_delay 2
+config lldp notification_interval 5
+config lldp ports {{ port_downlink }} notification disable
+config lldp ports {{ port_uplink }} admin_status tx_and_rx
+config lldp ports {{ port_uplink }} basic_tlvs port_description system_name system_description system_capabilities enable
+config lldp ports {{ port_uplink }} mgt_addr ipv4 {{ ip }} enable
+
+config ddm ports {{ port_uplink }} state disable
+
+config ddm ports {{ port_downlink }}  state disable
+
+
+enable syslog
+create syslog host 1 ipaddress 10.228.60.12 severity all facility local0 udp_port 514  state enable 
+
+create syslog host 2 ipaddress 10.184.88.169 severity debug facility local5 udp_port 514 state enable 
+
+
+config traffic_segmentation {{ port_downlink }} forward_list {{ port_uplink }}                          
+config traffic_segmentation {{ port_uplink }} forward_list all 
+
+config ports {{ port_uplink }} description  ${{ uplink_and_port }}$
+
+
+create authen server_host 10.178.199.4 protocol tacacs+ port 49 key "wpS29slv" timeout 5 retransmit 2
+create authen server_host 10.184.121.4 protocol tacacs+ port 49 key "wpS29slv" timeout 5 retransmit 2
+config authen_login default method local
+create authen_login method_list_name tacacs+                                   
+config authen_login method_list_name tacacs+ method tacacs+
+config authen_enable default method local_enable
+create authen_enable method_list_name tacacs+_ena
+config authen_enable method_list_name tacacs+_ena method tacacs+
+config authen application console login default
+config authen application console enable default
+config authen application telnet login method_list_name tacacs+
+config authen application telnet enable method_list_name tacacs+_ena
+config authen application ssh login default
+config authen application ssh enable default
+config authen application http login method_list_name tacacs+
+config authen application http enable method_list_name tacacs+_ena
+config authen parameter response_timeout 0
+config authen parameter attempt 3
+enable authen_policy
+
+
+enable snmp
+create snmp community inity2016 view CommunityView read_only
+enable snmp traps
+enable snmp linkchange traps    
+enable snmp linkchange_traps
+create snmp host 10.184.88.169 v2c inity2016
+config snmp linkchange_traps ports all enable
+config snmp linkchange traps ports all enable
+disable snmp authenticate_traps
+disable snmp authenticate traps
+config snmp coldstart_traps enable
+
+
+config temperature threshold high 65
+config temperature threshold low 5
+config temperature trap state enable
+config temperature log state enable
+
+
+
+config traffic control auto_recover_time 0
+config traffic trap both
+config traffic control {{ port_downlink }} broadcast enable multicast disable unicast enable action drop threshold 64 countdown 0 time_interval 5
+
+
+disable stp
+config stp ports {{ port_downlink }} fbpdu enable
+config stp ports {{ port_downlink }} restricted_role false
+config stp ports {{ port_downlink }} restricted_tcn false
+config stp loop_guard ports {{ port_downlink }} state disable
+
+config stp ports {{ port_uplink }} fbpdu enable
+config stp ports {{ port_uplink }} restricted_role false
+config stp ports {{ port_uplink }} restricted_tcn false
+config stp loop_guard ports {{ port_uplink }} state disable
+
+config max_mcast_group ports {{ port_downlink }} max_group 12
+config max_mcast_group ports {{ port_downlink }} action drop
+
+config bpdu_protection ports {{ port_downlink }} mode shutdown
+
+
+config fdb aging_time 3600

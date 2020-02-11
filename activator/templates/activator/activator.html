@@ -1,0 +1,106 @@
+{% extends "header.html" %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+	<link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@19.4.2/dist/css/suggestions.min.css" rel="stylesheet" />
+	<script src="https://cdn.jsdelivr.net/npm/suggestions-jquery@19.4.2/dist/js/jquery.suggestions.min.js"></script>
+<form class="needs-validation" id="activator">
+<!-- <form> -->
+	<div class="form-row">
+		<div class="col-12 col-xl-10">
+			<div class="d-flex align-items-center my-2">
+				<div class="col-2"><label for="mip">Основание установки:*</label></div>
+				<div class="col-8 col-xl-6"><input class="form-control" type="text" id="mip" placeholder="Заявка Гермес или МИП" name="mip" required></div>
+				<div class="invalid-feedback">Please provide a valid state</div>
+				<!-- <div class="valid-feedback"></div> -->
+				<!-- <div class="mr"><span class="badge badge-primary">Primary</span></div> -->
+			</div>
+			<!-- <div class="w-100"></div> -->
+			<div class="d-flex align-items-center my-2 block_uplink">
+				<div class="col-2"><label for="uplink">IP адрес аплинка:*</label></div>
+				<div class="col-8 col-xl-6"><input class="form-control" type="text" id="uplink" placeholder="10.224.35.11" name="uplink" required autofocus></div>
+				<div class="valid-feedback"></div>
+				<!-- <span class="badge badge-primary bdg_uplink">Primary</span> -->
+			</div>
+			<div class="d-flex align-items-center my-2 block_address">
+				<div class="col-2"><label for="sn">Адрес установки:*</label></div>
+				<div class="col-8 col-xl-6"><input class="form-control" type="text" id="address" placeholder="г.Тюмень, ул.Республики 51" required></div>
+				<div class="valid-feedback"></div>
+				<!-- <div class="mr"><span class="badge badge-primary bdg_address">Primary</span></div> -->
+			</div>
+			<div class="d-flex align-items-center my-2">
+				<div class="col-2"><label for="office">Доп информация по адресу:</label></div>
+				<div class="col-8 col-xl-6"><input class="form-control" type="text" id="office" placeholder="подъезд 3, подвал" name="office"></div>
+				<div class="valid-feedback"></div>
+				<!-- <div class="mr"><span class="badge badge-primary">Primary</span></div> -->
+			</div>		
+		
+			<div class="d-flex align-items-center my-2 block_model">
+				<div class="col-2"><label for="model"><label for="inputState">Модель оборудования:*</label></div>
+				<div class="col-8 col-xl-6"><input class="form-control typeahead" type="text" id="model" placeholder="2124MB" name="model" required></div>
+				<!-- <div class="mr"><span class="badge badge-primary">Primary</span></div> -->
+			</div>
+		
+			<div class="d-flex align-items-center my-2">
+				<div class="col-2"><label for="sn">S/N устройства:*</label></div>
+				<div class="col-8 col-xl-6"><input class="form-control" type="text" id="serial" placeholder="0Z0651029008" name="serial" required></div>
+				<div class="valid-feedback"></div>
+				<!-- <div class="mr"><span class="badge badge-primary">Primary</span></div> -->
+			</div>
+		
+			<div class="d-flex align-items-center my-2">
+				<div class="col-2"><label for="number_sd">Комментарий:</label></div>
+				<div class="col-8 col-xl-6"><input class="form-control" type="text" id="sd" placeholder="Будет включено через РРЛ" name="sd"></div>
+				<div class="valid-feedback"></div>
+				<!-- <div class="mr"><span class="badge badge-primary">Primary</span></div> -->
+			</div>
+			<div class="d-flex align-items-center my-2">
+				<div class="col-2"><label for="old_ip">Присвоить IP вручную:</label></div>
+				<div class="col-8 col-xl-6"><input class="form-control" type="text" id="old_ip" placeholder="10.224.35.11" name="old_ip"></div>
+			</div>
+		</div>
+	</div>
+	<div id="buttons" class="col-4 offset-2">
+		<button class="btn btn-primary" id="submit" type="submit">Send</button>
+		<!-- <button class="btn btn-primary" id="submit_test" type="submit_test">TEST</button> -->
+	</div>
+	<br>
+	<div class="row">
+		<div class="col-2"><label for="old_ip">Ваша Заявка:</label></div>
+		<div class="col-1"><span class ="acds_id" id="acds_id"></span></div>
+	</div>
+	<div class="row col-10 col-xl-8 block_acds_data">
+		<!-- <div class="col-6"><span class ="acds_data" id="acds_data"></span></div> -->
+	</div>
+
+	<div class="alert alert-danger alert-dismissible fade col-6" id="alert_uplink" role="alert">
+		<strong>Указанный IP/HOSTNAME адрес не существует</strong>
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="alert alert-danger alert-dismissible fade col-6" id="alert_model" role="alert">
+		<strong>Указанная модель не существует</strong>
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="alert alert-danger alert-dismissible fade col-6" id="alert_model_zyxel" role="alert">
+		<strong>Укажите корректную модель, 1212 или 1248</strong>
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="alert alert-danger alert-dismissible fade col-6" id="alert_address" role="alert">
+		<strong>Указанный адрес не существует в ФИАС</strong>
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+</form>
+</div>
+<script src="{% static 'activator/scripts/activator.js' %}"></script>
+
+
+
+{% endblock %}

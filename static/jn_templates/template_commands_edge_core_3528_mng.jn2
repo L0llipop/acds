@@ -1,0 +1,37 @@
+configure
+vlan database
+vlan {{ mgmvlan }} name MNG media ethernet state active
+exit
+interface VLAN {{ mgmvlan }}
+ip address {{ ipaddmgm }} {{ mask }}
+ exit
+ip default-gateway  {{ gw }}
+ interface ethernet 1/{{ port_uplink }}
+  switchport mode trunk
+  switchport allowed vlan add {{ mgmvlan }} tagged
+  switchport native vlan 1
+ exit
+exit
+
+copy running-config startup-config
+y
+ 
+
+-------Для проверки доступности управления  использовать ping---
+
+ping {{ gw }}
+
+Успешный ответ выглядит так 
+{{ networkname }}-0#ping {{ gw }}
+Type ESC to abort.
+PING to {{ gw }}, by 5 32-byte payload ICMP packets, timeout is 5 seconds
+response time: 140 ms
+response time: 200 ms
+response time: 10 ms
+response time: 0 ms
+response time: 0 ms
+Ping statistics for {{ gw }}: 
+ 5 packets transmitted, 5 packets received (100%), 0 packets lost (0%)
+Approximate round trip times: 
+ Minimum = 0 ms, Maximum = 200 ms, Average = 70 ms
+{{ networkname }}-0#

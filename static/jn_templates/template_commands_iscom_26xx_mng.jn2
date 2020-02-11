@@ -1,0 +1,20 @@
+config
+create vlan {{ mgmvlan }}
+
+vlan {{ mgmvlan }}
+name RTK-MANAGEMENT
+exit
+
+interface vlan {{ mgmvlan }}
+ip address {{ ipaddmgm }} {{ mask }}
+ip management-traffic cos 7 
+exit
+
+interface gigaethernet {{ port_uplink }}
+switchport mode trunk
+exit
+
+ip route 0.0.0.0 0.0.0.0 {{ gw }}
+exit
+
+write

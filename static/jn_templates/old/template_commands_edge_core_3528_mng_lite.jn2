@@ -1,0 +1,16 @@
+configure
+ ip default-gateway  {{gw}}
+ vlan database
+  vlan 13 name MNG media ethernet state active
+ exit
+ interface VLAN {{vlan_mng}}
+  IP address {{ip}} {{mask}}
+ exit
+ interface ethernet {{port_uplink}}
+  switchport mode trunk
+  switchport allowed vlan add {{vlan_mng}} tagged
+  switchport native vlan 1
+ exit
+exit
+
+copy running-config startup-config

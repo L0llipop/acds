@@ -1,0 +1,20 @@
+configure terminal
+
+vlan {{ mgmvlan }}
+ name mgm-vlan
+exit
+
+interface {{ port_uplink }}
+description ${{ uplink }}$
+switchport mode trunk
+exit
+
+interface Vlan {{ mgmvlan }}
+ ip address {{ ipaddmgm }} {{ mask }}
+ no ip route-cache
+exit
+
+ip default-gateway {{ gw }}
+exit
+
+copy running-config startup-config

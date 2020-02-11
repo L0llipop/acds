@@ -1,0 +1,73 @@
+enable
+configure
+no service password-encryption
+hostname {{ hostname }}
+
+username wizard privilege 15 password 0 nlFgw3Uh
+username admin privilege 15 password 7 8f3bf42bb1e250bdde22955ef3832996
+username inity2016 privilege 2 password 7 78d23bcf430170696f0a6e784a2834b0
+
+authentication line console login local
+authentication line vty login tacacs local
+authorization line vty exec tacacs local
+aaa authorization config-commands
+accounting line vty exec start-stop tacacs
+accounting line vty command 15 start-stop tacacs
+
+clock timezone EKB add 5 0
+
+logging executed-commands enable
+
+tacacs-server authentication host 10.184.121.4 key 7 qcsfdpZJKpQ=
+tacacs-server authentication host 10.178.199.4 key 7 qcsfdpZJKpQ=
+
+snmp-server enable
+snmp-server securityip disable
+snmp-server host 10.184.88.169 v2c inity2016
+snmp-server community ro 0 inity2016
+snmp-server community ro 7 xakHarXWzrI=
+snmp-server community rw 7 cI6TNOHMtNY=
+snmp-server enable traps
+
+vlan 1;{{ mgmvlan }};{{ pppoe['vlan'] }};{{ iptv['vlan'] }};{{ ims['vlan'] }};{{ tr069['vlan'] }}
+
+vlan {{ mgmvlan }}
+name MNG
+
+vlan {{ pppoe['vlan'] }}
+name PPPoE
+
+vlan {{ iptv['vlan'] }}
+name IP-TV
+
+vlan {{ ims['vlan'] }}
+name IMS
+
+vlan {{ tr069['vlan'] }}
+name TR069
+
+
+mac-access-list extended pppoeONLY
+  permit any-source-mac any-destination-mac vlanId {{ pppoe['vlan'] }} ethertype 34916
+  permit any-source-mac any-destination-mac vlanId {{ pppoe['vlan'] }} ethertype 34915
+  deny any-source-mac any-destination-mac
+  exit
+
+mls qos map cos-intp  0 1 1 3 2 3 3 3 
+mls qos map dscp-intp  8 9 10 11 12 13 14 15 to 1
+mls qos map dscp-intp  34 to 1
+mls qos map dscp-intp  24 25 26 27 28 29 30 31 to 3
+mls qos map dscp-intp  40 41 42 43 44 45 46 47 to 3
+mls qos queue weight 35 30 25 10 
+
+Interface Ethernet{{ port_downlink }}
+shutdown
+switchport mode trunk
+
+Interface Ethernet{{ port_uplink }}
+description ${{ uplink_and_port }}$
+
+ntp enable
+ntp server {{ default_gateway }}
+
+no login

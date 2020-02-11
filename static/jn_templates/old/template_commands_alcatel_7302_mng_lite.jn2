@@ -1,0 +1,18 @@
+configure interface shub port {{ port_uplink }} mode auto
+port-type network
+configure interface shub port {{ port_uplink }} admin-status auto-up
+
+configure system shub entry vlan ext-vlan-id {{ vlan_mng }}
+  exit all
+configure vlan shub id {{ vlan_mng }}
+  name mgm-vlan
+  egress-port network:{{ port_uplink }}
+  exit
+configure system mgnt-vlan-id {{ vlan_mng }}
+  exit all
+configure interface shub port {{ port_uplink }} port-type network admin-status auto-up
+  exit all
+
+configure system management no default-route 
+configure system management host-ip-address manual:{{ ip }}/{{ mask }}
+configure system management default-route {{ gw }}

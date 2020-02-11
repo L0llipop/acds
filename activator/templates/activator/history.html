@@ -1,0 +1,24 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+	<form class="needs-validation" id="history">
+		<div class="form-row">
+			<div class="col-12 col-xl-12">
+				<div class="d-flex align-items-center my-2">
+					<div class="col-2"><label for="id">ID заявки:</label></div>
+					<div class="col-2 col-xl-3"><input class="form-control" type="text" id="id" required></div>
+					<div class="valid-feedback"></div>
+					<button class="btn btn-primary" id="acds_id_btn" type="submit">Поиск</button>
+				</div>
+			</div>
+		</div>	
+	</form>
+	<table class="table table-bordered table-sm" id="logs">
+
+	</table>
+</div>
+
+<script src="{% static 'activator/scripts/history.js' %}"></script>
+{% endblock %}

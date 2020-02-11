@@ -1,0 +1,23 @@
+configure terminal
+
+management ip {{ ipaddmgm }} {{ mask }}
+management vid {{ mgmvlan }}
+management gateway {{ gw }}
+
+enable
+switch
+configure
+vlan {{ mgmvlan }}
+  name MNG
+  tagged front-port 4
+  tagged 10G-front-port 0
+  tagged port-channel 0
+  untagged mgmt-pon-port 0 , mgmt-pon-port 1
+  no ip igmp snooping enable
+exit
+commit
+exit
+exit
+
+commit
+save

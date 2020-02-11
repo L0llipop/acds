@@ -1,0 +1,68 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-xl-5 col-7">
+			<form id="massconfig" class="needs-validation" novalidate action="/activator/massconfig/" method="GET" onsubmit="get_massconfig(); return false;">
+				<div class="d-flex align-items-center my-2">
+
+				</div>
+				<div class="d-flex align-items-center my-2">
+					<div class="col-5">
+						<label for="ip_uplink">LOGIN:</label>
+					</div>
+					<div class="col-7 px-0">
+						<input class="form-control" type="text" id="login" required placeholder="admin">
+					</div>
+				</div>				
+				<div class="d-flex align-items-center my-2">
+					<div class="col-5">
+						<label for="ip_uplink">PASSWORD:</label>
+					</div>
+					<div class="col-7 px-0">
+						<input class="form-control" type="password" id="password" required placeholder="admin">
+					</div>
+				</div>					
+				<div class="d-flex align-items-center my-2">
+					<div class="col-5">
+						<label for="ip_uplink">Результат будет на странице</label>
+					</div>
+					<div class="col-7 px-0">
+						<a href="http://10.180.7.34/chat/massconfig/">Mass config chart</a>
+					</div>
+				</div>					
+			
+
+				<div class="form-group-lite">
+					<label for="text">Список IP адресов</label>
+					<textarea class="form-control" id="iplist" rows="5" required placeholder="10.228.63.228"></textarea>
+				</div>
+				
+				<div class="form-group-lite">
+					<label for="text">Коменды для отправки</label>
+					<textarea class="form-control" id="command_list" rows="5" required placeholder="show version"></textarea>
+				</div>
+						<!-- <div id="setting_mng"></div> -->
+						<!-- <div id="setting_all"></div> -->
+						<div id="result"></div>
+				<div class="d-flex align-items-center my-2">
+					<div class="col-3 offset-10"><button class="btn btn-primary" id="massconfig_submit" type="submit">Submit form</button></div>
+					<!-- <div class="col-2 offset-3"><input type="submit" value="Отправить данные" class="btn btn-primary"></div> -->
+				</div>				
+			</form>
+		</div>
+	
+		<div class="col-xl-7 col-5">
+			<div class="offset-1">
+				<div class="form-group">
+					<label for="text">Результат</label>
+					<textarea class="form-control" id="command_output" rows="10" placeholder="output"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="{% static 'activator/scripts/massconfig.js' %}"></script>
+{% endblock %}

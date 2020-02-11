@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+<div class="login-form">
+<h2 class="card-title text-center">{% trans "Sign In" %}</h2>
+
+	<form class="form-signin" method="POST" action="{% url 'account_login' %}">
+		{% csrf_token %}
+	
+<!-- 		<div class="checkbox"> -->
+	    <p>
+			<label for="id_user_name">E-mail:</label>
+			<input type="email" name="login" placeholder="E-mail address" autofocus="autofocus" required="" id="id_login" class="form-control">
+	    </p>
+	    <p>
+			<label for="id_password">Password:</label>
+			<input type="password" name="password" placeholder="Password" required="" id="id_password" class="form-control">
+	    </p>
+	    	{% if redirect_field_value %}
+	    	<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+		<!-- </div> -->
+	    {% endif %}
+		{% if form.errors %}
+    	{% for field in form %}
+    	    {% for error in field.errors %}
+    	        <div class="alert alert-error">
+    	            <strong>{{ error|escape }}</strong>
+    	        </div>
+    	    {% endfor %}
+    	{% endfor %}
+    	{% for error in form.non_field_errors %}
+    	    <div class="alert alert-error">
+    	        <strong>{{ error|escape }}</strong>
+    	    </div>
+    	{% endfor %}
+		{% endif %}	    
+	    <div class="form-group">
+	   		<button class="btn btn-primary btn-block" type="submit">{% trans "Login" %}</button>
+		</div>
+	    <div class="checkbox mb-3">
+            <label class="pull-left checkbox-inline"><input type="checkbox"> Remember me</label>
+            <a href="{% url 'account_reset_password' %}" class="float-right">{% trans "Forgot Password?" %}</a>
+		</div>
+	</form>
+	<p class="text-center">{% blocktrans %} <a href="{{ signup_url }}">Create an Account</a> {% endblocktrans %}</p>
+</div>
+</div>
+
+{% endblock %}

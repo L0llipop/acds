@@ -1,0 +1,104 @@
+{% if '3600' in model %}configure terminal
+
+interface {{ downlink }}
+ description ${{ hostname_port }}$
+ switchport trunk allowed vlan none
+ switchport mode trunk
+ no service-policy input INGRESS
+
+ service instance {{ mgmvlan }} ethernet
+  encapsulation dot1q {{ mgmvlan }}
+  rewrite ingress tag pop 1 symmetric
+  service-policy input INGRESS
+  bridge-domain {{ mgmvlan }}
+
+ service instance {{ pppoe['vlan'] }} ethernet
+  encapsulation dot1q {{ pppoe['vlan'] }}
+  rewrite ingress tag pop 1 symmetric
+  bridge-domain {{ pppoe['vlan'] }}
+ !
+ service instance {{ iptv['vlan'] }} ethernet
+  encapsulation dot1q {{ iptv['vlan'] }}
+  rewrite ingress tag pop 1 symmetric
+  bridge-domain {{ iptv['vlan'] }}
+ !
+ service instance {{ ims['vlan'] }} ethernet
+  encapsulation dot1q {{ ims['vlan'] }}
+  rewrite ingress tag pop 1 symmetric
+  bridge-domain {{ ims['vlan'] }}
+ !
+ service instance {{ tr069['vlan'] }}  ethernet
+  encapsulation dot1q {{ tr069['vlan'] }} 
+  rewrite ingress tag pop 1 symmetric
+  bridge-domain {{ tr069['vlan'] }} 
+ exit
+exit        
+
+copy running-config startup-config
+{% elif '3400' in model %}configure terminal
+
+interface {{ downlink }}
+description ${{ hostname_port }}$
+
+switchport mode trunk
+switchport trunk allowed vlan {{ mgmvlan }},{{ pppoe['vlan'] }},{{ iptv['vlan'] }},{{ ims['vlan'] }},{{ tr069['vlan'] }}
+exit
+exit
+
+copy running-config startup-config
+{% elif '4500' in model %}configure private
+
+set interfaces {{ downlink }} description "${{ hostname_port }}$"
+set interfaces {{ downlink }} mtu 9216
+set interfaces {{ downlink }} unit 0 family ethernet-switching port-mode trunk
+set interfaces {{ downlink }} unit 0 family ethernet-switching vlan members {{ mgmvlan }}
+set interfaces {{ downlink }} unit 0 family ethernet-switching vlan members {{ pppoe['vlan'] }}
+set interfaces {{ downlink }} unit 0 family ethernet-switching vlan members {{ iptv['vlan'] }}
+set interfaces {{ downlink }} unit 0 family ethernet-switching vlan members {{ ims['vlan'] }}
+set interfaces {{ downlink }} unit 0 family ethernet-switching vlan members {{ tr069['vlan'] }}
+set interfaces {{ downlink }} unit 0 family ethernet-switching filter output OUTPUT-ACCESS_FILTER
+{% if 'ae' in downlink or 'xe' in downlink %}set class-of-service interfaces {{ downlink }} scheduler-map qos_1
+{% elif 'ge' in downlink %}set class-of-service interfaces {{ downlink }} scheduler-map qos_2
+{% endif %}set class-of-service interfaces {{ downlink }} unit 0 classifiers dscp DSCPQoS
+
+show | compare
+
+commit
+{% elif '3124' in model or '3324' in model or '2124' in model or '2324' in model %}configure terminal
+
+interface {{ downlink }}
+description ${{ hostname_port }}$
+
+switchport mode trunk
+switchport trunk allowed vlan add {{ mgmvlan }},{{ pppoe['vlan'] }},{{ iptv['vlan'] }},{{ ims['vlan'] }},{{ tr069['vlan'] }}
+exit
+exit
+
+write memory
+{% elif 'MES-3528' in model or 'MES3500-24' in model or 'ES-2108G' in model %}configure
+interface port-channel {{ downlink }}
+name "${{ hostname_port }}$"
+exit
+vlan {{ mgmvlan }}
+fixed {{ downlink }}
+no untagged {{ downlink }}
+exit
+vlan {{ pppoe['vlan'] }}
+fixed {{ downlink }}
+no untagged {{ downlink }}
+exit
+vlan {{ iptv['vlan'] }}
+fixed {{ downlink }}
+no untagged {{ downlink }}
+exit
+vlan {{ ims['vlan'] }}
+fixed {{ downlink }}
+no untagged {{ downlink }}
+exit
+vlan {{ tr069['vlan'] }}
+fixed {{ downlink }}
+no untagged {{ downlink }}
+exit
+exit
+write memory 
+{% endif %}

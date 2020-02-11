@@ -1,0 +1,12 @@
+configure terminal
+
+interface {{ downlink }}
+description ${{ hostname }}$
+
+switchport mode trunk
+switchport trunk allowed vlan {{ mgmvlan }},{{ pppoe['vlan'] }},{{ iptv['vlan'] }},{{ ims['vlan'] }},{{ tr069['vlan'] }}
+
+exit
+exit
+
+copy running-config startup-config

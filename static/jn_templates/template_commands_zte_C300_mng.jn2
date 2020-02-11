@@ -1,0 +1,29 @@
+
+vlan database
+  vlan {{ mgmvlan }}
+
+!
+vlan {{ mgmvlan }}
+  name FTTX_MNG
+  description FTTX_MNG
+  multicast-packet drop-unknown
+!
+
+interface vlan {{ mgmvlan }}
+  ip address {{ ipaddmgm }} {{ mask }}
+exit
+
+
+interface {{ port_uplink }}
+  no shutdown
+  hybrid-attribute fiber
+  negotiation auto
+  flowcontrol disable
+  linktrap enable
+  switchport mode hybrid
+  switchport vlan {{ mgmvlan }} tag
+  port-protect disable
+  uplink-isolate disable
+!
+
+ip route 0.0.0.0 0.0.0.0 {{ gw }}

@@ -1,0 +1,15 @@
+
+.leaflet-popup-content-wrapper{
+ font-size: 12px;
+ min-height: 30px;
+ vertical-align:top;
+ border-radius: 5px;
+
+}
+.leaflet-popup-content{
+ margin: 2px !important;
+}
+
+.leaflet-popup-content-wrapper:before {
+    height: 0px;
+}

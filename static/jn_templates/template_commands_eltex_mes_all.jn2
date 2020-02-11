@@ -1,0 +1,207 @@
+configure
+ip dhcp information option
+ip dhcp snooping
+no ip dhcp snooping verify
+ip dhcp snooping information option allowed-untrusted
+ip dhcp relay enable
+ip dhcp information option format-type option user-defined "%h eth%p:%v"
+
+vlan database
+vlan {{ mgmvlan }} name MNG
+map protocol 8863 ethernet protocols-group 1
+map protocol 8864 ethernet protocols-group 1
+exit
+
+{%- if pppoe %}
+ vlan database
+  vlan {{ pppoe['vlan'] }} name {{ pppoe['name'] }}
+ exit
+ interface {{ port_uplink }}
+  switchport mode trunk
+  switchport trunk allowed vlan add {{ pppoe['vlan'] }}
+ exit
+ ip dhcp snooping vlan {{ pppoe['vlan'] }}
+{%- endif %}
+
+{%- if iptv %}
+ vlan database
+  vlan {{ iptv['vlan'] }} name {{ iptv['name'] }}
+ exit
+ interface {{ port_uplink }}
+  switchport mode trunk
+  switchport trunk allowed vlan add {{ iptv['vlan'] }}
+ exit
+ ip igmp snooping
+ ip igmp snooping vlan {{ iptv['vlan'] }}
+ ip igmp snooping vlan {{ iptv['vlan'] }} forbidden mrouter interface {{ port_downlink }}
+ ip igmp snooping vlan {{ iptv['vlan'] }} mrouter interface {{ port_uplink }}
+ ip igmp snooping vlan {{ iptv['vlan'] }} immediate-leave host-based
+ ip dhcp snooping vlan {{ iptv['vlan'] }}
+{%- endif %}
+
+{%- if tr069 %}
+ vlan database
+  vlan {{ tr069['vlan'] }} name {{ tr069['name'] }}
+ exit
+ interface {{ port_uplink }}
+  switchport mode trunk
+  switchport trunk allowed vlan add {{ tr069['vlan'] }}
+ exit
+ ip dhcp snooping vlan {{ tr069['vlan'] }}
+{%- endif %}
+
+{%- if ims %}
+ vlan database
+  vlan {{ ims['vlan'] }} name {{ ims['name'] }}
+ exit
+ interface {{ port_uplink }}
+  switchport mode trunk
+  switchport trunk allowed vlan add {{ ims['vlan'] }}
+ exit
+ ip dhcp snooping vlan {{ ims['vlan'] }}
+{%- endif %}
+
+interface range {{ port_downlink }}
+ loopback-detection enable
+ switchport protected {{ port_uplink }}
+
+ {%- if '2124' in model or '3124' in model or '1124' in model or '2208' in model %}
+  storm-control multicast enable
+  storm-control broadcast enable
+  storm-control unknown-unicast enable
+  storm-control broadcast logging
+  storm-control multicast level kbps 1000
+  storm-control broadcast level kbps 1000
+  storm-control unknown-unicast level kbps 1000
+  no ip dhcp information option format-type circuit-id
+
+ {%- elif '2324' in model or '2308' in model or '3508' in model %}
+  storm-control multicast unregistered kbps 1000 trap
+  storm-control broadcast kbps 1000 trap
+  storm-control unicast kbps 1000 trap
+  no ip dhcp information option format-type circuit-id
+
+ {%- elif '3324' in model or '3348' in model %}
+  storm-control multicast unregistered kbps 1000 trap
+  storm-control broadcast kbps 1000 trap
+  storm-control unicast kbps 1000 trap
+  no ip dhcp information option format-type circuit-id
+ {%- endif %}
+ {%- if '2124' in model or '2324' in model or '1124' in model or '2208' in model or '2308' in model or '3508' in model %}
+   no lldp transmit
+ {%- endif %}
+  spanning-tree disable
+  switchport forbidden default-vlan
+  qos tail-drop profile 1
+  pppoe intermediate-agent
+  no qos trust
+exit
+
+interface {{ port_uplink }}
+ description ${{ uplink_and_port }}$
+ lldp receive
+ lldp transmit
+ lldp management-address automatic {{ port_uplink }}
+ lldp optional-tlv sys-name
+ pppoe intermediate-agent trust
+ ip dhcp snooping trust
+exit
+
+line telnet
+password 5b4a7f457d33e5c2e8053b2afe41478be0f4e1f1 encrypted
+exit
+line ssh
+password 5b4a7f457d33e5c2e8053b2afe41478be0f4e1f1 encrypted
+exit
+line console
+password 5b4a7f457d33e5c2e8053b2afe41478be0f4e1f1 encrypted
+exit
+
+{%- if '2124' in model or '3124' in model or '1124' in model or '2224' in model %}
+ enable password level 15 admin
+ passwords aging 0
+ username admin privilege 15 password Cdbnx0AA
+ tacacs-server host 10.184.121.4 timeout 10 priority 1 key wpS29slv
+ tacacs-server host 10.178.199.4 timeout 10 priority 2 key wpS29slv
+ aaa authentication login default tacacs local
+ aaa accounting commands stop-only default tacacs
+ aaa authentication mode break
+ service cpu-rate-limits telnet 1024
+ no snmp-server trap authentication
+{%- elif '2324' in model or '3324' in model or '3348' in model or '2308' in model  or '3508' in model %}
+ username admin privilege 15 password Cdbnx0AA
+ tacacs-server host 10.184.121.4 timeout 10 key wpS29slv priority 1
+ tacacs-server host 10.178.199.4 timeout 10 key wpS29slv priority 2
+ aaa authentication login authorization default tacacs local
+ aaa authentication enable default line
+ aaa authentication mode break
+ aaa accounting commands stop-only group tacacs+
+ ip http authentication aaa login-authentication tacacs local
+ no snmp-server enable trap authentication
+{%- endif %}
+
+hostname {{ hostname }}
+snmp-server server
+snmp-server host 10.184.88.169 traps version 2c inity2016
+snmp-server enable traps
+snmp-server enable traps link-status
+snmp-server community inity2016 ro 10.184.88.160 mask 255.255.255.224 view Default
+snmp-server community inity2016 ro 10.184.88.173 mask 255.255.255.224 view Default
+bridge multicast filtering
+logging console errors
+logging host 10.228.60.12 severity warnings
+logging buffered 400
+no spanning-tree
+spanning-tree bpdu filtering
+pppoe intermediate-agent
+pppoe intermediate-agent format-type option user-defined {{ ip }}::%p::%v
+port jumbo-frame
+no boot host auto-config
+no boot host auto-update
+Port-Channel load-balance src-dst-mac-ip-port
+no ip routing
+
+clock source sntp
+sntp unicast client enable
+sntp unicast client poll
+sntp server {{ default_gateway }} poll
+clock timezone ekb +5
+
+loopback-detection enable
+loopback-detection interval 60
+errdisable recovery cause all
+errdisable recovery interval 60
+
+qos basic
+qos map dscp-dp 32 to 2
+qos map dscp-dp 33 to 2
+qos map dscp-dp 34 to 2
+qos map dscp-dp 35 to 2
+qos map dscp-dp 36 to 2
+qos map dscp-dp 37 to 2
+qos map dscp-dp 38 to 2
+qos map dscp-dp 39 to 2
+qos map dscp-queue 32 to 4
+qos map dscp-queue 33 to 4
+qos map dscp-queue 34 to 4
+qos map dscp-queue 35 to 4
+qos map dscp-queue 36 to 4
+qos map dscp-queue 37 to 4
+qos map dscp-queue 38 to 4
+qos map dscp-queue 39 to 4
+qos statistics queues 1 4 all all
+qos statistics queues 2 1 all all
+qos statistics interface
+qos tail-drop profile 1
+ queue 4 limit 400
+ queue 1 limit 400
+ port-limit 400
+exit
+
+banner login ^
+UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+You must have explicit, authorized permission to access or configure this device.
+Unauthorized attempts and actions to access or use this system may result in civil and/or
+criminal penalties.
+All activities performed on this device are logged and monitored.
+^

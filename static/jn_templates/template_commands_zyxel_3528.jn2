@@ -1,0 +1,115 @@
+configure
+admin-password Cdbnx0AA Cdbnx0AA
+tacacs-server host 1 10.184.121.4 key wpS29slv
+tacacs-accounting host 1 10.178.199.4 key wpS29slv
+aaa authentication login tacacs+ local
+aaa authorization exec tacacs+
+service-control ftp 21
+service-control ssh 22
+service-control https 443
+exit
+ 
+vlan1q ingress-check
+vlan 1
+ inactive 
+exit
+
+vlan {{ pppoe['vlan'] }}
+ name {{ pppoe['name'] }}
+ fixed {{ port_uplink }}
+ fixed {{ port_downlink }}
+exit
+
+vlan {{ iptv['vlan'] }}
+ name {{ iptv['name'] }}
+ fixed {{ port_uplink }}
+ fixed {{ port_downlink }}
+exit
+
+vlan {{ ims['vlan'] }}
+ name {{ ims['name'] }}
+ fixed {{ port_uplink }}
+ fixed {{ port_downlink }}
+exit
+
+vlan {{ tr069['vlan'] }}
+ name {{ tr069['name'] }}
+ fixed {{ port_uplink }}
+ fixed {{ port_downlink }}
+exit
+
+lldp
+interface port-channel *
+lldp admin-status rx-only
+exit
+
+interface port-channel 25-28
+lldp admin-status tx-rx
+lldp basic-tlv management-address 
+lldp basic-tlv system-capabilities 
+lldp basic-tlv system-description 
+lldp basic-tlv system-name
+exit
+
+hostname  {{ hostname }}
+
+time timezone 500 
+timesync server {{ default_gateway }} 
+timesync ntp 
+syslog server 10.228.60.12 level 7  
+
+dhcp snooping 
+dhcp snooping vlan {{ iptv['vlan'] }}
+dhcp snooping vlan {{ ims['vlan'] }}
+
+igmp-snooping 
+igmp-snooping vlan mode fixed 
+igmp-snooping vlan {{ iptv['vlan'] }} name {{ iptv['name'] }} 
+igmp-snooping unknown-multicast-frame drop 
+
+pppoe intermediate-agent
+pppoe intermediate-agent format-type access-node-identifier string {{ ip }}
+pppoe intermediate-agent format-type identifier-string string {{ ip }} option sp delimiter /
+pppoe intermediate-agent vlan {{ pppoe['vlan'] }}
+pppoe intermediate-agent vlan {{ pppoe['vlan'] }} circuit-id 
+pppoe intermediate-agent vlan {{ pppoe['vlan'] }} remote-id
+
+no spanning-tree 
+
+loopguard
+errdisable recovery
+errdisable recovery cause loopguard
+errdisable recovery cause loopguard interval 30
+
+snmp-server get-community public
+snmp-server set-community public
+snmp-server trap-community public
+snmp-server trap-destination 10.184.88.169
+snmp-server version v2c
+
+storm-control
+
+port-security {{ port_downlink }}
+port-security {{ port_downlink }} address-limit 12
+
+interface port-channel {{ port_downlink }}
+ igmp-snooping querier-mode edge
+ igmp-snooping group-limited 
+ igmp-snooping group-limited number 6 
+ vlan1q port-isolation
+ broadcast-limit 
+ broadcast-limit 20 
+ multicast-limit 
+ multicast-limit 10
+ loopguard
+exit
+
+interface port-channel {{ port_uplink }}
+ dhcp snooping trust
+ pppoe intermediate-agent trust
+ igmp-snooping querier-mode fixed
+ name ${{ uplink_and_port }}$
+exit
+exit
+
+write memory

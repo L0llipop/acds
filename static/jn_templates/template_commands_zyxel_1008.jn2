@@ -1,0 +1,47 @@
+home
+vlan1q
+
+svlan setentry {{ pppoe['vlan'] }} 1 fixed tag
+svlan setentry {{ pppoe['vlan'] }} 2 fixed untag
+svlan setentry {{ pppoe['vlan'] }} 3 fixed untag
+svlan setentry {{ pppoe['vlan'] }} 4 fixed untag
+svlan setentry {{ pppoe['vlan'] }} 5 fixed untag
+svlan setentry {{ pppoe['vlan'] }} 6 fixed untag
+svlan setentry {{ pppoe['vlan'] }} 7 fixed untag
+svlan setentry {{ pppoe['vlan'] }} 8 fixed untag
+svlan setentry {{ pppoe['vlan'] }} 9 fixed untag
+
+svlan setentry {{ tr069['vlan'] }} 1 fixed tag
+svlan setentry {{ tr069['vlan'] }} 2 fixed untag
+svlan setentry {{ tr069['vlan'] }} 3 fixed untag
+svlan setentry {{ tr069['vlan'] }} 4 fixed untag
+svlan setentry {{ tr069['vlan'] }} 5 fixed untag
+svlan setentry {{ tr069['vlan'] }} 6 fixed untag
+svlan setentry {{ tr069['vlan'] }} 7 fixed untag
+svlan setentry {{ tr069['vlan'] }} 8 fixed untag
+svlan setentry {{ tr069['vlan'] }} 9 fixed untag
+
+home
+
+sys set name {{hostname}}
+
+adsl
+adsl delete chs 
+set chs * {{ vpi_pppoe }} {{ vci_pppoe }} {{ pppoe['vlan'] }} 0 DEFVAL
+set chs * 7 49 {{ tr069['vlan'] }} 0 DEFVAL
+adsl enable ports
+
+adsl set profile base-1 512 1024 ldly 16 16 6 0 31 32 6 0 31 32
+adsl set profile base-2 512 2048 ldly 16 16 6 0 31 32 6 0 31 32
+adsl set profile base-4 512 4096 ldly 16 16 6 0 31 32 6 0 31 32
+adsl set profile base-8 512 8144 ldly 16 16 6 0 31 32 6 0 31 32
+adsl set profile base-01 128 128 ldly 16 16 6 0 31 32 6 0 31 32
+adsl set profile base-02 256 256 ldly 16 16 6 0 31 32 6 0 31 32
+adsl set profile base-05 512 512 ldly 16 16 6 0 31 32 6 0 31 32
+
+
+adsl set ports base-4 auto
+
+
+home
+config save

@@ -1,0 +1,13 @@
+configure 
+ vlan {{ mgmvlan }}
+  name MNG-vlan 
+  fixed {{ port_uplink }}
+  forbidden {{ port_downlink  }}
+  ip address default-management {{ ipaddmgm }} {{ mask }}
+  ip address default-gateway {{ gw }}
+  exit
+ interface port-channel {{ port_uplink }}   
+  exit
+exit
+write memory
+ 

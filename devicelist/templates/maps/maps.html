@@ -1,0 +1,43 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+ <hr size="1">
+  <script src="https://maps.api.2gis.ru/2.0/loader.js"> </script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="/static/css/style_2gis.css"/>
+  <input id="showServices" type="button" value="Сервисы" />
+   <div id="map" style="width: 100%; height: 900px;"></div>
+   <script src="{% static 'js/maps.js' %}"></script>
+<!--     <script>
+
+
+            DG.then(function() {
+
+                map = DG.map('map', {
+                    center: [57.151184, 65.547212],
+                    zoom: 16
+                });
+
+                marker = DG.marker([57.150777, 65.546021]).addTo(map);
+                marker.bindPopup('RTK');
+                marker.openPopup();
+				console.log("start map config");
+                mapdata1 = get_massconfig();
+				console.log(mapdata1);
+                $.each(mapdata1 , function(key, value) { 
+					var latitude = value["lat"];
+					var longitude = value["lon"];
+					var title = value["model"];
+					var marker = DG.marker([latitude, longitude], { title: title });
+					marker.bindPopup(title);
+					markers.addLayer(marker);
+					});
+
+            });
+  </script> -->
+
+
+
+{% endblock %}

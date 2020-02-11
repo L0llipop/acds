@@ -1,0 +1,323 @@
+configure terminal
+hostname {{ hostname }}
+clock timezone hours 05 minutes 00
+ip sntp poll-period 1440
+ip sntp server {{ default_gateway }}
+ip sntp client
+ip igmp snooping pp4x enable
+ip igmp unregistered ip4-mc drop
+
+{%- for slot_num in range(16) %}
+ slot {{slot_num}} type plc8
+ slot {{slot_num}} profile dhcp-ra "dhcp-ra-01"
+ slot {{slot_num}} profile dhcp-ra "dhcp-ra-01" vlan {{ims['vlan']}}
+ qos type 2 slot {{slot_num}}
+ qos map 1 32-39 to 4 slot {{slot_num}}
+ qos map 1 40-47 to 5 slot {{slot_num}}
+ qos map 1 48-63 to 6 slot {{slot_num}}
+{%- endfor %}
+
+cli session-timeout 5
+cli max-sessions 3
+cli confirmation timer 15
+
+
+logging console error
+logging monitor crit
+logging host 10.184.88.169 port 514 transport udp info
+logging file-size 200
+logging max-files 1
+logging filter pp
+ facility any debug
+exit
+
+port-channel load-balance mac
+qos type 2 pp
+qos map 1 32-39 to 4 pp
+qos map 1 40-47 to 5 pp
+qos map 1 48-63 to 6 pp
+
+
+vlan 1
+ forbidden front-port 1/0
+ forbidden front-port 1/1
+ forbidden front-port 1/3
+ forbidden front-port 1/4
+ forbidden front-port 1/5
+ forbidden front-port 2/0
+ forbidden front-port 2/1
+ forbidden front-port 2/3
+ forbidden front-port 2/4
+ forbidden front-port 2/5
+ no ip igmp snooping pp4x enable
+exit
+
+vlan {{pppoe['vlan']}} 
+ name {{pppoe['name']}}
+ tagged port-channel 1
+{%- for slot_num in range(16) %}
+ tagged slot-channel {{slot_num}}
+{%- endfor %}
+ no ip igmp snooping pp4x enable
+exit
+
+vlan {{iptv['vlan']}}
+ name {{iptv['name']}}
+ tagged port-channel 1
+{%- for slot_num in range(16) %}
+ tagged slot-channel {{slot_num}}
+{%- endfor %}
+ no ip igmp snooping mrouter learning
+ ip igmp snooping pp4x enable
+ ip igmp snooping mrouter add port-channel 1
+exit
+
+vlan {{ims['vlan']}}
+ name {{ims['name']}}
+ tagged port-channel 1
+{%- for slot_num in range(16) %}
+ tagged slot-channel {{slot_num}}
+{%- endfor %}
+ no ip igmp snooping mrouter learning
+ no ip igmp snooping pp4x enable
+exit
+
+vlan {{tr069['vlan']}} 
+ name {{tr069['name']}}
+ tagged port-channel 1
+{%- for slot_num in range(16) %}
+ tagged slot-channel {{slot_num}}
+{%- endfor %}
+ no ip igmp snooping pp4x enable
+exit
+
+user admin crypted_password $6$TOU0yx0MIo6radRF$EUXPHrgr9V60MiHqVAPyO1vfeBsTsbgL6CxpyDdi2kRD0jPuGaH7FuH8t22jerNXG4xiiS1uARC60L/GsNFIh0
+user hpsamain crypted_password $6$oB.jRqFzt2U.julP$nwUur0n.NGk/4AdQn4R/yOTZwyA5ViwpIWBOHqBoTmRaDYQo8y8hrsULvsizblycduD.qrgXiUUd//WIg1Y1L0
+user hpsamain privilege 15
+ip snmp agent system name {{ hostname }}
+ip snmp agent traps informs 10.228.130.197
+ip snmp agent traps trapsv2 10.184.86.27
+backup ontimer-period 86400
+cli session-timeout 3
+tacacs-server host 10.184.121.4
+ encrypted key DE85B37F05B9E369
+exit
+tacacs-server host 10.178.199.4
+  priority 1
+  encrypted key DE85B37F05B9E369
+exit
+aaa authentication login default tacacs+ local 
+aaa accounting commands tacacs+
+
+cli display received-password 
+gpon olt unactivated-timout 10
+gpon olt ont-sn-format "numerical"
+gpon olt password-in-trap
+gpon olt model "2"
+ip igmp snooping enable
+
+profile address-table "addresstable-00"
+ description "default"
+ no discard-pid-unlearned-sa
+ s-vlan {{ims['vlan']}}
+ exit
+ profile pppoe-ia "pppoe-ia-00"
+ description "PPPoEAgent"
+ enable
+ format circuit-id "%HOSTNAME%:ONT-%SLOTID%-%GPON-PORT%-%ONTID%:%VLAN0%"
+ sessions-limit 8192 per-user 4
+exit
+
+profile dhcp-ra "dhcp-ra-01"
+ description "OPTIONS82"
+ enable
+ overwrite-option82 circuit-id "%HOSTNAME%:ONT-%SLOTID%-%GPON-PORT%-%ONTID%"
+ overwrite-option82 remote-id "%HOSTNAME%"
+ overwrite-option82
+exit
+
+profile cross-connect "crossconnect-01"
+ description "ACS"
+ bridge
+ bridge group "9"
+ outer vid "{{tr069['vlan']}}"
+ type "management"
+exit
+
+profile cross-connect "crossconnect-02"
+ description "HSI"
+ bridge group "1"
+ outer vid "{{pppoe['vlan']}}"
+ user vid "20"
+exit
+
+profile cross-connect "crossconnect-03"
+ description "IMS"
+ bridge group "1"
+ outer vid "{{ims['vlan']}}"
+ user vid "30"
+exit
+
+profile cross-connect "crossconnect-04"
+ description "TVMC"
+ bridge group "1"
+ outer vid "{{iptv['vlan']}}"
+ user vid "40"
+ type "multicast"
+exit
+
+profile cross-connect "crossconnect-05"
+ description "TVUC"
+ bridge group "1"
+ outer vid "{{iptv['vlan']}}"
+ user vid "40"
+exit
+
+profile cross-connect "crossconnect-06"
+ description "VPN"
+exit
+
+profile dba "dba-00"
+ sla class "data"
+exit
+
+profile ports "ports-01"
+ veip multicast
+ veip upstream vid "40"
+ veip upstream tag-control replace-tag
+ veip downstream vid "40"
+ veip downstream tag-control replace-tag
+exit
+
+template "template-01"
+ undefine fec
+ undefine broadcast-downstream
+ undefine ber interval
+ undefine ber update-period
+ undefine profile shaping
+ service 0 profile cross-connect "crossconnect-02"
+ service 0 profile dba "dba-00"
+ service 1 profile cross-connect "crossconnect-03"
+ service 1 profile dba "dba-00"
+ service 2 profile cross-connect "crossconnect-04"
+ service 2 profile dba "dba-00"
+ service 3 profile cross-connect "crossconnect-05"
+ service 3 profile dba "dba-00"
+ undefine service 4 profile cross-connect
+ undefine service 4 profile dba
+ service 5 profile cross-connect "crossconnect-06"
+ service 5 profile dba "dba-00"
+ service 6 profile cross-connect "crossconnect-06"
+ service 6 profile dba "dba-00"
+ service 7 profile cross-connect "crossconnect-06"
+ service 7 profile dba "dba-00"
+ undefine profile ports
+ undefine profile management
+ undefine profile scripting
+ undefine rf-port-state
+ undefine omci-error-tolerant
+exit
+profile cross-connect "NTU-1-TR069U" 
+description "NTU-1-TR069 UNTAGGED" 
+bridge
+bridge group "2" 
+outer vid "{{tr069['vlan']}}"
+exit
+profile cross-connect "NTU-1-HSI" 
+description "NTU-1-HSI" 
+bridge
+bridge group "2" 
+outer vid "{{pppoe['vlan']}}"
+user vid "20"
+exit
+profile cross-connect "NTU-1-VoIP" 
+description "NTU-1-VoIP" 
+bridge
+bridge group "2" 
+outer vid "{{ims['vlan']}}"
+user vid "30"
+exit
+profile cross-connect "NTU-1-IPTV" 
+description "NTU-1-IPTV" 
+bridge
+bridge group "2" 
+outer vid "{{iptv['vlan']}}"
+user vid "40"
+type "multicast" 
+exit
+profile ports "NTU-1" 
+igmp multicast dynamic-entry 0 vid "40" 
+igmp multicast dynamic-entry 0 group "224.0.0.0" "239.255.255.255" 
+port 0 bridge group "2" 
+port 0 multicast
+port 0 igmp upstream vid "{{iptv['vlan']}}"
+port 0 igmp downstream vid "40" 
+exit
+template "NTU-1-3PLAY" 
+undefine fec
+undefine broadcast-downstream
+undefine ber interval
+undefine ber update-period
+undefine profile shaping
+service 0 profile cross-connect "NTU-1-TR069U" 
+service 0 profile dba "dba-00" 
+service 1 profile cross-connect "NTU-1-HSI" 
+service 1 profile dba "dba-00" 
+service 2 profile cross-connect "NTU-1-VoIP" 
+service 2 profile dba "dba-00" 
+service 3 profile cross-connect "NTU-1-IPTV" 
+service 3 profile dba "dba-00" 
+profile ports "NTU-1" 
+exit
+{%- for slot_num in range(16) %}
+vlan {{pppoe['vlan']}}
+tagged plc-pon-port {{slot_num}}/0
+tagged plc-pon-port {{slot_num}}/1
+tagged plc-pon-port {{slot_num}}/2
+tagged plc-pon-port {{slot_num}}/3
+tagged plc-pon-port {{slot_num}}/4
+tagged plc-pon-port {{slot_num}}/5
+tagged plc-pon-port {{slot_num}}/6
+tagged plc-pon-port {{slot_num}}/7
+tagged plc-slot-channel {{slot_num}}/0
+no ip igmp snooping slot {{slot_num}} enable
+exit
+vlan {{iptv['vlan']}}
+tagged plc-pon-port {{slot_num}}/0
+tagged plc-pon-port {{slot_num}}/1
+tagged plc-pon-port {{slot_num}}/2
+tagged plc-pon-port {{slot_num}}/3
+tagged plc-pon-port {{slot_num}}/4
+tagged plc-pon-port {{slot_num}}/5
+tagged plc-pon-port {{slot_num}}/6
+tagged plc-pon-port {{slot_num}}/7
+tagged plc-slot-channel {{slot_num}}/0
+exit
+vlan {{ims['vlan']}}
+tagged plc-pon-port {{slot_num}}/0
+tagged plc-pon-port {{slot_num}}/1
+tagged plc-pon-port {{slot_num}}/2
+tagged plc-pon-port {{slot_num}}/3
+tagged plc-pon-port {{slot_num}}/4
+tagged plc-pon-port {{slot_num}}/5
+tagged plc-pon-port {{slot_num}}/6
+tagged plc-pon-port {{slot_num}}/7
+tagged plc-slot-channel {{slot_num}}/0
+no ip igmp snooping slot {{slot_num}} enable
+exit
+vlan {{tr069['vlan']}}
+tagged plc-pon-port {{slot_num}}/0
+tagged plc-pon-port {{slot_num}}/1
+tagged plc-pon-port {{slot_num}}/2
+tagged plc-pon-port {{slot_num}}/3
+tagged plc-pon-port {{slot_num}}/4
+tagged plc-pon-port {{slot_num}}/5
+tagged plc-pon-port {{slot_num}}/6
+tagged plc-pon-port {{slot_num}}/7
+tagged plc-slot-channel {{slot_num}}/0
+exit
+{%- endfor %}
+exit
+commit
+confirm
+exit

@@ -1,0 +1,43 @@
+create vlan MNG tag {{ vlan_mng }}
+config vlan MNG add tagged {{ port_uplink }}
+
+
+config ipif System state enable
+config ipif System ipaddress {{ ip }}/{{ mask }}
+create iproute default {{ gw }} 1 
+config ipif System vlan MNG ipaddress {{ ip }}/{{ mask }} state enable
+
+save
+
+
+прошивка 3200-28 ревизии C1, если прошивка ниже 4.38 то обновлять через промежуточную прошивку 4.38
+download firmware_fromTFTP 10.228.63.237 src_file FTP/FTTb/DES3200R_4.38.B000(C1).had boot_up
+download firmware_fromTFTP 10.228.63.237 src_file FTP/FTTb/DES3200R_4.46.B008_revC1.had boot_up
+show boot_file
+dir
+config firmware image c:/DES3200R_4.46.B008_revC1.had boot_up
+
+
+
+DGS-3120-24SC
+download firmware_fromTFTP 10.228.63.237  src_file FTP/FTTb/DGS3120_Run_3_12_R012.had boot_up
+
+
+
+
+
+DES-3200-52  revC
+
+download firmware_fromTFTP 10.228.63.237 src_file FTP/FTTb/DES3200R_4.38.B000(C1).had boot_up
+download firmware_fromTFTP 10.228.63.237 src_file FTP/FTTb/DES3200R_4.51.B005.had boot_up
+
+
+
+
+
+DGS-3612g
+сначала  DGS36xxRun_2.52-B45.had
+потом   DGS36xx_Run_3_00_B48.had
+
+download firmware_fromTFTP 10.228.63.237 FTP/FTTb/DGS36xxRun_2.52-B45.had
+download firmware_fromTFTP 10.228.63.237 src_file  FTP/FTTb/DGS36xx_Run_3_00_B48.had

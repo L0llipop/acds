@@ -1,0 +1,14 @@
+config terminal 
+vlan {{ vlan_mng }}
+ name MNG
+ vlan active
+!
+interface {{ port_uplink }}
+switchport mode trunk
+!
+interface vlan {{ vlan_mng }}
+ ip address {{ ip }} {{ mask }}
+!
+ip route 0.0.0.0  0.0.0.0 {{ gw }}
+end
+copy running-config startup-config 

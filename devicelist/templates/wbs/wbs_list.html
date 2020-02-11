@@ -1,0 +1,64 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+	<hr size="1">
+	<style>
+		h6 {
+		font-family: 'Times New Roman', Times, serif; /* Гарнитура текста */ 
+		font-size: 20%%; /* Размер шрифта в процентах */ 
+		}
+	</style>
+		<table class="table table-sm">
+			<tr>
+				<form id="wbs_commit">
+				{% csrf_token %}
+				<th style="width: 15%"><input class="form-control" placeholder="IP" type="text" name="ip_address" maxlength="50" id="ip_address" required></td>
+				<th style="width: 10%"><input class="form-control" placeholder="SSID 0" type="text" name="wlan0_ssid" maxlength="50" id="wlan0_ssid"></td>
+				<th style="width: 4"><input class="form-control" placeholder="Азимут 0" type="number" name="wlan0_azimuth" maxlength="50" id="wlan0_azimuth"></td>
+				<th style="width: 9%"><input class="form-control" placeholder="MAC 0" type="text" name="wlan0_mac" maxlength="50" id="wlan0_mac"></td>
+				<th style="width: 10%"><input class="form-control" placeholder="SSID 1" type="text" name="wlan1_ssid" maxlength="50" id="wlan1_ssid"></td>
+				<th style="width: 4"><input class="form-control" placeholder="Азимут 1" type="number" name="wlan1_azimuth" maxlength="50" id="wlan1_azimuth"></td>
+				<th style="width: 9%"><input class="form-control" placeholder="MAC 1" type="text" name="wlan1_mac" maxlength="50" id="wlan1_mac"></td>
+				<th style="width: 10%"><input class="form-control" placeholder="SSID 2" type="text" name="wlan2_ssid" maxlength="50" id="wlan2_ssid"></td>
+				<th style="width: 4"><input class="form-control" placeholder="Азимут 2" type="number" name="wlan2_azimuth" maxlength="50" id="wlan2_azimuth"></td>
+				<th style="width: 9%"><input class="form-control" placeholder="MAC 2" type="text" name="wlan2_mac" maxlength="50" id="wlan2_mac"></td>
+				<th style="width: 3%" id="commitfield"><input class="btn btn-dark" style='' id="wbs_submit" type="submit" value="Commit"></td>
+				</form>
+			</tr>
+		</table>
+	<table class="table table-sm" id="mytable">
+		<thead class="thead-light">
+			<tr>
+				<th id="CITY_NAME" style="width: 12">Address</th>
+				<th id="IPADDMGM" style="width: 5">IP</th>
+				<th id="NETWORKNAME" style="width: 15">hostname</th>
+				<th id="MAC" style="width: 15">MAC</th>
+				<th id="Model" style="width: 6%">model</th>
+				<th id="wlan0" style="width: 15">Radio 0</th>
+				<th id="wlan1" style="width: 15">Radio 1</th>
+				<th id="wlan2" style="width: 15">Radio 2</th>
+				<th id="geo" style="width: 15">Geo lat lon</th>
+			</tr>
+			{% for rr in sqldata %}
+			<tr>
+					<td id="CITY_NAME" style="width: 12">{{rr.0}}</td>
+					<td id="IPADDMGM" style="width: 5">{{rr.1}}</td>
+					<td id="NETWORKNAME" style="width: 15">{{rr.2}}</td>
+					<td id="MAC" style="width: 15">mac={{rr.3}} sn={{rr.19}}</td>
+					<td id="Model" style="width: 6%">{{rr.4}}</td>
+					<td id="wlan0" style="width: 15">fr={{rr.5}} ssid={{rr.6}} azim={{rr.7}} mac={{rr.8}}</td>
+					<td id="wlan1" style="width: 15">fr={{rr.9}} ssid={{rr.10}} azim={{rr.11}} mac={{rr.12}}</td>
+					<td id="wlan2" style="width: 15">fr={{rr.13}} ssid={{rr.14}} azim={{rr.15}} mac={{rr.16}}</td>
+					<td id="geo" style="width: 15">шир={{rr.17}} дол={{rr.18}}<a href="https://yandex.ru/maps/?l=sat%2Cskl&ll={{rr.18}}%2C{{rr.17}}&mode=whatshere&whatshere%5Bpoint%5D={{rr.18}}%2C{{rr.17}}&whatshere%5Bzoom%5D=17&z=17" target="YANDEX_MAP"><img src="/static/geolocation.png" width="22" height="22"></a></td>
+			</tr>
+			{% endfor %}
+		</thead>
+		<tbody id="data">
+		</tbody>
+	</table>
+
+	<div id="show_more"></div>
+<br>
+<script src="{% static 'devicelist/scripts/wbs.js' %}"></script>
+{% endblock %}

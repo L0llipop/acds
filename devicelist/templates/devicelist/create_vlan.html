@@ -1,0 +1,21 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div id="create_vlan" class="row col-xl-6 col-lg-8 col-12">
+        <div id="forma" class="row col-12 align-items-center my-2">
+            <div class="col-4"><input class="form-control" type="search" id="ip_address" placeholder="10.228.130.130" required></div>
+            <div class="col-2"><input class="form-control" type="search" id="vlan" placeholder="123" required></div>
+            <div class="col-2"><input class="btn btn-dark" id="create_vlan_submit" type="submit" value="FIND"></div>
+            {# <div class="col-1"><input class="form-check-input" type="checkbox" id="online" value="option1">Online</div> #}
+            {# <div class="col-3" id="error"></div> #}
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'devicelist/scripts/create_vlan.js' %}"></script>
+
+{% endblock %}

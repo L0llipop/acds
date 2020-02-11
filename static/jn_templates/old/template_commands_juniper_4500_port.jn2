@@ -1,0 +1,20 @@
+
+
+configure private
+
+
+set interfaces {{downlink}} description "${{hostname}}_{{port_uplink}}$"
+set interfaces {{downlink}} mtu 9216
+set interfaces {{downlink}} unit 0 family ethernet-switching port-mode trunk
+set interfaces {{downlink}} unit 0 family ethernet-switching vlan members {{vlan_mng}}
+set interfaces {{downlink}} unit 0 family ethernet-switching vlan members {{pppoe['vlan']}}
+set interfaces {{downlink}} unit 0 family ethernet-switching vlan members {{iptv['vlan']}}
+set interfaces {{downlink}} unit 0 family ethernet-switching vlan members {{ims['vlan']}}
+set interfaces {{downlink}} unit 0 family ethernet-switching vlan members {{ tr069['vlan']}}
+set interfaces {{downlink}} unit 0 family ethernet-switching filter output OUTPUT-ACCESS_FILTER
+set class-of-service interfaces {{downlink}} scheduler-map qos_2
+set class-of-service interfaces {{downlink}} unit 0 classifiers dscp DSCPQoS
+
+show | compare
+
+commit

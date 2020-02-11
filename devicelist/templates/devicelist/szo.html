@@ -1,0 +1,73 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-3 px-0">
+			<table class="table table-sm">
+				<thead class="thead-light">
+					<tr>
+						<th>Username</th>
+						<th>Count</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for key, value in count.items %}<tr>
+						<td>{{ key }}</td>
+						<td>{{ value }}</td>
+					</tr>{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="offset-1 col-3 px-0">
+			<table class="table table-sm">
+				<thead class="thead-light">
+					<tr>
+						<th>Stat</th>
+						<th>Count</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for key, value in count_stat.items %}<tr>
+						<td>{{ key }}</td>
+						<td>{{ value }}</td>
+					</tr>{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<table class="table table-sm">
+		<thead class="thead-light">
+			<tr>
+				{% for k in key %}
+				{% if k != 'geolat' and k != 'geolon' %}<th>{{ k }}</th>{% endif %}{% endfor %}
+				<th>Подряд</th>
+			</tr>
+		</thead>
+		<tbody class="tbody-light">
+			{% for key, value in data.items %}<tr>
+				<td><font size="2">{{ value.ip }}</font></td>
+				<td><font size="2">{{ value.hostname }}</font></td>
+				<td><font size="2">{{ value.model }}</font></td>
+				<td><font size="2">{{ value.id }}</font></td>
+				<td><font size="2">{{ value.date }}</font></td>
+				<td><font size="2">{{ value.time }}</font></td>
+				<td><font size="2">{{ value.status }}</font></td>
+				<td><font size="2">{{ value.serial }}</font></td>
+				<td><font size="2">{{ value.addres }}</font></td>
+				<td><font size="2">{{ value.user }}</font></td>
+				<td><font size="2">{{ value.area }}</font></td>
+				<td><font size="2">{{ value.stat }}</font></td>
+				<td><font size="2">{{ value.contractor }}</font></td>
+			</tr>{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+
+{% endblock %}

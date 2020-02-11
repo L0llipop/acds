@@ -1,0 +1,22 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+
+	<div class="d-flex flex-row align-items-center">
+		<!-- <div class="row align-items-center my-2"> -->
+			<div class="p-2">{{ datetime }}</div>
+			<div class="p-2">Create room:</div>
+			<div class="p-2"><input id="room-name-input" type="text" /></div>
+			<div class="p-2"><input id="room-name-submit" type="button" value="Enter"/></div>
+		<!-- </div> -->
+	</div>
+	<div class="d-flex flex-column">
+		<div class="p-2">Chat rooms</div>
+		<div class="p-2"><input class="btn btn-info" id="log_free_ip" type="button" value="Log free ip"></div>
+		<div class="p-2"><input class="btn btn-info" id="log_configure" type="button" value="Log configure"></div>
+		<div class="p-2"><input class="btn btn-info" id="mass_config" type="button" value="massconfig"></div>
+	</div>
+
+<script src="{% static 'chat/scripts/index.js' %}"></script>
+{% endblock %}

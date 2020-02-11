@@ -1,0 +1,48 @@
+configure interface shub port {{ port_uplink }} mode auto
+port-type network
+configure interface shub port {{ port_uplink }} admin-status auto-up
+
+
+configure system shub entry vlan ext-vlan-id {{ mgmvlan }}
+  exit all
+configure vlan shub id {{ mgmvlan }}
+  name mgm-vlan
+  egress-port network:{{ port_uplink }}
+  exit
+configure system mgnt-vlan-id {{ mgmvlan }}
+  exit all
+configure interface shub port {{ port_uplink }} port-type network admin-status auto-up
+  exit all
+
+configure system management no default-route 
+configure system management host-ip-address manual:{{ ipaddmgm }}/{{ mask }}
+configure system management default-route {{ gw }}
+
+
+--- Для просмотра конфигурации -------------------------------
+
+configure system management
+info
+
+--- должно выглядеть так -------------------------------------
+management
+  host-ip-address manual:{{ ipaddmgm }}/{{ mask }}
+  default-route {{ gw }}
+  exit
+exit
+--------------------------------------------------------------
+
+--- Для проверки доступности управления  использовать ping ---
+
+ping {{ gw }}
+
+
+ip-addr        |received  |sent      |loss      |mean-delay|max-delay |min-delay 
+---------------+----------+----------+----------+----------+----------+----------
+{{ gw }}   1          1          0          1          1          1         
+{{ gw }}   2          2          0          2          2          2         
+{{ gw }}   3          3          0          1          1          1         
+{{ gw }}   4          4          0          1          1          1         
+{{ gw }}   5          5          0          223        223        223       
+---------------------------------------------------------------------------------
+ping count : 5

@@ -1,0 +1,71 @@
+sys user server 10.184.121.4 49 wpS29slv high
+sys user auth tacacsplus local
+
+switch enet name enet1 {{ uplink }}
+
+sys info hostname {{ hostname }}
+
+sys snmp getcommunity inity2016
+sys snmp setcommunity inity2016
+sys snmp trapcommunity inity2016
+sys snmp trustedhost 10.184.88.173
+
+sys timeserver set ntp {{ default_gateway }} utc+0500
+sys timeserver sync
+
+sys syslog server 10.224.67.251
+sys syslog enable
+
+switch igmpsnoop enable snooping v2
+
+switch igmpsnoop igmpcount enable *
+switch igmpsnoop igmpcount set * 5
+
+switch mac antispoofing disable 
+
+adsl annexm enable *
+
+switch poeagent set {{ pppoe['vlan'] }}
+switch poeagent info {{ pppoe['vlan'] }} {{ ipaddmgm }}
+switch poeagent optionmode {{ pppoe['vlan'] }} tr101
+switch poeagent enable {{ pppoe['vlan'] }}
+
+switch vlan pvid * 1
+
+adsl enable *
+
+switch mac count enable *
+switch mac count set * 12
+
+sys monitor tlimit 1 65 0
+sys monitor tlimit 2 65 0
+sys monitor tlimit 3 65 0
+
+adsl profile set base-02 interleave=16,16 256 256
+adsl profile set base-05 interleave=16,16 256 512
+adsl profile set base-1 interleave=16,16 384 1024
+adsl profile set base-2 interleave=16,16 408 2048
+adsl profile set base-4 interleave=16,16 460 4096
+adsl profile set base-6 interleave=16,16 480 6144
+adsl profile set base-8 interleave=16,16 512 8192
+adsl profile set base-10 interleave=16,16 1024 10240
+adsl profile set base-12 interleave=16,16 1024 12288
+adsl profile set base-14 interleave=16,16 1024 14336
+adsl profile set base-16 interleave=16,16 1024 16384
+adsl profile set base-18 interleave=16,16 1024 18432
+adsl profile set base-20 interleave=16,16 1024 20480
+
+switch vlan set {{ pppoe['vlan'] }} *:FU enet1,enet2:FT {{ pppoe['name'] }} 
+switch vlan set {{ iptv['vlan'] }} enet1,enet2:FT {{ iptv['name'] }}
+switch vlan set {{ tr069['vlan'] }} enet1,enet2:FT {{ tr069['name'] }}
+
+adsl pvc delete * 0 33
+
+adsl pvc set * {{ vpi_pppoe }} {{ vci_pppoe }} {{ pppoe['vlan'] }} 0 DEFVAL
+adsl pvc set * {{ vpi_ip_tv }} {{ vci_ip_tv }} {{ iptv['vlan'] }} 5 DEFVAL
+adsl pvc set * 7 49 {{ tr069['vlan'] }} 0 DEFVAL 
+
+adsl inp * 2,2
+adsl profile map * base-16 auto	
+
+config save

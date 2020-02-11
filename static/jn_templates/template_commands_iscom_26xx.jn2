@@ -1,0 +1,173 @@
+config
+
+create vlan {{ pppoe['vlan'] }} active
+create vlan {{ iptv['vlan'] }} active
+create vlan {{ ims['vlan'] }} active
+create vlan {{ tr069['vlan'] }} active
+
+igmp snooping
+igmp snooping vlan {{ iptv['vlan'] }}
+pppoeagent enable
+pppoeagent circuit-id format "%h %p:%v"
+protocol-vlan 1 ipv4
+protocol-vlan 2 ethertype 0806
+protocol-vlan 3 ethertype 8863
+protocol-vlan 4 ethertype 8864
+
+mls qos mapping cos-to-local-priority 1
+   cos 2 to local-priority 1
+   cos 4 to local-priority 2
+   cos 5 to local-priority 3
+   cos 6 to local-priority 3
+   cos 7 to local-priority 3
+exit
+
+mls qos mapping dscp-to-local-priority 1
+   dscp 32 to local-priority 2
+   dscp 33 to local-priority 2
+   dscp 34 to local-priority 1
+   dscp 35 to local-priority 2
+   dscp 36 to local-priority 2
+   dscp 37 to local-priority 2
+   dscp 38 to local-priority 2
+   dscp 39 to local-priority 2
+   dscp 40 to local-priority 3
+   dscp 41 to local-priority 3
+   dscp 42 to local-priority 3
+   dscp 43 to local-priority 3
+   dscp 44 to local-priority 3
+   dscp 45 to local-priority 3
+   dscp 46 to local-priority 3
+   dscp 47 to local-priority 3
+   dscp 48 to local-priority 3
+   dscp 49 to local-priority 3
+   dscp 50 to local-priority 3
+   dscp 51 to local-priority 3
+   dscp 52 to local-priority 3
+   dscp 53 to local-priority 3
+   dscp 54 to local-priority 3
+   dscp 55 to local-priority 3
+   dscp 56 to local-priority 3
+   dscp 57 to local-priority 3
+   dscp 58 to local-priority 3
+   dscp 59 to local-priority 3
+   dscp 60 to local-priority 3
+   dscp 61 to local-priority 3
+   dscp 62 to local-priority 3
+   dscp 63 to local-priority 3
+exit
+
+user login tacacs-local 
+user login web tacacs-local 
+user name wizard password cipher $@!!f5f365268f0d9f9a9db8746a69630bff confirm
+password check none
+hostname CHANGE-ME-PLS
+tacacs-server 10.184.121.4 
+tacacs-server backup 10.178.199.4 
+tacacs-server encrypt-key "QXx9+jTrPWlY"
+clock timezone + 5 0 EKT 
+
+interface fastethernet 1/0/1
+shutdown
+exit
+
+vlan {{ pppoe['vlan'] }}
+name PPPoE-20
+exit
+
+vlan {{ iptv['vlan'] }}
+name IPTV-45
+exit
+
+vlan {{ ims['vlan'] }}
+name USI_IMS_PON-52
+exit
+
+vlan {{ tr069['vlan'] }}
+name TR069-DSL-3851
+exit
+
+vlan 4094
+name LOCAL_GARBAGE
+exit
+
+interface range 
+interface range gigaethernet {{ port_downlink }}
+switchport mode trunk
+switchport trunk native vlan 4094
+switchport trunk allowed vlan {{ pppoe['vlan'] }},{{ iptv['vlan'] }},{{ ims['vlan'] }},{{ tr069['vlan'] }}
+switchport trunk untagged vlan {{ pppoe['vlan'] }},{{ tr069['vlan'] }}
+mls qos cos-to-local-priority 1
+mls qos dscp-to-local-priority 1
+mls qos trust dscp-or-cos
+mls qos queue scheduler wrr 35 25 25 15 0 0 0 0
+switchport protect
+ip dhcp snooping information option vlan-list {{ iptv['vlan'] }},{{ ims['vlan'] }},{{ tr069['vlan'] }}
+ip dhcp snooping binding max 5
+lldp disable
+spanning-tree disable
+loopback-detection restore-time 60 
+pppoeagent enable
+ip arp-rate-limit rate 30
+ip dhcp option vlan {{ ims['vlan'] }} description 1/1/1
+switchport protocol-vlan 3-4 vlan 20
+switchport protocol-vlan 1-2 vlan {{ tr069['vlan'] }}
+storm-control unknown-multicast pps 100 
+storm-control dlf pps 100 
+igmp immediate-leave vlan {{ iptv['vlan'] }}
+igmp drop query
+exit
+
+interface gigaethernet 1/1/10
+interface {{ port_uplink }}
+description {{ uplink_and_port }}
+switchport reject-frame untagged
+mls qos cos-to-local-priority 1
+mls qos dscp-to-local-priority 1
+mls qos trust dscp-or-cos
+mls qos queue scheduler wrr 35 25 25 15 0 0 0 0
+ip dhcp snooping trust
+pppoeagent trust
+ip arp-inspection trust
+ip verify source trust
+storm-control broadcast pps 1000 
+storm-control trap enable
+exit
+
+interface vlan 1
+shutdown
+exit
+
+storm-control detection enable
+mac-address mac-move trap enable
+snmp-server trap transceiver enable
+snmp-server host 10.184.88.169 version 2c inity2016
+snmp-server location LOCATION-CHANGE-ME-PLS
+snmp-server contact rcuss-chel@ural.rt.ru
+snmp-server community encryption 0xfc88244245cd1e32 ro
+snmp-server community encryption 0x5be29b3081c51bd1b6399607bde64dcb ro
+snmp-server trap-source vlan {{ vlan_mng }}
+no snmp-server community public
+no snmp-server community private
+
+ip dhcp snooping
+ip dhcp snooping information option
+ip dhcp relay information policy keep
+ip dhcp information option circuit-id format "%h eth %bd:%v"
+
+transceiver ddm enable
+transceiver ddm poll-interval 10
+logging buffered
+lldp enable
+ip arp-inspection dhcp-snooping
+ip arp-inspection vlan {{ iptv['vlan'] }}
+ip arp-inspection vlan {{ ims['vlan'] }}
+ip arp-inspection vlan {{ tr069['vlan'] }}
+
+ntp server 10.228.32.1
+cpu threshold recovering 80 rising 90
+mac-address multicast drop-unknown vlan {{ iptv['vlan'] }} 
+igmp snooping mrouter vlan {{ iptv['vlan'] }} priority 4
+exit
+
+write

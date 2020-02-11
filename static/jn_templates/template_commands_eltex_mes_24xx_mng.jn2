@@ -1,0 +1,33 @@
+config terminal 
+vlan {{ mgmvlan }}
+ name MNG
+ vlan active
+!
+interface {{ port_uplink }}
+switchport mode trunk
+switchport acceptable-frame-type all
+set port-role uplink 
+!
+interface vlan {{ mgmvlan }}
+ no shutdown
+ ip address {{ ipaddmgm }} {{ mask }}
+!
+ip route 0.0.0.0  0.0.0.0 {{ gw }}
+exit
+copy running-config startup-config 
+
+
+-----------------------------------
+# Убедитесь что команда на сохранение конфигурации прошла успешно
+
+---Для проверки доступности управления  использовать ping---
+
+ping {{ gw }}
+
+Успешный ответ выглядит так 
+Reply Received From :{{ gw }}, TimeTaken : 50 msecs
+Reply Received From :{{ gw }}, TimeTaken : 10 msecs
+Reply Received From :{{ gw }}, TimeTaken : 30 msecs
+
+--- {{ gw }} Ping Statistics --- 
+3 Packets Transmitted, 3 Packets Received, 0% Packets Loss

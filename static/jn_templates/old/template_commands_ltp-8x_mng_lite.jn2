@@ -1,0 +1,23 @@
+enable
+switch
+configure
+vlan {{ vlan_mng }}
+  name MNG
+  tagged front-port 4
+  tagged 10G-front-port 0
+  tagged port-channel 0
+  untagged mgmt-pon-port 0 , mgmt-pon-port 1
+  no ip igmp snooping enable
+exit
+commit
+exit
+exit
+
+configure terminal
+management ip {{ ip }}
+management vid {{ vlan_mng }}
+management gateway {{ gw }}
+
+exit
+commit
+save

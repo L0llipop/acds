@@ -1,0 +1,311 @@
+
+
+///Конфигурация не проверенная в целом
+
+
+# system-forwarding-mode normal-mode
+
+tacacs enable 
+tacacs-server timeout 5
+tacacs-server deadtime 5
+tacacs key-encrypt 
+tacacs-server packet 1024
+!
+tacacs-server host 10.178.199.4 key wpS29slv
+tacacs-server host 10.184.121.4 key wpS29slv
+!
+aaa group-server tacacs+ MFIST_TACACS
+  server 10.178.199.4   
+  server 10.184.121.4 master  
+!
+!
+aaa authorization console 
+aaa authentication login default group MFIST_TACACS local 
+aaa authorization exec default group MFIST_TACACS local 
+aaa accounting commands 15 default stop-only group MFIST_TACACS 
+aaa authorization commands 3 default group MFIST_TACACS 
+aaa authorization commands 15 default group MFIST_TACACS 
+aaa accounting commands 3 default stop-only group MFIST_TACACS
+
+user-authentication-type aaa
+user-authorization-type aaa
+
+
+banner incoming @
+
+*************************************************************************
+ZXAN product C300 of ZTE Corporation
+*************************************************************************
+@
+
+message-of-day @ "UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+You must have explicit, authorized permission to access or configure this device.
+Unauthorized attempts and actions to access or use this system may result in civil and/or criminal penalties.
+All activities performed on this device are logged and monitored"
+@
+
+
+mac aging-time 3600
+mac monitor-period 10
+mac usage-threshold 70
+
+voip-media priority 6
+vlan database
+  vlan {{ pppoe['vlan'] }},{{ iptv['vlan'] }},{{ ims['vlan'] }},{{tr069['vlan']}}
+
+!
+vlan 8
+  name FTTX_MNG
+  description FTTX_MNG
+  multicast-packet drop-unknown
+!
+vlan {{ pppoe['vlan'] }}
+  name PPPoE
+  description PPPoE
+  multicast-packet drop-unknown
+!
+vlan {{ iptv['vlan'] }}
+  description IPTV
+  multicast-packet drop-unknown
+  ip dhcp snooping
+!
+vlan {{ ims['vlan'] }}
+  voip-bind
+!
+vlan 777
+  description for plate EPMB
+!
+vlan {{tr069['vlan']}}
+  name TR069-DSL
+  description TR069-DSL
+  multicast-packet drop-unknown
+  ip dhcp snooping
+!
+
+
+ip dhcp snooping enable
+ip dhcp snooping control-port enable
+port-identification format-profile PPPoE_profile
+  port-identification add variable Access-Node-ID index 1
+  port-identification add delimiter space index 2
+  port-identification add variable Frame index 3
+  port-identification add string / index 4
+  port-identification add variable Slot index 5
+  port-identification add string / index 6
+  port-identification add variable Port index 7
+  port-identification add string : index 8
+  port-identification add variable Cvlan index 9
+!
+port-identification access-node-id-type hostname
+port-identification rackno 1 frameno 1
+!
+dhcpv4-l2-relay-agent enable
+!
+pppoe-intermediate-agent enable
+!
+security mac-move-report enable
+security mac-move-report interval 60
+security mac-anti-spoofing enable
+!
+igmp enable
+igmp mvlan {{ iptv['vlan'] }}
+igmp mvlan {{ iptv['vlan'] }} host-ip 172.50.38.137
+igmp mvlan {{ iptv['vlan'] }} router-ip 172.50.38.137
+igmp mvlan {{ iptv['vlan'] }} version-mode v1 drop
+igmp mvlan {{ iptv['vlan'] }} version-mode v2 accept
+igmp mvlan {{ iptv['vlan'] }} version-mode v3 drop
+igmp mvlan {{ iptv['vlan'] }} group-filter disable
+igmp mvlan {{ iptv['vlan'] }} priority 4
+mld disable
+  mib-compatibility iftable v1
+performance dsl-statistics all-start
+!
+
+qos queue-block-profile RT-WRR queue-number 4 queue0 15 0 queue1 25 0 queue2 25 0 queue3 35 0
+qos queue-map-profile RT_QMAP cos-queue-type queue-number 4 cos0 3 cos1 2 cos2 1 cos3 0 cos4 1 cos5 0 cos6 0 cos7 0
+
+
+vdsl2 dsdatarate-prf base-10
+MaxDataRateDs:10240
+!
+vdsl2 dsdatarate-prf base-12
+MaxDataRateDs:12288
+!
+vdsl2 dsdatarate-prf base-14
+MaxDataRateDs:14366
+!
+vdsl2 dsdatarate-prf base-16
+MaxDataRateDs:16384
+!
+
+vdsl2 dsdatarate-prf base-18
+MaxDataRateDs:18432
+!
+
+vdsl2 dsdatarate-prf base-20
+MaxDataRateDs:20480
+!
+
+vdsl2 dsdatarate-prf base-24
+MaxDataRateDs:24032
+!
+
+vdsl2 dsdatarate-prf base-32
+MaxDataRateDs:32064
+!
+
+vdsl2 snrmargin-prf SNR7
+TargetSnrmDs:70
+TargetSnrmUs:70
+MaxSnrmDs:310
+MaxSnrmUs:310
+MinSnrmDs:60
+MinSnrmUs:60
+!
+vdsl2 snrmargin-prf SNR10
+TargetSnrmDs:100
+TargetSnrmUs:100
+MaxSnrmDs:310
+MaxSnrmUs:310
+MinSnrmDs:80
+MinSnrmUs:80
+!
+vdsl2 snrmargin-prf SNR12
+TargetSnrmDs:120
+TargetSnrmUs:120
+MaxSnrmDs:310
+MaxSnrmUs:310
+MinSnrmDs:80
+MinSnrmUs:80
+!
+vdsl2 snrmargin-prf SNR15
+TargetSnrmDs:150
+TargetSnrmUs:150
+MaxSnrmDs:310
+MaxSnrmUs:310
+MinSnrmDs:90
+MinSnrmUs:90
+!
+vdsl2 vector-bandplan
+GroupId:1
+PsdshapeId:31
+!
+vdsl2 vector-tracking
+Mode:1
+
+vdsl2 vector-legacycpe-policy 2-ReduceFrequency(default)
+vdsl2 vector-mode rack 1 shelf 1 slot 2
+!
+vdsl2 vector-mode rack 1 shelf 1 slot 4
+!
+vdsl2 vector-mode rack 1 shelf 1 slot 5
+!
+vdsl2 vector-mode rack 1 shelf 1 slot 8
+VectorMode:1
+!
+
+
+
+voip interface add ctrl-ip 10.128.84.29 ctrl-mask 255.255.255.0
+
+voip interface add media-ip 10.128.84.29 media-mask 255.255.255.0
+
+sip proxy-server add 1 5060 1 172.16.4.200
+sip proxy-server add 2 5060 1 172.16.1.200 proxy-type 0
+
+sip user-agent add 1 1 domain-name 345.rt.ru
+
+media-nat add 10 1 10 20000
+
+digitmap add 1 test service-type 2 digit-map EFX.F|EX.F|FX.F|EX.EX.|X.|EXFX.|EXF.|8xxxxxxxxxx|810xxxxxxxxxxxxxxx|852xxxxxxxxxxxxxxx|EX.EX.EX.|EXXEXXXXEXX|s
+
+sip supported uaid 1 timer off 100rel off
+
+//для системы управления
+interface vlan 25
+  ip address 172.50.41.2 255.255.255.224
+!
+interface vlan 65
+  ip address dhcp voip port-identification circuit-id {{ hostname }} remote-id {{ hostname }}
+!
+
+
+{%- for slot_num in range(1, 18) %}
+interface vdsl_1/{{ slot_num }}/1-64
+
+  no shutdown
+  atm pvc 1 vpi 8 vci 35
+  atm pvc 2 vpi 8 vci 37
+  pvc 2 enable
+  atm pvc 3 vpi 7 vci 49
+  pvc 3 enable
+  switchport default vlan {{ pppoe['vlan'] }} pvc 1
+  switchport default vlan {{ iptv['vlan'] }} pvc 2
+  switchport default vlan {{tr069['vlan']}} pvc 3
+  port-identification format PPPoE_profile
+  port-identification format PPPoE_profile pvc 1
+  pppoe-intermediate-agent enable
+  pppoe-intermediate-agent trust true replace
+  pppoe-intermediate-agent enable pvc 1
+  pppoe-intermediate-agent trust true replace pvc 1
+  mvlan-translate {{ iptv['vlan'] }} to untag pvc 2
+vdsl2 snrmargin-prf base-20
+
+
+exit
+{%- endfor %}
+
+
+lldp enable
+lldp enable interface gei_1/20/4
+
+hostname {{ hostname }}
+
+clock timezone Ural 5 0
+
+snmp-server location {{ location }} 
+snmp-server contact rcuss-chel@ural.rt.ru
+snmp-server packetsize 8192
+snmp-server engine-id mode mac
+snmp-server group GroupPriv15 v3 priv read AllView write AllView
+snmp-server group GroupPriv10 v3 priv read AllView write ViewPriv10
+snmp-server group GroupPriv5 v3 priv read AllView write ViewPriv5
+snmp-server group GroupPriv0 v3 priv read AllView
+snmp-server community public view AllView rw
+snmp-server community surnic view AllView ro
+snmp-server community inity2016 view AllView ro
+snmp-server view AllView 1.2 included 
+snmp-server view AllView 1.3 included 
+snmp-server view ViewPriv5 1.2 included 
+snmp-server view ViewPriv5 1.3 included 
+snmp-server view ViewPriv5 1.3.6.1.4.1.3902.1082.10.1 excluded 
+snmp-server view ViewPriv5 1.3.6.1.4.1.3902.1082.10.10 excluded 
+snmp-server view ViewPriv5 1.3.6.1.4.1.3902.1082.20.1 excluded 
+snmp-server view ViewPriv5 1.3.6.1.4.1.3902.1082.20.10 excluded 
+snmp-server view ViewPriv10 1.2 included 
+snmp-server view ViewPriv10 1.3 included 
+snmp-server view ViewPriv10 1.3.6.1.4.1.3902.1082.20.10 excluded 
+snmp-server host 172.50.1.4  version 2c public enable NOTIFICATIONS target-addr-name zte isnmsserver udp-port 162 trap-report-compatibility v20 
+snmp-server host 172.50.1.6  version 2c public enable NOTIFICATIONS target-addr-name zte2 isnmsserver udp-port 162 trap-report-compatibility v20 
+!
+
+ntp server {{ gw }} priority 1
+ntp enable
+ntp client
+ntp master 7
+
+syslog facility local0
+syslog severity 6
+syslog hostname-field hostname
+line console idle-timeout 15 
+line console absolute-timeout 1440 
+line telnet idle-timeout 15 
+line telnet absolute-timeout 1440 
+line telnet users 16 
+
+ssh server authentication mode aaa
+ssh server authentication type pap
+no ssh server only
+ssh server version 2
+
+

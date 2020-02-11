@@ -1,0 +1,31 @@
+undo smart
+undo interactive
+enable
+
+config
+
+
+vlan {{ mgmvlan }} smart
+vlan desc {{ mgmvlan }} description "MNG"
+
+port vlan {{ mgmvlan }}  0/9 0
+
+port vlan {{ mgmvlan }} 0/9 0    // плата с аплинками в 9 слоту  0 порт 10 гбит
+
+
+interface vlanif{{ mgmvlan }}
+ ip address {{ ipaddmgm }} {{ mask }}
+
+quit
+ 
+//[meth]
+//  <meth0>
+//interface meth0
+// ip address 10.11.104.2 255.255.255.0
+
+ip route-static 0.0.0.0 0.0.0.0 {{ gw }}
+
+//логин/пароль заводской  root admin123
+
+
+

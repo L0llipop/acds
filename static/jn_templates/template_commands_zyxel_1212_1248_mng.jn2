@@ -1,0 +1,36 @@
+switch vlan set {{ mgmvlan }} enet1,enet2:FT MGN 
+switch vlan cpu set {{ mgmvlan }}
+ip set  {{ ipaddmgm }}/{{ mask }} {{ mgmvlan }} 6
+ip gateway {{ gw }}
+
+config save
+
+--- Для просмотра конфигурации-------------------------
+
+switch vlan show {{ mgmvlan }}
+
+--- должно выглядеть так----------------------
+ vid name                            F:fixed X:forbidden N:normal U:untag T:tag
+---- ------------------------------- -------------------------------------------
+{{ mgmvlan }} MNG
+                                              1  
+     enabled                         123456789012 12
+                                     XXXXXXXXXXXX FF
+                                     ------------ TT
+
+ip show 
+--- должно выглядеть так----------------------
+interface ip              netmask         vid  priority
+--------- --------------- --------------- ---- --------
+Ethernet  {{ ipaddmgm }}   {{ netmask }}   {{ mgmvlan }}   6       
+default gateway: {{ gw }}
+
+
+--- Для проверки доступности управления  использовать ping---
+
+ip ping {{ gw }}
+
+--- Успешный ответ выглядит так: ---
+Resolving {{ gw }}... 
+reply from {{ gw }}: bytes=32 time 10ms
+

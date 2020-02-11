@@ -1,0 +1,115 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-xl-5 col-lg-7 col-12">
+			<div class="row align-items-center my-2">
+				{% if request.user.groups.all.0.name == 'admins' or request.user.groups.all.0.name == 'engineers' or request.user.groups.all.1.name == 'admins' or request.user.groups.all.1.name == 'engineers' %}
+					<div class="col-3"><input class="btn btn-dark" id="clear_all" type="reset" value="CLEAR ALL"></div>
+					<div class="col-4">ID/IP/HOSTNAME:</div>
+				{% else %}
+					<div class="col-4 offset-3">ID/IP/HOSTNAME:</div>
+				{% endif %}
+			</div>
+			<form id="patterns" method="GET" onsubmit="return false;">
+				<div class="row align-items-center my-2">
+					<div class="offset-3 col-6"><input class="form-control" type="search" id="ip_address" placeholder="10.228.130.130" required></div>
+				</div>
+			</form>
+			<div id="all_data" name="generate_tabl">
+			</div>
+		</div>
+
+		{% if request.user.groups.all.0.name == 'admins' or request.user.groups.all.0.name == 'engineers' or request.user.groups.all.1.name == 'admins' or request.user.groups.all.1.name == 'engineers' %}
+		<div class="col-lg-5 col-12">
+			<div class="row align-items-center my-2">
+				<div class="col-3">DEVICE ID</div>
+				<div class="col-3">NETWORK ID</div>
+				<div class="col-3">VLANS ID</div>
+			</div>
+			<form id="pattern" method="GET">
+				<div class="row align-items-center my-2">
+					<div class="col-3 pr-0"><input class="form-control" type="search" id="DEVICE_ID" placeholder="1" value=""></div>
+					<div class="col-3 pr-0"><input class="form-control" type="search" id="NETWORK_ID" placeholder="2" value=""></div>
+					<div class="col-3 pr-0"><input class="form-control" type="search" id="VLANS_ID" placeholder="3" value=""></div>
+					<div class="col-3 text-right"><input class="btn btn-danger" id="pattern_add" type="button" value="ADD"></div>
+				</div>
+			</form>
+
+			<div><br></div>
+
+			<div class="row align-items-center my-2">
+				<div class="col-2">ID</div>
+				<div class="col-2">MNG</div>
+				<div class="col-2">VRF</div>
+				<div class="col-4">GW_NET</div>
+				<div class="col-2">REGION</div>
+			</div>
+			<form id="networks" method="GET">
+				<div class="row align-items-center my-2">
+					<div class="col-2 pr-0"><input class="form-control" type="search" id="NETID" placeholder="10"></div>
+					<div class="col-2 pr-0"><input class="form-control" type="search" id="MNG" placeholder="12"></div>
+					<div class="col-2 pr-0"><input class="form-control" type="search" id="VRF" placeholder="CORE"></div>
+					<div class="col-4 pr-0"><input class="form-control" type="search" id="GW_NET" placeholder="10.228.130.254"></div>
+					<div class="col-2 pr-0"><input class="form-control" type="search" id="REGION" placeholder="72"></div>
+				</div>
+			</form>
+			<div id="data_networks" name="generate_tabl" class="col-12 px-0">
+			</div>
+
+			<div><br></div>
+
+			<div class="row align-items-center my-2">
+				<div class="col-2">ID</div>
+				<div class="col-2">HSI</div>
+				<div class="col-2">IPTV</div>
+				<div class="col-2">IMS</div>
+				<div class="col-2">TR069</div>
+			</div>
+			<!-- <form id="vlans" action="/activator/patterns_checking/" method="GET" onsubmit="get_vlans(); return false;"> -->
+			<form id="vlans" method="GET">
+				<div class="row align-items-center my-2">
+					<div class="col-2 pr-0"><input class="form-control" type="search" id="VLANID" placeholder="10"></div>
+					<div class="col-2 pr-0"><input class="form-control" type="search" id="HSI" placeholder="400"></div>
+					<div class="col-2 pr-0"><input class="form-control" type="search" id="IPTV" placeholder="992"></div>
+					<div class="col-2 pr-0"><input class="form-control" type="search" id="IMS" placeholder="2065"></div>
+					<div class="col-2 pr-0"><input class="form-control" type="search" id="TR069" placeholder="3050"></div>
+					<div class="col-2 text-right"><input class="btn btn-danger" id="vlans_add" type="button" value="ADD"></div>
+				</div>
+			</form>
+			<div id="data_vlans" name="generate_tabl" class="col-11 px-0">
+			</div>
+
+		</div>
+		{% endif %}
+
+	</div>
+
+</div>
+
+<div class="modal fade" id="deleteModal" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="idPattern"></h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div>Вы уверены что хотите удалить шаблон?</div>
+			</div>
+			<div class="modal-footer justify-content-between">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+				<button type="button" class="btn btn-danger deletePattrnYes" data-dismiss="modal">Yes</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- <div class="col-1 px-1" id="result"></div> -->
+
+<script src="{% static 'activator/scripts/patterns_checking.js' %}"></script>
+{% endblock %}

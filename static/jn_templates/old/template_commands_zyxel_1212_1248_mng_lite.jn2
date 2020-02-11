@@ -1,0 +1,6 @@
+switch vlan set {{ vlan_mng }} enet1,enet2:FT MGN 
+switch vlan cpu set {{ vlan_mng }}
+ip set  {{ip}}/{{mask}} {{ vlan_mng }} 6
+ip gateway {{gw}}
+
+config save
