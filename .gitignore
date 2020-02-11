@@ -1,0 +1,9 @@
+.pyc
+.vscode
+/venv
+/devicelist/__pycache__
+/chat/__pycache__
+/activator/__pycache__
+/acds/__pycache__
+/acds/settings.py
+/acds/configuration.py
