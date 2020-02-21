@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
 import getpass
 import sys, os, re, time
 import mysql.connector 
@@ -14,7 +12,10 @@ import requests
 import json
 import topology
 import ipaddress
-from acds import configuration
+try:
+	from acds import configuration
+except:
+	import configuration
 
 # from django.contrib.staticfiles.templatetags.staticfiles import static
 
@@ -56,8 +57,8 @@ class FastModulAut:
 		if self.login == 'default':
 			self.login = getpass.getuser()
 		
-		ini_local = getattr(configuration, 'CONFIG_LOCAL_INI')
-		pathini = "/home/"+self.login+"/.config/config_data.ini"
+		ini_local = getattr(configuration, 'STATIC_PATH')+'config_data_local.ini'
+		# pathini = "/home/"+self.login+"/.config/config_data.ini"
 		# ini_local = "/var/scripts/system/config_data_local.ini"
 		# ini_local = static('config_data_local.ini')
 	
@@ -132,17 +133,17 @@ class FastModulAut:
 			if 'server' in hash_config_sql:
 				server = hash_config_sql['server']
 			else:
-				server = self.server
+				server = getattr(configuration, 'MYSQL_DB')
 
 			if 'login' in hash_config_sql:
 				login_sql = hash_config_sql['login']
 			else:
-				login_sql = self.login
+				login_sql = getattr(configuration, 'MYSQL_LOGIN')
 
 			if 'password' in hash_config_sql:
 				p_sql	= hash_config_sql['password']
 			else:
-				p_sql = self.p_sql
+				p_sql = getattr(configuration, 'MYSQL_PASS')
 
 			self.sql = mysql.connector.connect(host = server, user = login_sql, password = p_sql, charset='utf8', use_unicode = True)
 			self.cursor_mysql = self.sql.cursor(buffered=True)
@@ -335,7 +336,7 @@ class FastModulAut:
 
 
 		"""
-		print(f"*****----- AUT IN {ip} -----*****")
+		# print(f"*****----- AUT IN {ip} -----*****")
 
 		if 'login' in hash_aut and hash_aut['login'] != 'tacacs':
 			telnet_login = hash_aut['login']
@@ -398,7 +399,7 @@ class FastModulAut:
 		# print ("login: {}\npassword: {}\nexpect_login: {}\nexpect_password: {}\nprompt_1: {}\nprompt_2: {}".format(login, password, expect_login, expect_password, prompt_1, prompt_2))
 
 		i = self.new_telnet.expect([expect_login, 'Connection closed', pexpect.TIMEOUT, '[Nn]o route to host', '[Cc]onnection refused'], timeout=self.timeout)
-		print(f"*****----- I - {i} -----*****")
+		# print(f"*****----- I - {i} -----*****")
 		self.check_telnet_connect(i, errors)
 		if i != 0:
 			return i

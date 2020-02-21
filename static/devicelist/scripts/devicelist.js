@@ -81,6 +81,7 @@ async function get_devicelist() {
           //   }
           // }
           $('#data').append(`<tr ${class_bg} id="${data[ip_address]['id']}">`);
+          // console.log(data['uplink']);
           for (let cell in data[ip_address]) {
             if (cell != 'id' && cell != 'latitude' && cell != 'longitude'){
 
@@ -153,9 +154,9 @@ $(document).on('click', '.edit_device', function(){
   // let select = document.getElementById('102379').getElementsByClassName('device_addres').innerHTML;
   // console.log(`select: ${select}`);
   // end test zone
-  let uplink = 'Null';
-  let port = 'Null';
-  let port_uplink = 'Null'
+  let uplink = '';
+  let port = '';
+  let port_uplink = ''
 
   let ip = $(`#${deviceid} td:eq(0)`).html(),
       hostname = $(`#${deviceid} td:eq(1)`).html(),
@@ -175,7 +176,7 @@ $(document).on('click', '.edit_device', function(){
   if (!addres){
     addres = $(`#${deviceid} td:eq(4)`).html()
   };
-  if (uplink_and_port){
+  if (uplink_and_port != "Null"){
     let res = uplink_and_port.split(" ");
     uplink = res[0];
     port = res[1];
@@ -201,6 +202,10 @@ $(document).on('click', '.edit_device', function(){
   $('#portuplink_modal').val(port_uplink);
   $('#mac_modal').val(mac);
   $('#serial_modal').val(serial);
+  if (uplink_and_port == "Null") {
+    $("#port_modal").prop("disabled", true);
+    $("#portuplink_modal").prop("disabled", true);
+  }
 });
 
 
@@ -255,7 +260,7 @@ $('#save_data_device').on('click', function(){
         'mac': $('#mac_modal').val(),
         'serial': $('#serial_modal').val()
       };
-  console.log(`addres add|edit: ${all_data['addres']}`);
+  console.log(`addres add|edit: ${all_data['uplink']}`);
   if (head_modal == 'New device') {
     url_ajax = 'device_add/';
   }
@@ -267,7 +272,7 @@ $('#save_data_device').on('click', function(){
 
   console.log(`url_ajax: ${url_ajax}`);
   $.ajax({
-    url: 'http://10.180.7.34/devicelist/' + url_ajax,
+    url: '/devicelist/' + url_ajax,
     method: "GET",
     data: {all_data: json_data},
     cache: false,
@@ -349,7 +354,7 @@ $('#check_argus').on('click', function(){
   $('#check_argus').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Проверка...');
   // $('#check_argus').attr('data-original-title', 'Идёт проверка, ожидайте...').tooltip('show');
   $.ajax({
-    url: "http://10.180.7.34/devicelist/fias_data_update/",
+    url: "/devicelist/fias_data_update/",
     method: "GET",
     data: {ip: ip},
     cache: false,
@@ -465,7 +470,7 @@ $("#model_modal").autocomplete({
   minLength:3,
   source: function( request, response ) {
     $.ajax({
-      url: "http://10.180.7.34/activator/get_model/",
+      url: "/activator/get_model/",
       method: "GET",
       data: {model: request.term},
       cache: false,
@@ -507,3 +512,18 @@ $("#model_modal").autocomplete({
 
 $( "#model_modal" ).autocomplete( "option", "appendTo", ".model_autocomplete" );
 $('.spinner_load_update').modal('hide');
+
+
+$('#uplink_modal').keyup(function () {
+  modal_uplink = $('#uplink_modal').val();
+  console.log(modal_uplink);
+  if (!modal_uplink) {
+    $("#port_modal").prop("disabled", true);
+    $("#portuplink_modal").prop("disabled", true);
+  }
+  else {
+    $("#port_modal").prop("disabled", false);
+    $("#portuplink_modal").prop("disabled", false);    
+  }
+
+})

@@ -13,6 +13,8 @@ import multimodule
 import fias_import
 import astu_data
 import subprocess
+
+from acds import configuration
 # import free_ip
 
 def settings_col():
@@ -185,12 +187,12 @@ def get_devicelist(request):
 
 			# t.ws_send_message(f"address: {address}")
 			ticket = data_in_sql[4]
-			if ticket:
-				match = re.search(r"(.*?)([1-5])\s?(\d{3})\s?(\d{3})(.*?)", ticket)
-				if match:
-					sd_tick = f"{match.group(2)}{match.group(3)}{match.group(4)}"
+			# if ticket:
+			# 	match = re.search(r"(.*?)([1-5])\s?(\d{3})\s?(\d{3})(.*?)", ticket)
+			# 	if match:
+			# 		sd_tick = f"{match.group(2)}{match.group(3)}{match.group(4)}"
 					
-					ticket = f"""{match.group(1)}<a href="http://10.180.5.39/sd/claim.php?ser_id={sd_tick}" target="HPSD">{sd_tick}</a>{match.group(5)}"""
+			# 		ticket = f"""{match.group(1)}<a href="http://10.180.5.39/sd/claim.php?ser_id={sd_tick}" target="HPSD">{sd_tick}</a>{match.group(5)}"""
 
 			for i, item in enumerate(data_in_sql):
 				if not item:
@@ -229,7 +231,7 @@ def fias_data_update(request):
 	values = {}
 	if request.GET:
 		ip = ''.join(list(request.GET.get('ip', str(False))))
-		t.oracle_connect('connect', server = "10.184.67.7:1521/DESIGNER", login = "T_BORISOV-SV_", password = "ghj&&832$$--+GG")
+		t.oracle_connect('connect', server = getattr(configuration, 'ARGUS_DB'), login = getattr(configuration, 'ARGUS_LOGIN'), password = getattr(configuration, 'ARGUS_PASS'))
 		summ = t.oracle_select(f"""SELECT argus_sys.name3(ip.ip_interface_id,1,27200005), reg.REGION_TREE_NAME, reg.REGION_NAME, str.STREET_NAME, bld.HOUSE, bld.CORPUS, (SELECT REGION_NAME FROM ARGUS_SYS.REGION_L x WHERE x.OBJECT_ID = reg.PARENT_ID) AS region,
 		        i.host_name,
 		        i.title,
@@ -437,6 +439,9 @@ def device_update(request):
 								t.sql_update(f"INSERT INTO guspk.topology (child, parent, child_port, parent_port) VALUES({all_data['id']}, {device_id}, NULL, NULL);")
 
 							t.sql_update(f"INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `old`, `new`) VALUES({all_data['id']}, '{user}', 'parent', '{sql_hesh[key]}', '{all_data[key]}');")
+					if not all_data['uplink']:
+						print(f"""DELETE from guspk.topology WHERE child = {all_data['id']}""")
+						t.sql_update(f"""DELETE from guspk.topology WHERE child = {all_data['id']}""")
 					continue
 
 				if key == 'port':
@@ -564,7 +569,7 @@ def device_add(request):
 			structura = 16
 		else:
 			values['status'] = "Error"
-			values['message'] = f"Для данной модели '{model}' {all_data['model']} не указан ID структуры"
+			values['message'] = f"Для данной модели '{all_data['ip']}' {all_data['model']} не указан ID структуры"
 			return JsonResponse(values, safe=False)
 
 		if re.match(r'^45-', all_data['hostname']):

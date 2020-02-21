@@ -22,7 +22,7 @@ def main(args_temp):
 				k: args_temp[action][k],
 			})
 
-	user = getpass.getuser()
+	user = getattr(configuration, 'ASTU_USER')
 	try:
 		astu_password = getattr(configuration, 'ASTU_PASS')
 	except:

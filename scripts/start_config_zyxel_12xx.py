@@ -12,8 +12,13 @@ import subprocess
 import ftplib
 import binascii
 import ipaddress
+import start_topology
 # from ftplib import FTP
 # from websocket import create_connection
+try:
+	from acds import configuration
+except:
+	import configuration
 
 
 
@@ -58,25 +63,24 @@ def authorization_in_zyxel(t, data_mes):
 
 	if not uplink:
 		print(f"authorization_in_zyxel|start topology")
-		try:
-			t.ws_send_message(f"this device haven't data for uplink, topology started")
-			uplink = subprocess.check_call(["perl", "/var/scripts/system/find_ip.pl", ip], universal_newlines=True)
-			t.sql_connect('connect')
-			add = t.sql_select(f"SELECT (SELECT NETWORKNAME FROM guspk.host WHERE DEVICEID = top.parent) FROM guspk.host h LEFT JOIN guspk.topology top ON top.child = h.DEVICEID WHERE h.IPADDMGM = '{ip}'", 'full')
-			t.sql_connect('disconnect')
-			print(f"authorization_in_zyxel|add: {add}")
-			if add[0][0]:
-				uplink = add[0][0]
-				data_mes['uplink'] = uplink
-				print(f"authorization_in_zyxel|data_mes['uplink']: {data_mes['uplink']}")
-				t.ws_send_message(f"uplink: {uplink}")
-			else:
-				print("authorization_in_zyxel|Не отстроилась топология")
-				t.ws_send_message("topology error")
+		t.ws_send_message(f"this device haven't data for uplink, topology started")
+		topology_result = start_topology.loop(ip)
+		t.sql_connect('connect')
+		add = t.sql_select(f"""SELECT (SELECT NETWORKNAME FROM guspk.host WHERE DEVICEID = top.parent) 
+							FROM guspk.host h 
+							LEFT JOIN guspk.topology top ON top.child = h.DEVICEID 
+							WHERE h.IPADDMGM = '{ip}'""", 'full')
+		t.sql_connect('disconnect')
+		print(f"authorization_in_zyxel|add: {add}")
+		if add[0][0]:
+			uplink = add[0][0]
+			data_mes['uplink'] = uplink
+			print(f"authorization_in_zyxel|data_mes['uplink']: {data_mes['uplink']}")
+			t.ws_send_message(f"uplink: {uplink}")
+		else:
+			print("authorization_in_zyxel|Не отстроилась топология")
+			t.ws_send_message("topology error")
 
-		except subprocess.CalledProcessError as err:
-			print('authorization_in_zyxel|Не удалось запустить скрипт топологии /var/scripts/core/find_ip.pl')
-			t.ws_send_message(f"can't run topology script /var/scripts/core/find_ip.pl")
 	if not uplink:
 		print('authorization_in_zyxel|Нет данных по uplink')
 		t.ws_send_message("Error in topology, no data for uplink")
@@ -130,8 +134,7 @@ def authorization_in_zyxel(t, data_mes):
 
 	print(check_version)
 
-
-	with open ('/var/www/acds/static/jn_templates/template_commands_zyxel_1212_1248.jn2') as f:
+	with open (getattr(configuration, 'STATIC_PATH')+'jn_templates/template_commands_zyxel_1212_1248.jn2') as f:
 		mes_switches_template = f.read()
 		template = jinja2.Template(mes_switches_template)
 		commands_mes_switches = template.render(data_mes).splitlines()

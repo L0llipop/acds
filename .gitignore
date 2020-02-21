@@ -5,5 +5,8 @@
 /chat/__pycache__
 /activator/__pycache__
 /acds/__pycache__
+/venv/lib/python3.7/configuration.py
 /acds/settings.py
 /acds/configuration.py
+/scripts/config.py
+/scripts/_pycache__

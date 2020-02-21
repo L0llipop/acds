@@ -8,6 +8,10 @@ import getpass
 import argparse
 from multiprocessing import Pool
 import subprocess
+try:
+	from acds import configuration
+except:
+	import configuration
 
 
 def createParser ():
@@ -91,11 +95,11 @@ def authorization_in_eltex(t, reply, data_olt):
 
 
 	if model == 'MA-4000px':
-		path = '/var/www/acds/static/jn_templates/template_commands_ma4000.jn2'
+		path = getattr(configuration, 'STATIC_PATH')+'jn_templates/template_commands_ma4000.jn2'
 	elif model == 'LTP-8X':
-		path = '/var/www/acds/static/jn_templates/template_commands_ltp-8x.jn2'
+		path = getattr(configuration, 'STATIC_PATH')+'jn_templates/template_commands_ltp-8x.jn2'
 	elif model == 'LTP-4X':
-		path = '/var/www/acds/static/jn_templates/template_commands_ltp-4x.jn2'
+		path = getattr(configuration, 'STATIC_PATH')+'jn_templates/template_commands_ltp-4x.jn2'
 
 	try:
 		with open (path) as f:

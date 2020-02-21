@@ -63,7 +63,7 @@ exit
 
 interface range {{ port_downlink }}
  loopback-detection enable
- switchport protected {{ port_uplink }}
+ switchport protected-port
 
  {%- if '2124' in model or '3124' in model or '1124' in model or '2208' in model %}
   storm-control multicast enable

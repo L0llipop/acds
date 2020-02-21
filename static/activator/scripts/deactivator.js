@@ -6,7 +6,7 @@ $("#deactivator").on('submit', function () {
 	console.log(ip)
 	$("#submit").prop("disabled", true);
 	$("#submit").html(`<span id="submit-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...`);
-	$.ajax("http://10.180.7.34/activator/get_acds_id_deactivator/", {
+	$.ajax("/activator/get_acds_id_deactivator/", {
 		method: "GET",
 		data: {mip: mip, ip: ip, comment: comment}, 
 		cache: false,
@@ -35,7 +35,7 @@ $("#device_move").on('submit', function () {
 	// console.log(comment)
 	$("#submit").prop("disabled", true);
 	$("#submit").html(`<span id="submit-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...`);
-	$.ajax("http://10.180.7.34/activator/get_device_move/", {
+	$.ajax("/activator/get_device_move/", {
 		method: "GET",
 		data: {ip: ip, comment: comment}, 
 		cache: false,

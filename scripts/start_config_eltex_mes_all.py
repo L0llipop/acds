@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import datetime
 import multimodule as telnet
@@ -10,6 +9,12 @@ import argparse
 from multiprocessing import Pool
 import subprocess
 import ipaddress
+import start_topology
+
+try:
+	from acds import configuration
+except:
+	import configuration
 # from websocket import create_connection
 
 
@@ -28,7 +33,7 @@ def createParser ():
 
 	parser = argparse.ArgumentParser(
 		prog = 'Setting MES Eltex',
-		description = '''Данный скрипт позваляет настроить базовый конфиг MES Eltex.''',
+		description = '''Данный скрипт позволяет настроить базовый конфиг MES Eltex.''',
 		epilog = '''(c) January 2019. Автор программы, как всегда,
 			не несет никакой ответственности ни за что.'''
 		)
@@ -46,11 +51,11 @@ def upgrade(t, model, ip, hostname):
 	image_33 = 'mes3300-4013-R1.ros'
 	version_33 = '4.0.13'
 
-	image_21 = 'mes2000-11485.ros'
-	version_21 = '1.1.48.5'
+	image_21 = 'mes2000-11486.ros'
+	version_21 = '1.1.48.6'
 
-	image_31 = 'mes3000-25482.ros'
-	version_31 = '2.5.48.2'
+	image_31 = 'mes3000-25486.ros'
+	version_31 = '2.5.48.6'
 
 	t.new_sendline('configure')
 	t.new_sendline('port jumbo-frame')
@@ -228,22 +233,20 @@ def authorization_in_eltex(t, data_mes, vlans_mng_list):					# id	hostname	model
 	# return
 
 	if uplink == None or not uplink:
-		try:
-			t.ws_send_message(f"this device haven't data for uplink, topology started")
-			uplink = subprocess.check_call(["perl", "/var/scripts/system/find_ip.pl", ip], universal_newlines=True)
-			t.sql_connect('connect')
-			add = t.sql_select(f"SELECT CONCAT((SELECT NETWORKNAME FROM guspk.host WHERE DEVICEID = top.parent), '_', top.parent_port) FROM guspk.host h LEFT JOIN guspk.topology top ON top.child = h.DEVICEID WHERE h.IPADDMGM = '{ip}'", 'full')
-			t.sql_connect('disconnect')
-			if add[0][0]:
-				uplink = add[0][0]
-				t.ws_send_message(f"uplink: {uplink}")
-			else:
-				print(f"authorization_in_eltex|Не отстроилась топология")
-				t.ws_send_message("topology error")
+		t.ws_send_message(f"this device haven't data for uplink, topology started")
+		topology_result = start_topology.loop(ip)
+		t.sql_connect('connect')
+		add = t.sql_select(f"""SELECT CONCAT((SELECT NETWORKNAME FROM guspk.host WHERE DEVICEID = top.parent), '_', top.parent_port) 
+								FROM guspk.host h 
+								LEFT JOIN guspk.topology top ON top.child = h.DEVICEID WHERE h.IPADDMGM = '{ip}'""", 'full')
+		t.sql_connect('disconnect')
+		if add[0][0]:
+			uplink = add[0][0]
+			t.ws_send_message(f"uplink: {uplink}")
+		else:
+			print(f"authorization_in_eltex|Не отстроилась топология")
+			t.ws_send_message("topology error")
 
-		except subprocess.CalledProcessError as err:
-			print(f'authorization_in_eltex|Не удалось запустить скрипт топологии /var/scripts/core/find_ip.pl')
-			t.ws_send_message(f"can't run topology script /var/scripts/core/find_ip.pl")
 	if not uplink:
 		print(f'authorization_in_eltex|Нет данных по uplink')
 		t.ws_send_message("Error in topology, no data for uplink")
@@ -373,7 +376,7 @@ def authorization_in_eltex(t, data_mes, vlans_mng_list):					# id	hostname	model
 
 	print(f"authorization_in_eltex|{data_mes}")
 
-	with open ('/var/www/acds/static/jn_templates/template_commands_eltex_mes_all.jn2') as f:
+	with open (getattr(configuration, 'STATIC_PATH')+'jn_templates/template_commands_eltex_mes_all.jn2') as f:
 		mes_switches_template = f.read()
 		template = jinja2.Template(mes_switches_template)
 		commands_mes_switches = template.render(data_mes).splitlines()

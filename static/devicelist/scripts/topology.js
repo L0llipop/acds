@@ -24,6 +24,7 @@ chatSocket.onmessage = function(e) {
             $("#result").append(`<div class="col-12 justify-content-center align-items-center text-center result_topology" id="count_${count}">`);
             $(`#count_${count}`).append(`<div class="col-auto">\u2B06`);
             $(`#count_${count}`).append(`<div class="col-12">${data[count]['desc']}&emsp;${data[count]['ip']}&emsp;${data[count]['model']}`);
+            $(`#count_${count}`).append(`<div class="col-auto">${data[count]['port']}`);
         }
         return;
     }

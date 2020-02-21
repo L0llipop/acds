@@ -9,8 +9,12 @@ import argparse
 from multiprocessing import Pool
 import subprocess
 import ipaddress
+import start_topology
 # from websocket import create_connection
-
+try:
+	from acds import configuration
+except:
+	import configuration
 
 def createParser ():
 	parametr = {
@@ -53,13 +57,23 @@ def upgrade(t, model, ip):
 
 	image_24_boot = 'mes2400-1019-R2.boot'
 	image_24 = 'mes2400-1019-R2.iss'
-	verison_24 = '10.1.9'
+	version_24 = '10.1.9'
 
 	t.new_sendline('configure')
 	t.new_sendline('port jumbo-frame')
 	t.new_sendline('exit')
 
+	ip_ftp = '10.224.62.2'
 
+	if re.search(r'^10\.228\.', ip):
+		if re.search(r'^45-', hostname):
+			ip_ftp = '10.228.65.253'
+		else:
+			ip_ftp = '10.228.63.237'
+		
+	if re.search(r'^10\.225\.', ip):
+		ip_ftp = '10.225.80.253'
+		
 	counter = 0
 	download_required = 'yes'
 	while download_required != 'no':
@@ -77,7 +91,7 @@ def upgrade(t, model, ip):
 
 			# Сравниваем активную версию с эталонной
 			if activ_version != version_33:
-				download_command = (f"boot system tftp://10.228.63.237/FTP/FTTb/{image_33}") # boot system tftp://10.224.62.2/FTP/FTTb/mes3300-4012-R183.ros
+				download_command = (f"boot system tftp://{ip_ftp}/FTP/FTTb/{image_33}")
 			else:
 				t.ws_send_message("software is up to date")
 				return 'end_version'
@@ -105,9 +119,9 @@ def upgrade(t, model, ip):
 
 			# Сравниваем активную версию с эталонной
 			if re.search(r'MES31\d\d', model) and activ_version != version_31:
-				download_command = (f"copy tftp://10.228.63.237/FTP/FTTb/{image_31} flash://image")
+				download_command = (f"copy tftp://{ip_ftp}/FTP/FTTb/{image_31} flash://image")
 			elif activ_version != version_21:
-				download_command = (f"copy tftp://10.228.63.237/FTP/FTTb/{image_21} flash://image")
+				download_command = (f"copy tftp://{ip_ftp}/FTP/FTTb/{image_21} flash://image")
 			else:
 				t.ws_send_message("software is up to date")
 				return 'end_version'
@@ -135,8 +149,8 @@ def upgrade(t, model, ip):
 
 			# Сравниваем активную версию с эталонной
 			if re.search(r'MES24\d{2}', model) and activ_version != version_24:
-				download_command_boot = (f"copy tftp://10.228.63.237/FTP/FTTb/mes24xx/{image_24_boot} boot")
-				download_command = (f"copy tftp://10.228.63.237/FTP/FTTb/mes24xx/{image_24} image")
+				download_command_boot = (f"copy tftp://{ip_ftp}/FTP/FTTb/mes24xx/{image_24_boot} boot")
+				download_command = (f"copy tftp://{ip_ftp}/FTP/FTTb/mes24xx/{image_24} image")
 			else:
 				t.ws_send_message("software is up to date")
 				return 'end_version'
@@ -145,7 +159,7 @@ def upgrade(t, model, ip):
 			# Сравниваем активную версию с эталонной
 			t.new_sendline('show bootvar')
 			data = t.data_split()
-			match_inactive = re.findall(r'Version\s+:\s+([\d\.]+)', a)
+			match_inactive = re.findall(r'Version\s+:\s+([\d\.]+)', data)
 
 			if match_inactive and match_inactive[1] == image_24:
 				download_required = 'no'
@@ -157,7 +171,7 @@ def upgrade(t, model, ip):
 		else:
 			error = "Error id_210 = SW Version not found"
 			t.ws_send_message(error)
-			t.ws_send_message("""Данное регуулярное выражение не сработало: Active-image.*\\n\\s+Version: ([\\d\\.]+)|SW version\\s+([\\d\\.]+)""")
+			t.ws_send_message("""Данное регулярное выражение не сработало: Active-image.*\\n\\s+Version: ([\\d\\.]+)|SW version\\s+([\\d\\.]+)""")
 			t.ws_send_message(f'''Вывод команды "show version": {data}''')
 			return error
 
@@ -242,22 +256,22 @@ def authorization_in_eltex(t, data_mes):					# id	hostname	model	ticket	office	d
 	# return
 
 	if uplink == None or not uplink:
-		try:
-			t.ws_send_message(f"this device haven't data for uplink, topology started")
-			subprocess.check_call(["perl", "/var/scripts/system/find_ip.pl", ip], universal_newlines=True)
-			t.sql_connect('connect')
-			add = t.sql_select(f"SELECT CONCAT((SELECT NETWORKNAME FROM guspk.host WHERE DEVICEID = top.parent), '_', top.parent_port) FROM guspk.host h LEFT JOIN guspk.topology top ON top.child = h.DEVICEID WHERE h.IPADDMGM = '{ip}'", 'full')
-			t.sql_connect('disconnect')
-			if add[0][0]:
-				uplink = add[0][0]
-				t.ws_send_message(f"uplink: {uplink}")
-			else:
-				print(f"authorization_in_eltex|Не отстроилась топология")
-				t.ws_send_message("topology error")
+		
+		t.ws_send_message(f"this device haven't data for uplink, topology started")
+		topology_result = start_topology.loop(ip)
+		t.sql_connect('connect')
+		add = t.sql_select(f"""SELECT CONCAT((SELECT NETWORKNAME FROM guspk.host WHERE DEVICEID = top.parent), '_', top.parent_port) 
+							FROM guspk.host h 
+							LEFT JOIN guspk.topology top ON top.child = h.DEVICEID 
+							WHERE h.IPADDMGM = '{ip}'""", 'full')
+		t.sql_connect('disconnect')
+		if add[0][0]:
+			uplink = add[0][0]
+			t.ws_send_message(f"uplink: {uplink}")
+		else:
+			print(f"authorization_in_eltex|Не отстроилась топология")
+			t.ws_send_message("topology error")
 
-		except subprocess.CalledProcessError as err:
-			print(f'authorization_in_eltex|Не удалось запустить скрипт топологии /var/scripts/core/find_ip.pl')
-			t.ws_send_message(f"can't run topology script /var/scripts/core/find_ip.pl")
 	if not uplink:
 		print(f'authorization_in_eltex|Нет данных по uplink')
 		t.ws_send_message("Error in topology, no data for uplink")
@@ -354,7 +368,7 @@ def authorization_in_eltex(t, data_mes):					# id	hostname	model	ticket	office	d
 	data_mes['port_downlink'] = port_downlink
 	data_mes['uplink_and_port'] = uplink
 
-	with open ('/var/www/acds/static/jn_templates/template_commands_eltex_mes_24xx.jn2') as f:
+	with open (getattr(configuration, 'STATIC_PATH')+'jn_templates/template_commands_eltex_mes_24xx.jn2') as f:
 		mes_switches_template = f.read()
 		template = jinja2.Template(mes_switches_template)
 		commands_mes_switches = template.render(data_mes).splitlines()

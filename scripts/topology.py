@@ -19,7 +19,7 @@ class getTopology(object):
 			t.new_sendline(command, timeout=time, prompt=prompt)
 
 		data = t.data_split()
-		print(f"check_search|data: {data}")
+		print(f"check_search|data: {data} regex {regular}")
 		print('======================================================================================')
 		match = re.search(regular, data, key)
 		if (match):
@@ -81,9 +81,9 @@ class getTopology(object):
 				parent_port = f"'{parent_port}'"
 
 
-			print(f"INSERT INTO guspk.topology (child, parent, child_port, parent_port) VALUES({id_child}, {id_parent}, {child_port}, {parent_port});")
+			print(f"INSERT INTO guspk.topology (child, parent, child_port, parent_port) VALUES ({id_child}, {id_parent}, {child_port}, {parent_port});")
 			print('======================================================================================')
-			t.sql_update(f"INSERT INTO guspk.topology (child, parent, child_port, parent_port) VALUES({id_child}, {id_parent}, {child_port}, {parent_port});")
+			t.sql_update(f"INSERT INTO guspk.topology (child, parent, child_port, parent_port) VALUES ({id_child}, {id_parent}, {child_port}, {parent_port});")
 
 
 	def select_topology(self, t, id_child):
@@ -587,7 +587,7 @@ class getTopology(object):
 			mac_gateway = check[0]
 
 			# определяем port Uplink
-			check = self.check_search(t, f"show fdb mac_address {mac_gateway}", rf"{mac_gateway}\s+(\d+)\s+Dynamic", 'dlink|не найден port Uplink')
+			check = self.check_search(t, f"show fdb mac_address {mac_gateway}", rf"{mac_gateway}\s+(\d+)\s+Dynamic", 'dlink|не найден port Uplink', re.I)
 			if type(check) == dict:
 				result.update(check)
 				return result
@@ -686,6 +686,40 @@ class getTopology(object):
 
 			return result
 
+		def alcatel_dslam(result, num, next_num, t):
+
+
+			if result['status'] != 'end_device':
+				
+				# Определяем порт нижестоящего коммутатора
+				for n in range(1,3):
+					check = self.check_search(t, f"statistics mac enet{n} {result['vlan']}", rf"{result['mac']}", f"alcatel_dslam {result[num]['ip']}|не найден mac downlink")
+					if type(check) == dict:
+						if n == 2:
+							result.update(check)
+							return result
+					else:
+						result[num].update({'port': f'enet{n}'})
+						break
+
+
+			# определяем vlan mgn
+			check = self.check_findall(t, 'info configure system shub entry vlan flat', rf"id\s+(\d+)", f"alcatel_dslam {result[num]['ip']}|не найден vlan mgm")
+			if type(check) == dict:
+				result.update(check)
+				return result
+			vlan = check[0]			
+
+			# определяем port Uplink
+			check = self.check_findall(t, f'show vlan shub-fdb {vlan}', rf"network:(\d+)", f"alcatel_dslam {result[num]['ip']}|не найден mac gateway")
+			if type(check) == dict:
+				result.update(check)
+				return result
+			result[num].update({'port_uplink': f'{check[0]}'})
+
+
+			return result
+
 
 
 		num = result['count']
@@ -737,6 +771,8 @@ class getTopology(object):
 			result = alcitec_switch(result, num, next_num, t)
 		elif re.search(r'1212|1248', result[num]['model']):
 			result = zyxel_dslam(result, num, next_num, t)
+		elif re.search(r'7330|7302', result[num]['model']):
+			result = alcatel_dslam(result, num, next_num, t)
 		else:
 			result.update({'status': 'error','message_error': f"def switch | There is no algorithm for this model {result[num]['model']}"})
 

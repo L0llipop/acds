@@ -23,17 +23,20 @@ DGS-3612g
 download firmware_fromTFTP {{ ftp_server }} FTP/FTTb/DGS36xxRun_2.52-B45.had
 download firmware_fromTFTP {{ ftp_server }} src_file  FTP/FTTb/DGS36xx_Run_3_00_B48.had
 
-{% elif model == '21xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes2000-11485.ros flash://image
+DES-1210-28/ME
+download firmware_fromTFTP 10.221.0.3 FTP/FTTb/DES-1210-28ME-B3-10-05-B020.hex image_id 1
+
+{% elif model == '21xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes2000-11486.ros flash://image
 show bootvar 
 boot system image-2
 
 //обновление загрузчика
-copy tftp://{{ ftp_server }}/FTP/FTTb/boot_mes2124m_1_8 boot
+copy tftp://{{ ftp_server }}/FTP/FTTb/franchise_boot-0017.rfb boot 
 reload
 
 {% elif model == '31xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes3000-25482.ros flash://image
 
-{% elif model == 'x3xx' %}boot system tftp://{{ ftp_server }}/FTP/FTTb/mes3300-4012-R183.ros
+{% elif model == 'x3xx' %}boot system tftp://{{ ftp_server }}/FTP/FTTb/mes3300-4013-3R1.ros
 
 {% elif model == 'MA-4000' %}tftp://{{ ftp_server }}/FTP/FTTh/firmware.3.26.3.2.ma4k fs://firmware 
 copy tftp://{{ ftp_server }}/FTP/license_ma4000.lic fs://license 
@@ -42,11 +45,12 @@ firmware select image-alternate
 //after reboot
 firmware confirm
 
-{% elif model == 'LTP' %}copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-8x-revc-3.36.0.822.fw.bin fs://firmware
-copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-4x-revc-3.36.2.57.fw.bin fs://firmware
+{% elif model == 'LTP' %}copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-8x-revc-3.38.0.1492.fw.bin fs://firmware
+copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-4x-revc-3.38.0.1490.fw.bin fs://firmware
+copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-8x-revb-3.38.0.1489.fw.bin fs://firmware
 copy tftp://{{ ftp_server }}/FTP/FTTh/license/license_for_ltp.lic fs://license
 
-{% elif model == '24xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1018-2R0.boot boot
-copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1018-2R0.iss image
+{% elif model == '24xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1019-R2.boot boot
+copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1019-R2.iss image
 
 {% endif %}

@@ -5,7 +5,7 @@ $("#acds_id_btn").on('click', function () {
 		alert("Введите ID заявки")
 	}
 	console.log(acds_id);
-	$.ajax("http://10.180.7.34/activator/get_history/", {
+	$.ajax("/activator/get_history/", {
 		method: "GET",
 		data: {id: acds_id},
 		cache: false,

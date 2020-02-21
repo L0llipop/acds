@@ -241,7 +241,7 @@ def get_device_move(request):
 							VALUES ('{comment}', 'other', '{uplink}', '{model}', '33270', '{serial}', '{address}', '{acswnodeid}', 'other', 0, 0, '{email}', '{comment}')""")
 			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'del', '{user}', 'Инициирована заявка на {comment}, {ip}')""")
 			# t.ws_send_message(f"acds_id - {acds_id}")
-			mail_admins(f"""Заявка {acds_id} [OTHER]""", f"""Пришла заявка, читайте комметарий""")
+			mail_admins(f"""Заявка {acds_id} [OTHER]""", f"""Пришла заявка, читайте комментарий""")
 			time.sleep(2)
 			# send_mail(f"""Заявка № {acds_id}""", f"""Поступила новая заявка № {acds_id}.""", 'acds@ural.rt.ru', ['zaripova-ak@ural.rt.ru'])
 			# time.sleep(2)
@@ -391,7 +391,7 @@ def free_ip_refresh(request):
 				mail_data, email, data_settings, header, footer = mail_generator(acds_id)
 				mail_data = '\n'.join(mail_data)
 				send_mail(f"""Ваша заявка на ввод оборудования {acds_id}""", f"""Здравствуй {user}!\n\n Реквизиты по вашей заявке № {acds_id}.\nОжидается установка на сеть.\n{header}\n{mail_data}\n{footer}""", 'acds@ural.rt.ru', [f'{email}'])
-				time.sleep(2)
+				time.sleep(4)
 				mail_admins(f"""Заявка {acds_id} [INIT]""", f"""Отработано успешно\nIP\t{data_settings['ipaddmgm']}\nnetname\t{data_settings['networkname']}\nGW\t{data_settings['gw']}\nMASK\t{data_settings['mask']}\nmgmvlan\t{data_settings['mgmvlan']}\nvlans\t{data_settings['vlans']}\noffice\t{data_settings['office']}\nserial\t{data_settings['serial']}\nmodel\t{data_settings['model']}""")
 				values.update({'status': 'init'})
 				values.update({'report': free_ip_run})
@@ -588,7 +588,7 @@ def get_acsw_node_id_update(request):
 			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'init', '{user}', 'Изменен комментарий "{db_comment[0][0]}" to "{comment}"')""")
 
 	print(f'{old_acsw_node_id[0][0]} - {type(old_acsw_node_id[0][0])} ; {acsw_node_id} {type(acsw_node_id)}')
-	if old_acsw_node_id[0][0] != int(acsw_node_id):
+	if acsw_node_id != "False" and old_acsw_node_id[0][0] != int(acsw_node_id):
 		t.sql_update(f"""UPDATE guspk.acds SET acsw_node_id = {acsw_node_id} WHERE id = {acds_id}""")
 		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acsw_node_id_update', '{acds_id}', '{user}', 'update acsw_node_id {old_acsw_node_id[0][0]} to {acsw_node_id}')""")
 		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'init', '{user}', 'Выполнена замена шаблонов - {old_acsw_node_id[0][0]} to {acsw_node_id}')""")
@@ -983,4 +983,3 @@ def mail_sender(*args, admins=False):
 	error = 'try'
 	while error != 'ok':
 		error = send_status(error)
-
