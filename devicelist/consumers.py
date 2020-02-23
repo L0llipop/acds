@@ -31,7 +31,7 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 		username = text_data_json['username']
 
 		t = multimodule.FastModulAut(login = 'yuzhakov-da')
-		t.sql_connect('connect', server = getattr(configuration, 'SERVER_IP'), login = getattr(configuration, 'LOGIN'), password = getattr(configuration, 'MYSQL_PASS'))
+		t.sql_connect('connect', server = getattr(configuration, 'SERVER_IP'), login = getattr(configuration, 'MYSQL_LOGIN'), password = getattr(configuration, 'MYSQL_PASS'))
 		t.count_website(t, page='topology', username=username)
 
 		message = re.sub(r'\s+', '', message)

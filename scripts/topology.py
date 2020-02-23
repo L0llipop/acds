@@ -183,7 +183,7 @@ class getTopology(object):
 
 		check_aut = t.aut(ip = result[1]['ip'], model = result[1]['model'], login = 'tum_support',password = 'hEreR2Mu3E')
 		if check_aut != 0:
-			result.update({'status': 'error','message_error': f"Can't connect {result[num]['ip']}"})
+			result.update({'status': 'error','message_error': f"Can't connect {result[1]['ip']}"})
 			return result
 
 		if result['ip']:

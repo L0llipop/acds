@@ -967,7 +967,7 @@ def mail_sender(*args, admins=False):
 	def send_status(error):
 		if admins == False:
 			try:
-				send_mail(f"""{args[0]}""", f"""{args[1]}""", 'acds@ural.rt.ru', [f'{args[2]}'])
+				send_mail(f"""{args[0]}""", f"""{args[1]}""", 'acds@ural.rt.ru', [args[2]])
 				error = 'ok'
 			except:
 				error = 'error'

@@ -62,8 +62,6 @@ class FastModulAut:
 		# ini_local = "/var/scripts/system/config_data_local.ini"
 		# ini_local = static('config_data_local.ini')
 	
-		self.p_sql = getattr(configuration, 'MYSQL_PASS')
-		self.server = getattr(configuration, 'SERVER_IP')
 		self.password = getattr(configuration, 'TACACS_PASS')
 
 		""" Читаем общий фаил конфигурации для доступа на оборудоание под локальными учётными данными """
@@ -341,12 +339,12 @@ class FastModulAut:
 		if 'login' in hash_aut and hash_aut['login'] != 'tacacs':
 			telnet_login = hash_aut['login']
 		else:
-			telnet_login = self.login
+			telnet_login = getattr(configuration, 'TACACS_LOGIN')
 
 		if 'password' in hash_aut and hash_aut['password'] != 'tacacs':
 			telnet_password	= hash_aut['password']
 		else:
-			telnet_password = self.password
+			telnet_password = getattr(configuration, 'TACACS_PASS')
 
 		self.ip = ip
 		self.model = model
