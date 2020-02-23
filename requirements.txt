@@ -17,6 +17,7 @@ cryptography==2.8
 cx-Oracle==7.3.0
 daphne==2.4.1
 defusedxml==0.6.0
+Django==3.0.3
 django-allauth==0.41.0
 dnspython==1.16.0
 et-xmlfile==1.0.1
@@ -39,6 +40,7 @@ oauthlib==3.1.0
 openpyxl==3.0.3
 pexpect==4.8.0
 protobuf==3.6.1
+psycopg2-binary==2.8.4
 ptvsd==4.3.2
 ptyprocess==0.6.0
 pyasn1==0.4.8
