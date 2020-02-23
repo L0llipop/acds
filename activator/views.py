@@ -820,7 +820,7 @@ def admin(request):
 
 
 def mail_generator(acds_id):
-	main_path_template = 'static/jn_templates'
+	main_path_template = 'scripts/jn_templates'
 	port_uplink = None
 	t = multimodule.FastModulAut()
 	# t.ws_connect('chat/mail_generator/')

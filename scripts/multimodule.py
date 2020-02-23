@@ -57,7 +57,7 @@ class FastModulAut:
 		if self.login == 'default':
 			self.login = getpass.getuser()
 		
-		ini_local = getattr(configuration, 'STATIC_PATH')+'config_data_local.ini'
+		ini_local = getattr(configuration, 'CONFIG_PATH')+'config_data_local.ini'
 		# pathini = "/home/"+self.login+"/.config/config_data.ini"
 		# ini_local = "/var/scripts/system/config_data_local.ini"
 		# ini_local = static('config_data_local.ini')

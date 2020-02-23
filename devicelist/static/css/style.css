@@ -1,8 +1,0 @@
-.d-flex flex-column {
-  display: flex;
-  justify-content: center;
-  background-color: DodgerBlue;
-}
-.flex-container > div {
-  background-color: #f1f1f1;
-}

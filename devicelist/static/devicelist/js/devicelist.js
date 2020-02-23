@@ -95,7 +95,7 @@ async function get_devicelist() {
                       <div class="device_addres">${data[ip_address][cell]}</div>
                       <div class="col px-2">\
                         <a href="https://yandex.ru/maps/?l=sat%2Cskl&ll=${data[ip_address]['longitude']}%2C${data[ip_address]['latitude']}&mode=whatshere&whatshere%5Bpoint%5D=${data[ip_address]['longitude']}%2C${data[ip_address]['latitude']}&whatshere%5Bzoom%5D=17&z=17" target="YANDEX_MAP">\
-                          <img src="/acds/static/geolocation.png" width="22" height="22">\
+                          <img src="/static/devicelist/geolocation.png" width="22" height="22">\
                         </a>\
                       </div>\
                     </div>\
@@ -107,7 +107,7 @@ async function get_devicelist() {
             }
           }
           // if (data['access'] == 'yes'){
-          $(`#${data[ip_address]['id']}`).append(`<td><a class="edit_device" id="${data[ip_address]['id']}"><img src="/acds/static/gear.png" width="22" height="22"></a>`);
+          $(`#${data[ip_address]['id']}`).append(`<td><a class="edit_device" id="${data[ip_address]['id']}"><img src="/static/devicelist/gear.png" width="22" height="22"></a>`);
           // }
         }
         

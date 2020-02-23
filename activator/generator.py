@@ -44,7 +44,7 @@ def get_template(request):
 
 
 	
-	main_path_template = 'static/jn_templates'
+	main_path_template = 'scripts/jn_templates'
 	data = ['model', 'ip', 'mask', 'gateway', 'hostname', 'uplink_hostname', 'uplink_port', 'MGM', 'HSI', 'IPTV', 'IMS', 'TR069']
 	
 	values = {}.fromkeys(data, '')

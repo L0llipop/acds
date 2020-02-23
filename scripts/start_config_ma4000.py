@@ -95,11 +95,11 @@ def authorization_in_eltex(t, reply, data_olt):
 
 
 	if model == 'MA-4000px':
-		path = getattr(configuration, 'STATIC_PATH')+'jn_templates/template_commands_ma4000.jn2'
+		path = getattr(configuration, 'JN_PATH')+'template_commands_ma4000.jn2'
 	elif model == 'LTP-8X':
-		path = getattr(configuration, 'STATIC_PATH')+'jn_templates/template_commands_ltp-8x.jn2'
+		path = getattr(configuration, 'JN_PATH')+'template_commands_ltp-8x.jn2'
 	elif model == 'LTP-4X':
-		path = getattr(configuration, 'STATIC_PATH')+'jn_templates/template_commands_ltp-4x.jn2'
+		path = getattr(configuration, 'JN_PATH')+'template_commands_ltp-4x.jn2'
 
 	try:
 		with open (path) as f:

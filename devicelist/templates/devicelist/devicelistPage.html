@@ -8,12 +8,12 @@
 
 
 <div class="scrolltop row align-items-end mx-0">
-	<a><img src="{% static 'scroll_to_top.png' %}" width="18" height="18"></a>
+	<a><img src="{% static 'devicelist/scroll_to_top.png' %}" width="18" height="18"></a>
 </div>
 
 {% if request.user.groups.all.0.name == 'admins' or request.user.groups.all.0.name == 'engineers'%}
 <div class="ew_device">
-	<a id="add_new_device"><img src="{% static 'add.png' %}" width="40" height="40">
+	<a id="add_new_device"><img src="{% static 'devicelist/add.png' %}" width="40" height="40">
 </div>
 {% endif %}
 <!-- <img src="{% static 'gear.png' %}" width="0" height="0"> -->
@@ -129,5 +129,5 @@
 
 
 
-<script src="{% static 'devicelist/scripts/devicelist.js' %}"></script>
+<script src="{% static 'devicelist/js/devicelist.js' %}"></script>
 {% endblock %}

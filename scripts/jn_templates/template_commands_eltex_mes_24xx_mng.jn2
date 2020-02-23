@@ -11,7 +11,6 @@ set port-role uplink
 interface vlan {{ mgmvlan }}
  no shutdown
  ip address {{ ipaddmgm }} {{ mask }}
- 
 !
 ip route 0.0.0.0  0.0.0.0 {{ gw }}
 exit

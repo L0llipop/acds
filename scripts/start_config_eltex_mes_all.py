@@ -376,7 +376,7 @@ def authorization_in_eltex(t, data_mes, vlans_mng_list):					# id	hostname	model
 
 	print(f"authorization_in_eltex|{data_mes}")
 
-	with open (getattr(configuration, 'STATIC_PATH')+'jn_templates/template_commands_eltex_mes_all.jn2') as f:
+	with open (getattr(configuration, 'JN_PATH')+'template_commands_eltex_mes_all.jn2') as f:
 		mes_switches_template = f.read()
 		template = jinja2.Template(mes_switches_template)
 		commands_mes_switches = template.render(data_mes).splitlines()
