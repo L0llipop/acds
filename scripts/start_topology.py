@@ -67,14 +67,9 @@ def loop(ip):
 		result['count'] += 1
 
 		if result['status'] == 'error':
-			print(result['message_error'])
-			break
+			return result
+
 	
 	multi.sql_connect('disconnect')
 
 	return result
-
-if __name__ == "__main__":
-	ip = '10.228.55.2'
-	answer = loop(ip)
-	print(answer)
