@@ -388,6 +388,48 @@ commit
 quit
 
 
+ont-lineprofile gpon profile-id 150 profile-name "RON:TR+L3_HSI_1,2,3,4+VOIP"
+  mapping-mode port-vlan
+  tcont 1 dba-profile-id 11
+  tcont 3 dba-profile-id 13
+  gem add 0 eth tcont 1
+  gem add 2 eth tcont 3
+  gem mapping 0 0 iphost
+  gem mapping 2 2 ippath 0
+  commit
+  quit
+  
+ont-lineprofile gpon profile-id 151 profile-name "RON:TR+L3_HSI_1,3,4+IPTV+VOIP"
+  mapping-mode port-vlan
+  tcont 1 dba-profile-id 11
+  tcont 2 dba-profile-id 12
+  tcont 3 dba-profile-id 13
+  gem add 0 eth tcont 1
+  gem add 1 eth tcont 2
+  gem add 2 eth tcont 3
+  gem mapping 0 0 iphost
+  gem mapping 1 1 eth 2
+  gem mapping 2 2 ippath 0
+  multicast gemport tcont 2 eth 2
+  commit
+  quit
+
+ont-lineprofile gpon profile-id 152 profile-name "RON:TR+L3_HSI_1,4+IPTV_2,3~+VOIP"
+  mapping-mode port-vlan
+  tcont 1 dba-profile-id 11
+  tcont 2 dba-profile-id 12
+  tcont 3 dba-profile-id 13
+  port-bundle eth 1 port 2,3
+  gem add 0 eth tcont 1
+  gem add 1 eth tcont 2
+  gem add 2 eth tcont 3
+  gem mapping 0 0 iphost
+  gem mapping 1 1 eth-bundle 1
+  gem mapping 2 2 ippath 0
+  multicast gemport tcont 2 port-bundle 1
+  commit
+  quit
+
 
 "ERIC:L2_HSI_1+IPTV_2,3,4+VOIP / ID 200"
 
