@@ -63,6 +63,7 @@ class FastModulAut:
 		# ini_local = static('config_data_local.ini')
 	
 		self.password = getattr(configuration, 'TACACS_PASS')
+		self.logs_dir = 'tmp/scripts/log_pexpect_authorization/'
 
 		""" Читаем общий фаил конфигурации для доступа на оборудоание под локальными учётными данными """
 		self.config = ConfigParser()
@@ -70,11 +71,6 @@ class FastModulAut:
 			self.config.read(ini_local)
 		else:
 			print ("Отсутствует общий конфигурационный файл:", ini_local)
-
-		""" Проверка пути до каталога для telnet логов, и создание каталога в случае его отсутствия """
-		if not os.path.exists("/tmp/scripts/log_pexpect_authorization/"+self.login):
-			os.makedirs("/tmp/scripts/log_pexpect_authorization/"+self.login)
-		# print (self.login, self.password)
 
 	def oracle_connect(self, dis_connect, **hash_config_sql):
 		if dis_connect == 'connect':
@@ -331,6 +327,7 @@ class FastModulAut:
 		дсламов: zyxel (1212, 1248, 5000, 5005), alcatel (7324, 7330, 7303, Pizza Box)
 		коммутаторов: eltex, zyxel, dlink, alcitec, cisco, juniper
 		gpon: ericsson, eltex
+		Для записи логов в конкретную директорию < logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}" >
 
 
 		"""
@@ -351,8 +348,16 @@ class FastModulAut:
 		self.new_telnet = pexpect.spawn('telnet ' + self.ip, encoding='utf-8', timeout=self.timeout)
 		self.new_telnet.setwinsize(50,150)
 		# print (f"""/tmp/scripts/log_pexpect_authorization/{self.login}/{self.ip}.txt""")
+		""" Проверка пути до каталога для telnet логов, и создание каталога в случае его отсутствия """
 		if logging == True:
-			self.new_telnet.logfile_read = open("/tmp/scripts/log_pexpect_authorization/"+self.login+"/"+self.ip+'.txt', 'w')
+			if 'logs_dir' in hash_aut:
+				if not os.path.exists(hash_aut['logs_dir']):
+					os.makedirs(hash_aut['logs_dir'])
+				self.new_telnet.logfile_read = open(f"{hash_aut['logs_dir']}/{ip}.txt", 'w')
+			else:
+				if not os.path.exists(self.logs_dir):
+					os.makedirs(self.logs_dir)
+				self.new_telnet.logfile_read = open(f"{self.logs_dir}{ip}.txt", 'w')
 
 
 		self.model_ini = 'other'
