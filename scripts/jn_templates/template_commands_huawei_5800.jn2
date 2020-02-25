@@ -732,6 +732,27 @@ ont-lineprofile gpon profile-id 210 profile-name "ERIC:TR+0MMI+VOIP"
    commit                                                                                                                  
    quit
 
+ ont-lineprofile gpon profile-id 211 profile-name "ERIC:L2_VMMI+VOIP"
+   qos-mode gem-car
+   mapping-mode port-vlan
+   tcont 1 dba-profile-id 11
+   tcont 2 dba-profile-id 12
+   tcont 3 dba-profile-id 13
+   tcont 4 dba-profile-id 11
+   port-bundle eth 1 port 2,3
+   gem add 0 eth tcont 1
+   gem add 1 eth tcont 2
+   gem add 2 eth tcont 3
+   gem add 3 eth tcont 1
+   gem add 7 eth tcont 4
+   gem mapping 1 1 eth-bundle 1
+   gem mapping 2 2 ippath 0
+   gem mapping 3 3 eth 1
+   gem mapping 7 7 eth 4 vlan 3500
+   multicast gemport tcont 2 port-bundle 1
+   commit
+   quit
+
  ont-lineprofile gpon profile-id 212 profile-name "ERIC:L2_HSI_1+VPN_2,3,4+VOIP"
   qos-mode gem-car
   mapping-mode port-vlan
@@ -785,6 +806,26 @@ ont-lineprofile gpon profile-id 210 profile-name "ERIC:TR+0MMI+VOIP"
   gem mapping 5 5 iphost vlan {{tr069['vlan']}}   
   commit
   quit
+
+
+ ont-lineprofile gpon profile-id 219 profile-name "ERIC:L3_TR_2+0MMM+VOIP"
+   qos-mode gem-car
+   mapping-mode port-vlan
+   tcont 1 dba-profile-id 11
+   tcont 2 dba-profile-id 12
+   tcont 3 dba-profile-id 13
+   port-bundle eth 1 port 2,3,4
+   gem add 0 eth tcont 1
+   gem add 1 eth tcont 2
+   gem add 2 eth tcont 3
+   gem add 5 eth tcont 1
+   gem mapping 0 0 iphost vlan 3500
+   gem mapping 1 1 eth-bundle 1
+   gem mapping 2 2 ippath 0
+   gem mapping 5 5 iphost vlan 3580
+   multicast gemport tcont 2 port-bundle 1
+   commit
+   quit
 
 
  ont-lineprofile gpon profile-id 221 profile-name "ERIC:L2_HSI_1,3+IPTV_2,4+VOIP"
