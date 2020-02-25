@@ -331,6 +331,16 @@ multicast gemport tcont 2 port-bundle 1
 commit
 quit
 
+ont-lineprofile gpon profile-id 108 profile-name "RON:VPN_1,2,3,4"
+   mapping-mode port-vlan
+   tcont 4 dba-profile-id 11
+   port-bundle eth 2 port 1,2,3,4
+   gem add 3 eth tcont 4
+   gem mapping 3 3 eth-bundle 2
+   commit
+   quit
+
+
  ont-lineprofile gpon profile-id 111 profile-name "RON:TR+L2_HSI_1,4+IPTV_2,3+VOIP"
   mapping-mode port-vlan
   tcont 1 dba-profile-id 11
@@ -398,7 +408,7 @@ ont-lineprofile gpon profile-id 150 profile-name "RON:TR+L3_HSI_1,2,3,4+VOIP"
   gem mapping 2 2 ippath 0
   commit
   quit
-  
+
 ont-lineprofile gpon profile-id 151 profile-name "RON:TR+L3_HSI_1,3,4+IPTV+VOIP"
   mapping-mode port-vlan
   tcont 1 dba-profile-id 11
