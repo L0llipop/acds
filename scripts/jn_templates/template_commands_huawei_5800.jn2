@@ -780,6 +780,11 @@ vlan packet-policy {{iptv['vlan']}} unicast discard
 vlan packet-policy {{ims['vlan']}} multicast discard
 vlan packet-policy {{tr069['vlan']}} multicast discard
 
+security anti-macduplicate enable
+security anti-macspoofing enable
+security anti-macspoofing vlan {{pppoe['vlan']}} enable
+security anti-macspoofing vlan {{iptv['vlan']}} enable
+security anti-macspoofing vlan {{ims['vlan']}} enable
 
 
 Профиль для влана с опцией 82
