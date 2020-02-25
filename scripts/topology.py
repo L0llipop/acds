@@ -8,6 +8,10 @@ import getpass
 import ipaddress
 import datetime
 import asyncio
+try:
+	from acds import configuration
+except:
+	import configuration
 
 class getTopology(object):
 
@@ -95,7 +99,7 @@ class getTopology(object):
 
 
 
-	def peagg(self, result, t):
+	def peagg(self, result, t, dir_name):
 
 		def find_in_cisco(result, t):
 			t.new_sendline('terminal length 0')
@@ -181,7 +185,7 @@ class getTopology(object):
 
 
 
-		check_aut = t.aut(ip = result[1]['ip'], model = result[1]['model'], login = 'tum_support',password = 'hEreR2Mu3E')
+		check_aut = t.aut(ip = result[1]['ip'], model = result[1]['model'], login = 'tum_support', password = 'hEreR2Mu3E', logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
 		if check_aut != 0:
 			result.update({'status': 'error','message_error': f"Can't connect {result[1]['ip']}"})
 			return result
@@ -209,7 +213,7 @@ class getTopology(object):
 		return result
 
 
-	def switch(self, result, t):
+	def switch(self, result, t, dir_name):
 
 		def bbagg_upe_juniper(result, num, next_num, t):
 
@@ -734,7 +738,7 @@ class getTopology(object):
 
 
 		# print(f"---- AUT IN {result[num]['ip']} ----")
-		check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login=login, password=password)
+		check_aut = t.aut(ip = result[num]['ip'], model = result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
 
 		if re.search(r'MES-3528|MGS-3712|MES3500-24|4728|4012', result[num]['model']) and check_aut != 0:
 			"""Дурацкие зиксиля, иногда авторизация не проходит с первого раза. 
@@ -794,15 +798,15 @@ class getTopology(object):
 		return result
 
 
-	async def main(self, result, t):
+	async def main(self, result, t, dir_name):
 		await asyncio.sleep(0.01)
 
 		# result['ip'] = 10.224.1.135
 
 		if result['count'] == 1:
-			result = self.peagg(result, t)
+			result = self.peagg(result, t, dir_name)
 
 		elif result['count'] >= 2:
-			result = self.switch(result, t)
+			result = self.switch(result, t, dir_name)
 		# print(result)
 		return result

@@ -27,7 +27,7 @@ def select_net_template(ip, multi):
 def main(result, multi, top):
 	loop = asyncio.new_event_loop()
 	asyncio.set_event_loop(loop)
-	result = loop.run_until_complete(top.main(result, multi))
+	result = loop.run_until_complete(top.main(result, multi, 'start_topology'))
 
 	return result
 
