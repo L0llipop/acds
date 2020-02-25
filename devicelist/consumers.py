@@ -30,7 +30,7 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 		online = text_data_json['online']
 		username = text_data_json['username']
 
-		t = multimodule.FastModulAut(login = 'yuzhakov-da')
+		t = multimodule.FastModulAut()
 		t.sql_connect('connect', server = getattr(configuration, 'SERVER_IP'), login = getattr(configuration, 'MYSQL_LOGIN'), password = getattr(configuration, 'MYSQL_PASS'))
 		t.count_website(t, page='topology', username=username)
 
@@ -204,7 +204,7 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 						t.sql_update(f"UPDATE guspk.host SET mac = '{result['mac']}' WHERE IPADDMGM = '{result['ip']}'") ##
 
 				if result['status'] != 'full_topology':
-					result = await top.main(result, t)
+					result = await top.main(result, t, 'consumer')
 					if result['status'] == 'error':
 						self.send(text_data=json.dumps({
 							'message': json.dumps(result)
