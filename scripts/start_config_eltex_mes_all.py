@@ -262,7 +262,7 @@ def authorization_in_eltex(t, data_mes, vlans_mng_list):					# id	hostname	model
 		check_for += 1
 		t.ws_send_message("log in to the device")
 		for n in range (len(logins)):
-			i = t.aut(ip = ip, model = model, login=logins[n]['login'], password=logins[n]['password'])
+			i = t.aut(ip = ip, model = model, login=logins[n]['login'], password=logins[n]['password'], logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/config_eltex")
 			if i == 0:
 				break
 
@@ -364,11 +364,6 @@ def authorization_in_eltex(t, data_mes, vlans_mng_list):					# id	hostname	model
 		t.ws_send_message(error)
 		return error
 
-	print(f"authorization_in_eltex|UPDATE guspk.topology SET child_port='{port_uplink}' WHERE child={data_mes['deviceid']};")
-	t.sql_connect('connect')
-	t.sql_update(f"UPDATE guspk.topology SET child_port='{port_uplink}' WHERE child={data_mes['deviceid']};")
-	t.sql_connect('disconnect')
-
 	# data_mes['mask'] = mask	не нашёл для чего раньше использовал, в конфиге этой переменной нету
 	data_mes['port_uplink'] = port_uplink
 	data_mes['port_downlink'] = port_downlink
@@ -437,7 +432,7 @@ t.aut(ip = k, model = reply[k]['model'], login='admin', password='admin')
 """
 
 def start_config(data_key, login='default', password='default', login_log='default'):
-	t = telnet.FastModulAut(login=login_log) # prompt = '#' - настройка по умолчанию
+	t = telnet.FastModulAut() # prompt = '#' - настройка по умолчанию
 	t.ws_connect('chat/log_configure/')
 	t.ws_send_message(f"=== START {data_key['ip']} ===")
 
