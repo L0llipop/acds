@@ -736,7 +736,6 @@ class getTopology(object):
 		if re.search(r'UCN', result[num]['desc']):
 			login, password = 'admin', 'admin'
 
-
 		# print(f"---- AUT IN {result[num]['ip']} ----")
 		check_aut = t.aut(ip = result[num]['ip'], model = result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
 
@@ -748,14 +747,17 @@ class getTopology(object):
 
 
 		if check_aut != 0:
-			login, password = 'admin', 'admin'
+			if re.search(r'1212|1248', result[num]['model']):
+				login, password = 'admin', '1234'
+			else:
+				login, password = 'admin', 'admin'
 			check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login=login, password=password)
 			
 			if check_aut != 0:
 				result.update({'status': 'error','message_error': f"Can't connect {result[num]['ip']}"})
 				return result
 
-		if re.search(r'EX4500-40F|EX9208|ACX2100|QFX5100', result[num]['model']):
+		if re.search(r'EX4500-40F|EX4550|EX9208|ACX2100|QFX5100', result[num]['model']):
 			result = bbagg_upe_juniper(result, num, next_num, t)
 		elif re.search(r'3324|3348|MES3124|3116|2324|2124|3508|2308|2208|1124', result[num]['model']):
 			result = eltex_x3xx_x1xx(result, num, next_num, t)

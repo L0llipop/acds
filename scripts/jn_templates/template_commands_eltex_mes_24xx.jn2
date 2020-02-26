@@ -1,6 +1,7 @@
 config terminal 
 ip dhcp snooping
 no spanning-tree
+port jumbo-frame
 
 snooping multicast-forwarding-mode ip
 snooping leave-process config-level port
