@@ -96,7 +96,7 @@ def authorization_in_zyxel(t, data_mes):
 		check_for += 1
 		t.ws_send_message("log in to the device")
 		for n in range (len(logins)):
-			i = t.aut(ip = ip, model = model, login=logins[n]['login'], password=logins[n]['password'])
+			i = t.aut(ip = ip, model = model, login=logins[n]['login'], password=logins[n]['password'], logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/config_zyxeldsl")
 			if i == 0:
 				break
 
@@ -177,7 +177,7 @@ t.aut(ip = k, model = reply[k]['model'], login='admin', password='admin')
 """
 
 def start_config(data_key, login='default', password='default', login_log='default'):
-	t = telnet.FastModulAut(login=login_log) # prompt = '#' - настройка по умолчанию
+	t = telnet.FastModulAut() # prompt = '#' - настройка по умолчанию
 	t.ws_connect('chat/log_configure/')
 	t.ws_send_message(f"=== START {data_key['ip']} ===")
 

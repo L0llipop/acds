@@ -44,24 +44,11 @@ def createParser ():
 	return parser
 
 
-def upgrade(t, model, ip):
-
-	image_33 = 'mes3300-4012-R183.ros'
-	version_33 = '4.0.12'
-
-	image_21 = 'mes2000-11485.ros'
-	version_21 = '1.1.48.5'
-
-	image_31 = 'mes3000-25482.ros'
-	version_31 = '48.2'
+def upgrade(t, model, ip, hostname):
 
 	image_24_boot = 'mes2400-1019-R2.boot'
 	image_24 = 'mes2400-1019-R2.iss'
 	version_24 = '10.1.9'
-
-	t.new_sendline('configure')
-	t.new_sendline('port jumbo-frame')
-	t.new_sendline('exit')
 
 	ip_ftp = '10.224.62.2'
 
@@ -77,78 +64,18 @@ def upgrade(t, model, ip):
 	counter = 0
 	download_required = 'yes'
 	while download_required != 'no':
-		if re.search(rf'24\d{2}', model):
-			t.new_sendline('show system information') # Смотрим активную версию
-		else:
-			t.new_sendline('show version') # Смотрим активную версию
+		t.new_sendline('show system information') # Смотрим активную версию
 		data = t.data_split()
-		match_active = re.search(r'Active-image.*\n\s+Version: ([\d\.]+)|SW version\s+([\d\.]+)|Software Version\s+: ([\d\.]+)', data, re.M)
+		match_active = re.search(r'Software Version\s+: ([\d\.]+)', data, re.M)
 
-		# х300 серия
-		if match_active and match_active[1]:	
+		#24xx version
+		if match_active and match_active[1]:
 			activ_version = match_active[1]
 			t.ws_send_message(f"current sw version: {activ_version}")
 
 			# Сравниваем активную версию с эталонной
-			if activ_version != version_33:
-				download_command = (f"boot system tftp://{ip_ftp}/FTP/FTTb/{image_33}")
-			else:
-				t.ws_send_message("software is up to date")
-				return 'end_version'
-
-
-			# Сравниваем не активную версию с эталонной
-			match_inactive = re.search(r'Inactive-image.*\n\s+Version: ([\d\.]+)', data, re.M)	# Смотрим не активную версию для x300-й серии
-			# Если в неактивном оброзе нет актуального ПО, то потребуется загрузка
-			if match_inactive and match_inactive[1] == version_33:
-				# В неактивном образе уже загружено актуальное ПО
-				download_required = 'no'
-				t.ws_send_message("new sw already loaded")
-
-				active_after = re.search(r'Active after reboot', data, re.M)
-				# Активируем не активное ПО и перезагружаемся, если ПО уже было активировано, то только перезагрузка
-				if not active_after:
-					t.ws_send_message("activating new sw")
-					t.new_sendline('boot system inactive-image')
-
-
-		# х100 серия
-		elif match_active and match_active[2]:	
-			activ_version = match_active[2]
-			t.ws_send_message(f"current sw version: {activ_version}")
-
-			# Сравниваем активную версию с эталонной
-			if re.search(r'MES31\d\d', model) and activ_version != version_31:
-				download_command = (f"copy tftp://{ip_ftp}/FTP/FTTb/{image_31} flash://image")
-			elif activ_version != version_21:
-				download_command = (f"copy tftp://{ip_ftp}/FTP/FTTb/{image_21} flash://image")
-			else:
-				t.ws_send_message("software is up to date")
-				return 'end_version'
-
-
-			# Сравниваем не активную версию с эталонной
-			t.new_sendline('show bootvar') # Смотрим активную версию
-			data = t.data_split()
-			match_inactive = re.search(r'image-([12])\s+([\d\.]+).+Not active(\*?)', data, re.M)
-			# Если в неактивном оброзе нет актуального ПО, то потребуется загрузка
-			if match_inactive and (match_inactive[2] == version_21 or match_inactive[2] == version_31):
-				# В неактивном образе уже загружено актуальное ПО
-				download_required = 'no'
-				t.ws_send_message("new sw already loaded")
-
-				# Активируем не активное ПО и перезагружаемся, если ПО уже было активировано, то только перезагрузка
-				if not match_inactive[3]:
-					t.ws_send_message("activating new sw")
-					t.new_sendline(f"boot system image-{match_inactive[1]}")
-
-		#24xx version
-		elif match_active and match_active[3]:
-			activ_version = match_active[3]
-			t.ws_send_message(f"current sw version: {activ_version}")
-
-			# Сравниваем активную версию с эталонной
-			if re.search(r'MES24\d{2}', model) and activ_version != version_24:
+			if activ_version != version_24:
+				download_required = 'yes'
 				download_command_boot = (f"copy tftp://{ip_ftp}/FTP/FTTb/mes24xx/{image_24_boot} boot")
 				download_command = (f"copy tftp://{ip_ftp}/FTP/FTTb/mes24xx/{image_24} image")
 			else:
@@ -156,28 +83,32 @@ def upgrade(t, model, ip):
 				return 'end_version'
 
 
-			# Сравниваем активную версию с эталонной
+			# Ищем новое ПО в неативном
 			t.new_sendline('show bootvar')
 			data = t.data_split()
 			match_inactive = re.findall(r'Version\s+:\s+([\d\.]+)', data)
+			t.ws_send_message(f"match_inactive - {match_inactive}")
 
-			if match_inactive and match_inactive[1] == image_24:
+			if version_24 in match_inactive:
 				download_required = 'no'
 				t.ws_send_message("new sw already loaded")
 				t.ws_send_message("activating new sw")
 				t.new_sendline(f"boot system inactive")
+				# t.new_sendline(download_command_boot, timeout=60)
 
 		# исключение на случай если не удалось определить версию
 		else:
 			error = "Error id_210 = SW Version not found"
 			t.ws_send_message(error)
-			t.ws_send_message("""Данное регулярное выражение не сработало: Active-image.*\\n\\s+Version: ([\\d\\.]+)|SW version\\s+([\\d\\.]+)""")
+			t.ws_send_message("""Данное регулярное выражение не сработало: Software Version\s+: ([\d\.]+)""")
 			t.ws_send_message(f'''Вывод команды "show version": {data}''')
 			return error
 
 		# Если ни в одном из образов не было обнаружено актуальное ПО, то сработает это условие
 		if download_required == 'yes':
 			t.ws_send_message(f'''waiting for the command to load new sw "timeout=30 min": {download_command}''')
+			t.new_sendline(download_command_boot, timeout=60)
+			t.ws_send_message("boot loaded")
 			t.new_sendline(download_command, timeout=1800)
 			t.ws_send_message("sw loaded")
 
@@ -188,15 +119,9 @@ def upgrade(t, model, ip):
 
 
 	t.ws_send_message("saving configuration")
-	if re.search(rf'24\d{2}', model):
-		t.new_sendline('copy running-config startup-config', timeout=12)
-	else:
-		t.new_sendline('write memory', prompt='\[startup-config\]')
-		t.new_sendline('y', timeout_expect=1)
+	t.new_sendline('copy running-config startup-config', timeout=12)
 	t.ws_send_message("reload")
-	t.new_sendline('reload', prompt='[yY]')
-	t.new_sendline('y')
-	t.new_sendline('y')
+	t.new_sendline('reload')
 	print (f"""\n{datetime.datetime.today().strftime("%H:%M:%S")}\t""", sep='', end='')
 	print (f"Ждём перезагрузки коммутатора")
 	time.sleep(10)
@@ -280,14 +205,14 @@ def authorization_in_eltex(t, data_mes):					# id	hostname	model	ticket	office	d
 
 	while check_version != 'end_version':
 		if check_for == 3:
-			print ('Неудалось загрузить или обновить коммутатор на новое ПО')
+			print ('Не удалось загрузить или обновить коммутатор на новое ПО')
 			error = "Error id_203 = Failed to load or update the switch to the new software"
 			t.ws_send_message(error)
 			return error
 		check_for += 1
 		t.ws_send_message("login to the device")
 		for n in range (len(logins)):
-			i = t.aut(ip = ip, model = model, login=logins[n]['login'], password=logins[n]['password'])
+			i = t.aut(ip = ip, model = model, login=logins[n]['login'], password=logins[n]['password'], logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/config_eltex24")
 			if i == 0:
 				break
 
@@ -296,9 +221,10 @@ def authorization_in_eltex(t, data_mes):					# id	hostname	model	ticket	office	d
 			t.ws_send_message(error)
 			return error
 		t.ws_send_message("success")
+		t.ws_send_message("sw check started")
+		check_version = upgrade(t, model, ip, data_mes['hostname'])
 
-
-		check_version = 'end_version'
+		# check_version = 'end_version'
 
 
 
@@ -339,7 +265,7 @@ def authorization_in_eltex(t, data_mes):					# id	hostname	model	ticket	office	d
 		t.ws_send_message(error)
 		return error
 
-	t.new_sendline (f"model: {model}")
+	t.ws_send_message(f"model: {model}")
 	check_port_uplink = 'bad'
 	if re.search(r'2428', model):
 		port_downlink = 'Gi 0/1-24'
@@ -360,9 +286,6 @@ def authorization_in_eltex(t, data_mes):					# id	hostname	model	ticket	office	d
 
 	uplink = uplink.replace(' ', '')
 
-	t.sql_connect('connect')
-	t.sql_update(f"UPDATE guspk.topology SET child_port='{port_uplink}' WHERE child={data_mes['deviceid']};")
-	t.sql_connect('disconnect')
 	# data_mes['mask'] = mask	не нашёл для чего раньше использовал, в конфиге этой переменной нету
 	data_mes['port_uplink'] = port_uplink
 	data_mes['port_downlink'] = port_downlink
@@ -399,20 +322,8 @@ def authorization_in_eltex(t, data_mes):					# id	hostname	model	ticket	office	d
 	t.disconnect()
 	return error
 
-"""
-Для new_sendline опционально можно применить prompt и timeout, по умолчанию эти значения равны # и 10 секунд соответственно
-t.new_sendline('sys info', prompt='>', timeout=100)
-
-Для sql_connect опционально можно применить server, login и password, по умолчанию они берутся из личного конфигурационного файла
-Обязательный параметр это "connect" и "disconnect"
-t.sql_connect('connect', server='10.10.10.10', login='username', password='userpassword')
-
-
-t.aut(ip = k, model = reply[k]['model'], login='admin', password='admin')
-"""
-
 def start_config(data_key, login='default', password='default', login_log='default'):
-	t = telnet.FastModulAut(login=login_log) # prompt = '#' - настройка по умолчанию
+	t = telnet.FastModulAut() # prompt = '#' - настройка по умолчанию
 	t.ws_connect('chat/log_configure/')
 	t.ws_send_message(f"=== START {data_key['ip']} ===")
 

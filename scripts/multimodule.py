@@ -63,7 +63,7 @@ class FastModulAut:
 		# ini_local = static('config_data_local.ini')
 	
 		self.password = getattr(configuration, 'TACACS_PASS')
-		self.logs_dir = 'tmp/scripts/log_pexpect_authorization/'
+		self.logs_dir = f'/tmp/scripts/log_pexpect_authorization/{self.login}/'
 
 		""" Читаем общий фаил конфигурации для доступа на оборудоание под локальными учётными данными """
 		self.config = ConfigParser()

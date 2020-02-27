@@ -71,7 +71,7 @@ def authorization_in_eltex(t, reply, data_olt):
 	check_for = 0
 	for n in range (len(logins)):
 		check_for += 1
-		i = t.aut(ip = ip, model = model, login=logins[n]['login'], password=logins[n]['password'])
+		i = t.aut(ip = ip, model = model, login=logins[n]['login'], password=logins[n]['password'], logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/config_eltexolt")
 		if i == 0:
 			break
 
@@ -135,7 +135,7 @@ def authorization_in_eltex(t, reply, data_olt):
 
 
 def start_config(data_key, login='default', password='default', login_log='default'):
-	t = telnet.FastModulAut(prompt = '#', login=login_log)
+	t = telnet.FastModulAut(prompt = '#')
 	reply = {}
 	t.ws_connect('chat/log_configure/')
 	t.ws_send_message(f"=== START {data_key['ip']} ===")
