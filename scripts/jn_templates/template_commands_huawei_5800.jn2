@@ -178,6 +178,35 @@ ont-lineprofile gpon profile-id 3 profile-name "Default_TR069"
   commit
   quit
   
+  
+
+
+ont-lineprofile gpon profile-id 10 profile-name "Default"
+  tr069-management enable
+  tcont 0 dba-profile-id 10
+  tcont 1 dba-profile-id 11
+  tcont 2 dba-profile-id 12
+  tcont 3 dba-profile-id 13
+  tcont 4 dba-profile-id 14
+  gem add 0 eth tcont 1
+  gem add 1 eth tcont 2
+  gem add 2 eth tcont 3
+  gem add 3 eth tcont 1
+  gem add 4 eth tcont 4
+  gem add 5 eth tcont 1
+  gem add 6 eth tcont 1
+  gem add 7 eth tcont 1
+  gem mapping 0 0 vlan 20  
+  gem mapping 1 0 vlan 40  
+  gem mapping 2 0 vlan 30 
+  gem mapping 3 0 vlan 50 
+  gem mapping 5 0 vlan 51  
+  gem mapping 6 0 vlan 52  
+  gem mapping 7 0 vlan 53  
+  gem mapping 4 0 vlan 69  
+  commit
+  quit
+  
 
 // "RON:TR+L3_HSI_1+IPTV_2,3,4+VOIP / ID 100"
 
