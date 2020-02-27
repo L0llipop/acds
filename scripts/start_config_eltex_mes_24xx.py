@@ -390,8 +390,3 @@ def start_config(data_key, login='default', password='default', login_log='defau
 	t.ws_close()
 	t.sql_connect('disconnect')
 	return error
-
-
-if __name__ == "__main__":
-	a = {'ip': '10.228.163.26', 'onlyup': True}
-	start_config(a)

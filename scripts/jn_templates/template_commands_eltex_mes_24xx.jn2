@@ -1,7 +1,6 @@
 config terminal 
 ip dhcp snooping
 no spanning-tree
-port jumbo-frame
 
 snooping multicast-forwarding-mode ip
 snooping leave-process config-level port
@@ -82,7 +81,6 @@ interface {{ port_uplink }}
 
 logging buffered 200
 logging severity debugging
-debug-logging flash:/mnt/
 user-defined offset 2 ethtype 0  
 
 
@@ -147,7 +145,6 @@ line ssh
 password validate symbols 0
 username admin password Cdbnx0AA privilege 15
 dcs information option enable
-dcs agent-circuit-id default-config enable
 dcs agent-circuit-id format-type identifier-string "" option sp delimiter slash 
 
 hostname {{ hostname }}
