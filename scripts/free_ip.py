@@ -315,7 +315,7 @@ def main(data_key, t, error_free_ip):
 	fttb = ['MES1124','MES1124M','MES2124','MES2124M','MES2124P','MES2124MB','MES2428','MES2408','MES2408C','MES2408P','MES2408B','MES2428B','MES2324B','MES3108F','MES3116F','MES2208P','MES2308','MES2308P','MES2324','MES2324F','MES2324P','MES3508P','MES3524F','MGS-3712','DES-3200-10','DES-3200-18','DES-3200-28','DES-3200-58','GS-3012', 'ES-2024a', '4024','ES-2108G','MGS-3712F','MES-3528','MGS-3712','MES3500-24','ES-3124','XGS-4728F','DES-2110','DES-3526','DES-3828','DGS-3700-12G','DGS-3200-10G','DES-3200-10','DES-3528','DES-3550','DES-1210-28/ME','DES-3200-28','DES-3200-18','DGS-3120-24SC','DGS-3627G','DES-3028','DES-3026','DES-3010G','DES-2108','DGS-3612G','DGS-1100-06','DGS-1210-10/ME','DGS-1210-12TS/ME','DGS-1210-20/ME','DES-3200-10/C','DGS-1210-28/ME','DES-3200-28/C','DGS-3000-28SC','DES-3226S','DGS-3100-24','DES-3552','DGS-3420-52T','DGS-3100-24TG','DXS-3400-24SC','DGS-3120-24SC/B1','DES-3200-52','DGS-3120-48TC','DES-3200-18/C','DGS-3200-10','DES-3028G','DGS-3420-26SC','DES-1210-52/ME','GS-4012F','ES3528M', 'ES3526XA', 'WS-C2950-12', 'SNR-S2985G-8T']
 	wbs  = ['ePMP 1000', 'WOP-2AC-LR5', 'WOP-12ac-LR']
 	vg   = ['SMG2016', 'MG-8FXS', 'MG-16FXS', 'MG-24FXS', 'MG-32FXS', 'MG-36FXS', 'MG-44FXS', 'MG-52FXS', 'MG-60FXS', 'MG-72FXS','TAU-72.IP','TAU-60.IP','TAU-24.IP','TAU-16.IP','TAU-36.IP','TAU-8.IP','TAU-4.IP']
-	adsl = ['AAM1212-51','DSL IES-1248-51','AAM1008-61','DSL IES-5000', '7330 FD', '7302 FD']
+	adsl = ['AAM1212-51','DSL IES-1248-51','AAM1008-61','DSL IES-5000', '7330 FD', '7302 FD', 'C300', 'C350MB']
 	acsw = ['ME-3600X-24TS-M', 'ME-3600X-24FS-M', 'ME-3400G-12CS-D','ME-3400-24TS-A','MES3124','MES3124F','MES3324F', 'MES3348F', 'WS-C3750E-24TD-S','ACX2100','WS-C3560E-24TD-S']
 	cnt  = ['КУБ-Микро']
 
@@ -486,25 +486,12 @@ def main(data_key, t, error_free_ip):
 		print (datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
 		print ("Запуск синхронизации astu")
 		t.ws_send_message("syncing astu db")
-		# base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+		
+		# Запус синхронизации баз данных
 		astu_check.start()
 		print (datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
-# 		temlplate_query = f"""python3 /var/scripts/common/yuzhakov-da/python/astu_data.py 
-# --req {out_of_exp} --hostname {new_hostname} 
-# --ip {free_ip}
-# --serial {data_key['sn']} 
-# --office '{data_key['office']}' 
-# --sd {data_key['sd']} 
-# --str {structura} 
-# --classid {type_id} 
-# --vendor {vendor_id} 
-# --status 2 
-# --uplink {nodeid} 
-# --model {model_id}"""
-# 		print ('\n',temlplate_query.replace('\n',''), sep='')
-		# print ("\npython3 /var/scripts/system/astu_check.py")
 
-		# Запус синхронизации баз данных
+
 		# subprocess.check_output(["python3", "/var/scripts/system/astu_check.py"], universal_newlines=True)
 		# после синхронизации занести данные по новому устройству в таблицу host_acsw_node
 		# print ("Send 'y' for next settings: ", end='')
