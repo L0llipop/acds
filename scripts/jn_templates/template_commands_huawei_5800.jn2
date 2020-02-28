@@ -1393,8 +1393,8 @@ ont-mg-attribute-profile modify profile-id 1 pstn-protocol-variant 7
 
 ont-sipagent-profile add profile-id 10 profile-name Erics_ONT
 ont-sipagent-profile modify profile-id 10 proxy-server {{ ims['server'] }} home-domain {{ ims['domain'] }} media port 40000 65535 signal signal-port 5060 registration expiration 3600 rereg-head-start-time 600
-ont-sipagent-profile add profile-id 15 profile-name RONT
-ont-sipagent-profile modify profile-id 15 proxy-server {{ ims['domain'] }} signal signal-port 5060 registration expiration 3600 rereg-head-start-time 600
+ont-sipagent-profile add profile-id 15 profile-name Iskratel
+ont-sipagent-profile modify profile-id 15 proxy-server 192.168.140.13 home-domain 192.168.140.13 signal signal-port 5060 registration expiration 3600 rereg-head-start-time 600
 
 lldp enable
 lldp enable port 0/9/0
