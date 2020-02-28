@@ -548,14 +548,6 @@ quit
 
 "ERIC:L2_HSI_1,4+IPTV_2,3+VOIP / ID 201"
 
-ont-srvprofile gpon profile-id 200 profile-name "ERIC:common"
-ont-port pots 2 eth 4 
-port q-in-q eth 1 enable 
-port q-in-q eth 2 enable 
-port q-in-q eth 3 enable 
-port q-in-q eth 4 enable 
-commit
-quit
 
 ont-lineprofile gpon profile-id 201 profile-name "ERIC:L2_HSI_1,4+IPTV_2,3+VOIP"
 qos-mode gem-car
@@ -577,14 +569,6 @@ quit
 
 "ERIC:L2_HSI_1+IPTV_2,3+VOIP+VPN_4 / ID 202"
 
-ont-srvprofile gpon profile-id 200 profile-name "ERIC:common"
-ont-port pots 2 eth 4 
-port q-in-q eth 1 enable 
-port q-in-q eth 2 enable 
-port q-in-q eth 3 enable 
-port q-in-q eth 4 enable 
-commit
-quit
 
 ont-lineprofile gpon profile-id 202 profile-name "ERIC:IMMV+VOIP"
 qos-mode gem-car
@@ -608,14 +592,6 @@ quit
 
 "ERIC:TR+L3_HSI_1+IPTV_2,3,4+VOIP / ID 203"
 
-ont-srvprofile gpon profile-id 200 profile-name "ERIC:common"
-ont-port pots 2 eth 4 
-port q-in-q eth 1 enable 
-port q-in-q eth 2 enable 
-port q-in-q eth 3 enable 
-port q-in-q eth 4 enable 
-commit
-quit
 
 ont-lineprofile gpon profile-id 203 profile-name "ERIC:TR+0MMM+VOIP"
 qos-mode gem-car
@@ -638,15 +614,6 @@ quit
 
 "ERIC:VOIP+VPN_1,2,3,4 / ID 204"
 
-ont-srvprofile gpon profile-id 200 profile-name "ERIC:common"
-ont-port pots 2 eth 4 
-port q-in-q eth 1 enable 
-port q-in-q eth 2 enable 
-port q-in-q eth 3 enable 
-port q-in-q eth 4 enable 
-commit
-quit
-
 ont-lineprofile gpon profile-id 204 profile-name "ERIC:VOIP+VPN_1,2,3,4"
 qos-mode gem-car
 mapping-mode port-vlan
@@ -661,15 +628,6 @@ commit
 quit
 
 "ERIC:TR+L3_HSI_1+IPTV_2,3+VOIP+VPN_4 / ID 205"
-
-ont-srvprofile gpon profile-id 200 profile-name "ERIC:common"
-ont-port pots 2 eth 4 
-port q-in-q eth 1 enable 
-port q-in-q eth 2 enable 
-port q-in-q eth 3 enable 
-port q-in-q eth 4 enable 
-commit
-quit
 
 ont-lineprofile gpon profile-id 205 profile-name "ERIC:TR+0MMV+VOIP"
 qos-mode gem-car
