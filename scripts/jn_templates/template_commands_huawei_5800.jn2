@@ -100,6 +100,20 @@ ont-srvprofile gpon profile-id 3 profile-name "Default_TR069"
   commit
 quit
 
+ont-srvprofile gpon profile-id 10 profile-name "Default"
+  ont-port pots adaptive eth adaptive catv adaptive 
+  multicast-forward tag translation 40 
+  multicast mode igmp-snooping 
+  port vlan iphost translation 20 user-vlan 20
+  port vlan iphost translation 30 user-vlan 30
+  port vlan iphost translation 40 user-vlan 40
+  port vlan iphost translation 50 user-vlan 50
+  port vlan iphost translation 51 user-vlan 51
+  port vlan iphost translation 52 user-vlan 52
+  port vlan iphost translation 53 user-vlan 53
+  port vlan iphost translation 69 user-vlan 69
+  commit
+quit
 
 // на элтексе аналог   template "template-01"
 
