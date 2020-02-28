@@ -122,7 +122,7 @@ quit
   tcont 1 dba-profile-id 0
   commit
   quit
- ont-lineprofile gpon profile-id 1 profile-name "Default_TR069"
+ ont-lineprofile gpon profile-id 1 profile-name "Default_TR069_2"
   qos-mode gem-car
   tcont 0 dba-profile-id 10
   tcont 1 dba-profile-id 11
@@ -181,14 +181,14 @@ ont-lineprofile gpon profile-id 3 profile-name "Default_TR069"
   gem add 5 eth tcont 1
   gem add 6 eth tcont 1
   gem add 7 eth tcont 1
-  gem mapping 0 0 vlan 20   // dba 11   inet
-  gem mapping 1 0 vlan 40   // dba 12  IPTV
-  gem mapping 2 0 vlan 30   // dba 13  sip
-  gem mapping 3 0 vlan 50   // dba 11  inet for vpn
-  gem mapping 5 0 vlan 51   // dba 11  inet for vpn
-  gem mapping 6 0 vlan 52   // dba 11  inet for vpn
-  gem mapping 7 0 vlan 53   // dba 11  inet for vpn
-  gem mapping 4 0 vlan 69    //dba 14  tr069
+  gem mapping 0 0 vlan 20  
+  gem mapping 1 0 vlan 40  
+  gem mapping 2 0 vlan 30 
+  gem mapping 3 0 vlan 50  
+  gem mapping 5 0 vlan 51 
+  gem mapping 6 0 vlan 52  
+  gem mapping 7 0 vlan 53  
+  gem mapping 4 0 vlan 69
   commit
   quit
   
