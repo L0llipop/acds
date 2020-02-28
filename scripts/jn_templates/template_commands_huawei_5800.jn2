@@ -1134,13 +1134,13 @@ gem add 4 eth tcont 4
 gem add 5 eth tcont 1
 gem add 6 eth tcont 1
 gem add 7 eth tcont 1
-gem mapping 0 0 vlan {{pppoe['vlan']}} // dba 11   inet
-gem mapping 1 0 vlan {{iptv['vlan']}} // dba 12  IPTV
-gem mapping 2 0 vlan {{ims['vlan']}} // dba 13  sip
-gem mapping 3 0 vlan 50   // dba 11  inet for vpn
-gem mapping 5 0 vlan 51   // dba 11  inet for vpn
-gem mapping 6 0 vlan 52   // dba 11  inet for vpn
-gem mapping 7 0 vlan 53   // dba 11  inet for vpn
+gem mapping 0 0 vlan {{pppoe['vlan']}} 
+gem mapping 1 0 vlan {{iptv['vlan']}} 
+gem mapping 2 0 vlan {{ims['vlan']}} 
+gem mapping 3 0 vlan 50
+gem mapping 5 0 vlan 51   
+gem mapping 6 0 vlan 52 
+gem mapping 7 0 vlan 53  
 gem mapping 4 0 vlan {{tr069['vlan']}} //dba 14  tr069
 commit
 quit
