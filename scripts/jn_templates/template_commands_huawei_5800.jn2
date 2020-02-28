@@ -1260,6 +1260,9 @@ security anti-macspoofing vlan {{ims['vlan']}} enable
 Профиль для влана с опцией 82
 
 dhcp option82 enable
+y
+
+
 
 vlan service-profile profile-id 1 profile-name "dhcp"
   pitp disable
