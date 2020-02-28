@@ -82,8 +82,6 @@ def authorization_in_zyxel(t, data_mes):
 			t.ws_send_message(f"topology error {topology_result['message_error']}")
 
 	if not uplink:
-		print('authorization_in_zyxel|Нет данных по uplink')
-		t.ws_send_message("Error in topology, no data for uplink")
 		error = f"Error id_201 = Error in topology, {topology_result['message_error']}"
 		return error
 

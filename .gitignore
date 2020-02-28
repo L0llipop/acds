@@ -1,4 +1,5 @@
 *.pyc
+*.ini
 .vscode
 /venv
 /devicelist/__pycache__
@@ -7,4 +8,4 @@
 /acds/__pycache__
 /scripts/__pycache__
 /acds/configuration.py
-/scripts/config_data_local.ini
+scripts/config_data_local.ini
