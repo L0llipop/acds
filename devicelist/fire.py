@@ -18,8 +18,8 @@ except:
 
 def db_model_search(query):
     try:
-        conn = mysql.connector.connect(host=FIRE_DB,
-                                    database=FIRE_HOST,
+        conn = mysql.connector.connect(host=FIRE_HOST,
+                                    database=FIRE_DB,
                                     user=FIRE_USER,
                                     password=FIRE_PASS)
     except Exception as e:
@@ -39,10 +39,10 @@ def db_model_search(query):
 
 def db_insert(query):
     try:
-        conn = mysql.connector.connect(host='10.180.7.34',
-                                    database='FireSupressor',
-                                    user='borisov-sv',
-                                    password='1234')
+        conn = mysql.connector.connect(host=FIRE_HOST,
+                                    database=FIRE_DB,
+                                    user=FIRE_USER,
+                                    password=FIRE_PASS)
     except Exception as e:
         return str(e)
     try:
