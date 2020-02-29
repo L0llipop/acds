@@ -11,6 +11,7 @@ import datetime
 import json
 import multimodule
 import mysql.connector
+import fire_fias
 try:
 	from acds import configuration
 except:
