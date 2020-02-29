@@ -11,14 +11,17 @@ import datetime
 import json
 import multimodule
 import mysql.connector
-
+try:
+	from acds import configuration
+except:
+	import configuration
 
 def db_model_search(query):
     try:
-        conn = mysql.connector.connect(host='10.180.7.34',
-                                    database='FireSupressor',
-                                    user='borisov-sv',
-                                    password='1234')
+        conn = mysql.connector.connect(host=FIRE_DB,
+                                    database=FIRE_HOST,
+                                    user=FIRE_USER,
+                                    password=FIRE_PASS)
     except Exception as e:
         print(e)
         return
