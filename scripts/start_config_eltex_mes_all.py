@@ -240,17 +240,19 @@ def authorization_in_eltex(t, data_mes, vlans_mng_list):					# id	hostname	model
 								FROM guspk.host h 
 								LEFT JOIN guspk.topology top ON top.child = h.DEVICEID WHERE h.IPADDMGM = '{ip}'""", 'full')
 		t.sql_connect('disconnect')
-		if add[0][0]:
+		if topology_result['status'] == 'end_device':
 			uplink = add[0][0]
+			t.ws_send_message(f"uplink: {uplink}")
+			print(f"authorization_in_zyxel|data_mes['uplink']: {data_mes['uplink']}")
 			t.ws_send_message(f"uplink: {uplink}")
 		else:
 			print(f"authorization_in_eltex|Не отстроилась топология")
-			t.ws_send_message("topology error")
+			t.ws_send_message(f"topology error {topology_result['message_error']}")
 
 	if not uplink:
 		print(f'authorization_in_eltex|Нет данных по uplink')
 		t.ws_send_message("Error in topology, no data for uplink")
-		error = "Error id_201 = Error in topology, no data for uplink"
+		error = f"Error id_201 = Error in topology, {topology_result['message_error']}"
 		return error
 
 	while check_version != 'end_version':

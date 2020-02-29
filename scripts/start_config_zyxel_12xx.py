@@ -72,19 +72,17 @@ def authorization_in_zyxel(t, data_mes):
 							WHERE h.IPADDMGM = '{ip}'""", 'full')
 		t.sql_connect('disconnect')
 		print(f"authorization_in_zyxel|add: {add}")
-		if add[0][0]:
+		if topology_result['status'] == 'end_device':
 			uplink = add[0][0]
 			data_mes['uplink'] = uplink
 			print(f"authorization_in_zyxel|data_mes['uplink']: {data_mes['uplink']}")
 			t.ws_send_message(f"uplink: {uplink}")
 		else:
 			print("authorization_in_zyxel|Не отстроилась топология")
-			t.ws_send_message("topology error")
+			t.ws_send_message(f"topology error {topology_result['message_error']}")
 
 	if not uplink:
-		print('authorization_in_zyxel|Нет данных по uplink')
-		t.ws_send_message("Error in topology, no data for uplink")
-		error = "Error id_201 = Error in topology, no data for uplink"
+		error = f"Error id_201 = Error in topology, {topology_result['message_error']}"
 		return error
 
 	while check_version != 'end_version':

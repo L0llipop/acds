@@ -1119,7 +1119,7 @@ port vlan iphost translation {{tr069['vlan']}} user-vlan {{tr069['vlan']}}
 commit
 quit
 
-ont-lineprofile gpon profile-id 400 profile-name " RV6699-no_ASC"
+ont-lineprofile gpon profile-id 400 profile-name "RV6699-no_ASC"
 tr069-management enable
 tcont 0 dba-profile-id 10
 tcont 1 dba-profile-id 11
@@ -1394,7 +1394,12 @@ ont-mg-attribute-profile modify profile-id 1 pstn-protocol-variant 7
 ont-sipagent-profile add profile-id 10 profile-name Erics_ONT
 ont-sipagent-profile modify profile-id 10 proxy-server {{ ims['server'] }} home-domain {{ ims['domain'] }} media port 40000 65535 signal signal-port 5060 registration expiration 3600 rereg-head-start-time 600
 ont-sipagent-profile add profile-id 15 profile-name Iskratel
+
+{%- if '72-' in hostname %}
 ont-sipagent-profile modify profile-id 15 proxy-server 192.168.140.13 home-domain 192.168.140.13 signal signal-port 5060 registration expiration 3600 rereg-head-start-time 600
+{%- elif '45-' in hostname %}
+ont-sipagent-profile modify profile-id 15 proxy-server 10.201.26.13 home-domain 10.201.26.13 signal signal-port 5060 registration expiration 3600 rereg-head-start-time 600
+{%- endif %}
 
 lldp enable
 lldp enable port 0/9/0
