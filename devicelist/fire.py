@@ -105,6 +105,7 @@ def set_fire_data(request):
       else:
         insertquery = "INSERT INTO FireSupressor.FireSupressor (serial, inventory, type, fullweight, room, comandor, status) VALUES ('"+serial+"', '"+inventory+"', '"+firetype+"', '"+weight+"', '"+address+" "+room+"', '"+comandor+"', '"+firestatus+"')"
       lastid_ee=db_insert(insertquery)
+      fias_rez=fire_fias.fire_fias_insert(lastid_ee,address)
 
       
       for ttt in fireclass:
@@ -112,7 +113,7 @@ def set_fire_data(request):
         print(insertclass)
         db_insert(insertclass)
       
-      return JsonResponse({'insert': 'ok', "result":lastid_ee}, safe=False)
+      return JsonResponse({'insert': 'ok', "result":lastid_ee, "fias":fias_rez}, safe=False)
       
 
     #t.count_website(t, page='set_wbs_data', username=request.user.username)
