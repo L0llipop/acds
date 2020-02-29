@@ -20,14 +20,10 @@
 	<tr>
 		<form id="fire_find">
 		{% csrf_token %}
-		<th style="width: 15%"><input class="form-control" placeholder="тип" type="text" name="ip_address" maxlength="50" id="ip_address" required></td>
-		<th style="width: 10%"><input class="form-control" placeholder="статус" type="text" name="wlan0_ssid" maxlength="50" id="wlan0_ssid"></td>
-		<th style="width: 4"><input class="form-control" placeholder="Заводской №" type="number" name="wlan0_azimuth" maxlength="50" id="wlan0_azimuth"></td>
-		<th style="width: 9%"><input class="form-control" placeholder="Инвентарный №" type="text" name="wlan0_mac" maxlength="50" id="wlan0_mac"></td>
-		<th style="width: 10%"><input class="form-control" placeholder="адрес" type="text" name="wlan1_ssid" maxlength="50" id="wlan1_ssid"></td>
-		<th style="width: 4"><input class="form-control" placeholder="класс" type="number" name="wlan1_azimuth" maxlength="50" id="wlan1_azimuth"></td>
-		<th style="width: 9%"><input class="form-control" placeholder="просрочен" type="text" name="wlan1_mac" maxlength="50" id="wlan1_mac"></td>
-		<th style="width: 3%" id="commitfield"><input class="btn btn-dark" style='' id="fire_submit" type="submit" value="find"></td>
+		<th style="width: 10%"><input class="form-control" placeholder="адрес" type="text" name="fire_address" maxlength="50" id="fire_address"></td>
+		<th style="width: 4"><input class="form-control" placeholder="Заводской №" type="number" name="fire_serial" maxlength="50" id="fire_serial"></td>
+		<th style="width: 9%"><input class="form-control" placeholder="Инвентарный №" type="text" name="fire_inventory" maxlength="50" id="fire_inventory"></td>
+		<th style="width: 3%" id="commitfield"><input class="btn btn-dark" style='' id="fire_submit" type="submit" value="fire_find"></td>
 		</form>
 	</tr>
 </table>
