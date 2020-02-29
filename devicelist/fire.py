@@ -62,7 +62,11 @@ def db_insert(query):
 def firelist(request):
   if not request.user.is_authenticated:
     return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-  
+  if request.method == 'GET':
+    fire_address = request.GET.get("fire_address", "")
+    fire_serial = request.GET.get("fire_serial", "")
+    fire_inventory = request.GET.get("fire_inventory", "")
+
   firedic={}
   sqldata= db_model_search("select fireid, type, serial, inventory, room, fullweight, status, comandor, address, ClassList from FireSupressor.FireList")
   for iii in sqldata:
