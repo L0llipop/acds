@@ -8,7 +8,7 @@ except:
 
 def db_model_search(query):
     try:
-        conn = mysql.connector.connect(host=FIRE_HOST, database=FIRE_DB, user=FIRE_USER, password=FIRE_PASS)
+        conn = mysql.connector.connect(host=configuration.FIRE_HOST, database=configuration.FIRE_DB, user=configuration.FIRE_USER, password=configuration.FIRE_PASS)
     except Exception as e:
         print(e)
         return
@@ -25,7 +25,7 @@ def db_model_search(query):
 
 def db_insert(query):
     try:
-        conn = mysql.connector.connect(host=FIRE_HOST, database=FIRE_DB, user=FIRE_USER, password=FIRE_PASS)
+        conn = mysql.connector.connect(host=configuration.FIRE_HOST, database=configuration.FIRE_DB, user=configuration.FIRE_USER, password=configuration.FIRE_PASS)
     except Exception as e:
         return str(e)
     try:
