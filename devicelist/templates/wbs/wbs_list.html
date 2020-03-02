@@ -50,7 +50,7 @@
 					<td id="wlan0" style="width: 15">fr={{rr.5}} ssid={{rr.6}} azim={{rr.7}} mac={{rr.8}}</td>
 					<td id="wlan1" style="width: 15">fr={{rr.9}} ssid={{rr.10}} azim={{rr.11}} mac={{rr.12}}</td>
 					<td id="wlan2" style="width: 15">fr={{rr.13}} ssid={{rr.14}} azim={{rr.15}} mac={{rr.16}}</td>
-					<td id="geo" style="width: 15">шир={{rr.17}} дол={{rr.18}}<a href="https://yandex.ru/maps/?l=sat%2Cskl&ll={{rr.18}}%2C{{rr.17}}&mode=whatshere&whatshere%5Bpoint%5D={{rr.18}}%2C{{rr.17}}&whatshere%5Bzoom%5D=17&z=17" target="YANDEX_MAP"><img src="/static/geolocation.png" width="22" height="22"></a></td>
+					<td id="geo" style="width: 15">шир={{rr.17}} дол={{rr.18}}<a href="https://yandex.ru/maps/?l=sat%2Cskl&ll={{rr.18}}%2C{{rr.17}}&mode=whatshere&whatshere%5Bpoint%5D={{rr.18}}%2C{{rr.17}}&whatshere%5Bzoom%5D=17&z=17" target="YANDEX_MAP"><img src="/static/devicelist/geolocation.png" width="22" height="22"></a></td>
 			</tr>
 			{% endfor %}
 		</thead>
@@ -60,5 +60,5 @@
 
 	<div id="show_more"></div>
 <br>
-<script src="{% static 'devicelist/scripts/wbs.js' %}"></script>
+<script src="{% static 'devicelist/scripts/js/wbs.js' %}"></script>
 {% endblock %}

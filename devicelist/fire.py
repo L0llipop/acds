@@ -11,14 +11,18 @@ import datetime
 import json
 import multimodule
 import mysql.connector
-
+import fire_fias
+try:
+	from acds import configuration
+except:
+	import configuration
 
 def db_model_search(query):
     try:
-        conn = mysql.connector.connect(host='10.180.7.34',
-                                    database='FireSupressor',
-                                    user='borisov-sv',
-                                    password='1234')
+        conn = mysql.connector.connect(host=FIRE_HOST,
+                                    database=FIRE_DB,
+                                    user=FIRE_USER,
+                                    password=FIRE_PASS)
     except Exception as e:
         print(e)
         return
@@ -36,10 +40,10 @@ def db_model_search(query):
 
 def db_insert(query):
     try:
-        conn = mysql.connector.connect(host='10.180.7.34',
-                                    database='FireSupressor',
-                                    user='borisov-sv',
-                                    password='1234')
+        conn = mysql.connector.connect(host=FIRE_HOST,
+                                    database=FIRE_DB,
+                                    user=FIRE_USER,
+                                    password=FIRE_PASS)
     except Exception as e:
         return str(e)
     try:
@@ -58,7 +62,11 @@ def db_insert(query):
 def firelist(request):
   if not request.user.is_authenticated:
     return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-  
+  if request.method == 'GET':
+    fire_address = request.GET.get("fire_address", "")
+    fire_serial = request.GET.get("fire_serial", "")
+    fire_inventory = request.GET.get("fire_inventory", "")
+
   firedic={}
   sqldata= db_model_search("select fireid, type, serial, inventory, room, fullweight, status, comandor, address, ClassList from FireSupressor.FireList")
   for iii in sqldata:
@@ -101,6 +109,7 @@ def set_fire_data(request):
       else:
         insertquery = "INSERT INTO FireSupressor.FireSupressor (serial, inventory, type, fullweight, room, comandor, status) VALUES ('"+serial+"', '"+inventory+"', '"+firetype+"', '"+weight+"', '"+address+" "+room+"', '"+comandor+"', '"+firestatus+"')"
       lastid_ee=db_insert(insertquery)
+      fias_rez=fire_fias.fire_fias_insert(lastid_ee,address)
 
       
       for ttt in fireclass:
@@ -108,7 +117,7 @@ def set_fire_data(request):
         print(insertclass)
         db_insert(insertclass)
       
-      return JsonResponse({'insert': 'ok', "result":lastid_ee}, safe=False)
+      return JsonResponse({'insert': 'ok', "result":lastid_ee, "fias":fias_rez}, safe=False)
       
 
     #t.count_website(t, page='set_wbs_data', username=request.user.username)
