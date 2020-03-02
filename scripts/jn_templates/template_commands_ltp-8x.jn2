@@ -144,6 +144,7 @@ exit
 gpon olt unactivated-timout 20
 gpon olt password-in-trap
 gpon olt profile dhcpra dhcp-ra-01 vid {{ims['vlan']}}
+gpon olt profile dhcpra dhcp-ra-01 vid {{tr069['vlan']}}
 gpon olt model "2"
 
 logging module pmchal-ont loglevel "debug"
