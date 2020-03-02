@@ -243,10 +243,7 @@ def authorization_in_eltex(t, data_mes, vlans_mng_list):					# id	hostname	model
 		if topology_result['status'] == 'end_device':
 			uplink = add[0][0]
 			t.ws_send_message(f"uplink: {uplink}")
-			print(f"authorization_in_zyxel|data_mes['uplink']: {data_mes['uplink']}")
-			t.ws_send_message(f"uplink: {uplink}")
 		else:
-			print(f"authorization_in_eltex|Не отстроилась топология")
 			t.ws_send_message(f"topology error {topology_result['message_error']}")
 
 	if not uplink:
