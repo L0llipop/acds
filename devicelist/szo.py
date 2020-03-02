@@ -123,4 +123,4 @@ def start(request):
 
 
 	t.sql_connect('disconnect')
-	return render(request, 'devicelist/szo.html', values, key)
+	return render(request, 'devicelist/szo.html', values)

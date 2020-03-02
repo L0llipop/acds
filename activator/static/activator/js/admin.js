@@ -25,7 +25,7 @@ $('.btn-primary.getip').on('click', function(){
 			if (data['status'] == 'init') {
 				// $(`#getip_${id}`).prop("disabled", true);
 				$(`#getip_${id}`).html('getip');
-				$(`#ip_${id}`).html(`<a target="_blank" href="http://10.180.7.34:8080/topology/topology.pl?ip=${data['ip']}&submit=Submit">${data['ip']}</a>`); 
+				$(`#ip_${id}`).html(data['ip']); 
 				$(`#network_${id}`).html(`${data['network']}; ${data['mgmvlan']}`);
 				$(`#hostname_${id}`).html(data['hostname']);
 				$(`#vlans_${id}`).html(data['vlans']);
