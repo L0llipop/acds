@@ -1141,7 +1141,7 @@ gem mapping 3 0 vlan 50
 gem mapping 5 0 vlan 51   
 gem mapping 6 0 vlan 52 
 gem mapping 7 0 vlan 53  
-gem mapping 4 0 vlan {{tr069['vlan']}} //dba 14  tr069
+gem mapping 4 0 vlan {{tr069['vlan']}}
 commit
 quit
 
