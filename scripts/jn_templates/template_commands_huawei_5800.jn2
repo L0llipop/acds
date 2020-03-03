@@ -1370,6 +1370,7 @@ multicast-vlan {{iptv['vlan']}}
   igmp uplink-port 0/9/0
   igmp match mode disable
   igmp mode proxy
+  y
   igmp version v2
 
   quit
