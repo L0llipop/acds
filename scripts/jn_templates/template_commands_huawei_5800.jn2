@@ -1251,10 +1251,15 @@ vlan packet-policy {{ims['vlan']}} multicast discard
 vlan packet-policy {{tr069['vlan']}} multicast discard
 
 security anti-macduplicate enable
+y
 security anti-macspoofing enable
+y
 security anti-macspoofing vlan {{pppoe['vlan']}} enable
+y
 security anti-macspoofing vlan {{iptv['vlan']}} enable
+y
 security anti-macspoofing vlan {{ims['vlan']}} enable
+y
 
 
 Профиль для влана с опцией 82
