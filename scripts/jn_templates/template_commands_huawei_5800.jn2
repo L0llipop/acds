@@ -1308,8 +1308,6 @@ vlan bind service-profile {{ims['vlan']}} profile-id 1
 vlan bind service-profile {{tr069['vlan']}} profile-id 1
  
  
-// ont tr069-server-profile add profile-id 1 profile-name TR069_axiros url "http://10.184.89.35:80/" user rtk rtk
-
 board confirm 0
  
 {%- for slot_num in [1,2,3,4,5,6,7,8,11,12,13,14,15,16,17] %}
@@ -1354,16 +1352,13 @@ ntp-service unicast-server {{ default_gateway }} source-interface vlanif{{ mgmvl
 
 
 
-[security-config]
-  <security-config>
  security anti-macduplicate enable
 
 btv
 
 multicast-vlan {{iptv['vlan']}}
   igmp priority 4
-  // igmp ipv6 mode   // check mld
-  igmp match group ip 224.0.2.0 to-ip 239.255.255.0
+   igmp match group ip 224.0.2.0 to-ip 239.255.255.0
   igmp uplink-port 0/9/0
   igmp match mode disable
   igmp mode proxy
@@ -1373,8 +1368,7 @@ multicast-vlan {{iptv['vlan']}}
   quit
 
 -------------------------------------------
-[vomci-voip-config]
-  <vomci-voip-config>
+
 ont-sipagent-profile modify profile-id 1 proxy-server {{ ims['server'] }} outbound-server {{ ims['server'] }} auth-realm {{ ims['domain'] }} home-domain {{ ims['domain'] }} media port 40000 65535 signal signal-port 5060 signal-dscp 40
 ont-sipagent-profile modify profile-id 1 registration server-uri {{ ims['server'] }} expiration 3600 rereg-head-start-time 90
 ont-digitmap-profile modify profile-id 1 critical-dial-time 5 partial-dial-time 10 roh-time 10
@@ -1429,7 +1423,6 @@ hwtacacs-server accounting 10.184.121.4
 hwtacacs-server accounting 10.178.199.4 secondary
 hwtacacs-server shared-key wpS29slv
 hwtacacs-server source-interface Vlanif{{ mgmvlan }}
-//hwtacacs-server source interface meth0  // for Yamal 
 undo hwtacacs-server user-name domain-included
 quit
 
