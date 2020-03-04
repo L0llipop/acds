@@ -217,3 +217,50 @@ btnexcel.onclick = function() {
   delete link;
 }
 
+
+$(".address_dadata").suggestions({
+  token: "4050395393551c7931ceabf9015365c473c8879b",
+  type: "ADDRESS",
+  deferRequestBy: 300,
+  minChars: 4,
+  constraints: {
+    label: "Урал",
+    // ограничиваем поиск по коду ФИАС
+    locations: [
+      {"region_fias_id": "54049357-326d-4b8f-b224-3c6dc25d6dd3"},
+      {"region_fias_id": "4a3d970f-520e-46b9-b16c-50d4ca7535a8"},
+      {"region_fias_id": "826fa834-3ee8-404f-bdbc-13a5221cfb6e"},
+      {"region_fias_id": "4f8b1a21-e4bb-422f-9087-d3cbf4bebc14"},
+      {"region_fias_id": "27eb7c10-a234-44da-a59c-8b1f864966de"},
+      {"region_fias_id": "92b30014-4d52-4e2e-892d-928142b924bf"},
+      {"region_fias_id": "d66e5325-3a25-4d29-ba86-4ca351d9704b"},
+    ],
+    deletable: true
+  },
+  // locations: [{"region_fias_id": "54049357-326d-4b8f-b224-3c6dc25d6dd3"}]
+  /* Вызывается, когда пользователь выбирает одну из подсказок */
+  onSelect: function(suggestion) {
+
+
+    let fias_id = {'region_fias_id' : suggestion['data']['region_fias_id'],
+        'area_fias_id' : suggestion['data']['area_fias_id'],
+        'city_fias_id' : suggestion['data']['city_fias_id'],
+        'settlement_fias_id' : suggestion['data']['settlement_fias_id'],
+        'street_fias_id' : suggestion['data']['street_fias_id'],
+        'house_fias_id' : suggestion['data']['house_fias_id'],
+      }
+
+    sessionStorage.setItem('fias_id_key', JSON.stringify(fias_id));
+
+    // console.log(fias_id);
+    // let fias_data = JSON.parse(sessionStorage.getItem('fias_id_key'));
+    // console.log(fias_data);
+
+    //$("#alert_address").addClass('show');
+    //$("#submit").prop("disabled", true);
+    //$("span.bdg_address").remove();
+    //$("div.block_address").append("<span class='badge badge-danger bdg_address'>error</span>");
+
+
+  }
+});
