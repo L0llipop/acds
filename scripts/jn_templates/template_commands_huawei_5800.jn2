@@ -1150,19 +1150,6 @@ quit
 sysname {{ hostname }}
 
 
-
-terminal user name 
-test123
-test12345
-test12345
-root
-1
-5
-test
-n
-
-
-
 terminal session max-number 15
 sysman service telnet enable
 idle-timeout  15
