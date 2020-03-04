@@ -1198,13 +1198,10 @@ undo monitor uplink-port pppoe port 0/9/3
 
 
 
-  <platform-config>
 autosave time on
 autosave time 04:00:00              
 autosave type all
 
-//не понятно стоит ли менять этот таймаут по умолчанию 300
-ont autofind timeout 120  
 
 
 sysman source trap vlanif {{ mgmvlan }}
