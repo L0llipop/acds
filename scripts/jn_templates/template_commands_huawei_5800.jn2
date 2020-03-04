@@ -459,7 +459,7 @@ multicast gemport tcont 2 eth 2
 commit
 quit
 
- ont-lineprofile gpon profile-id 136 profile-name "RON:TR+L3_HSI_1,3,4+IPTV_2+VOIP_2"
+ ont-lineprofile gpon profile-id 136 profile-name "TR+L3_HSI_1,3,4+IPTV_2+VOIP_2"
   mapping-mode port-vlan
   tcont 1 dba-profile-id 11
   tcont 2 dba-profile-id 12
