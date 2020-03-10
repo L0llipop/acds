@@ -20,7 +20,7 @@
 	<tr>
 		<form id="fire_find">
 		{% csrf_token %}
-		<th style="width: 10%"><input class="form-control" placeholder="адрес" type="text" name="fire_address" maxlength="50" id="fire_address"></td>
+		<th style="width: 70%"><input class="form-control address_dadata" placeholder="адрес" type="text" name="fire_address" maxlength="50" id="fire_address"></td>
 		<th style="width: 4"><input class="form-control" placeholder="Заводской №" type="number" name="fire_serial" maxlength="50" id="fire_serial"></td>
 		<th style="width: 9%"><input class="form-control" placeholder="Инвентарный №" type="text" name="fire_inventory" maxlength="50" id="fire_inventory"></td>
 		<th style="width: 3%" id="commitfield"><input class="btn btn-dark" style='' id="fire_submit" type="submit" value="fire_find"></td>
@@ -35,7 +35,7 @@
 	<span class="close" style="right: 0;">&times;</span>
 	<h3 style="text-align: center;">Описание огнетушителя</h3>
 	<form id="addfireform">
-	<input id="addres_modal" type="text" placeholder="Географический адрес" required style="width: 630px;">адрес<br>
+	<input id="addres_modal" type="text" class="address_dadata" placeholder="Географический адрес" required style="width: 630px;">адрес<br>
 	<input id="room_modal" type="text" placeholder="помещение" style="width: 630px; ">помещение<br>
 	<input id="comandor_modal" type="text" placeholder="Ответственный" style="width: 630px;" value="{{request.user.email}}" >ответственный<br>
 	<input id="serial_modal" type="text" placeholder="заводской номер" style="width: 315px;">
@@ -97,7 +97,7 @@
 	<span class="close_edit" style="right: 0;">&times;</span>
 	<h3 style="text-align: center;">Редактирование огнетушителя</h3>
 	<form id="editfireform">
-	<input id="addres_modal" type="text" placeholder="Географический адрес" required style="width: 630px;">адрес<br>
+	<input id="addres_modal" type="text" class="address_dadata"  placeholder="Географический адрес" required style="width: 630px;">адрес<br>
 	<input id="room_modal" type="text" placeholder="помещение" style="width: 630px; ">помещение<br>
 	<input id="comandor_modal" type="text" placeholder="Ответственный" style="width: 630px;" value="{{request.user.email}}" >ответственный<br>
 	<input id="serial_modal" type="text" placeholder="заводской номер" style="width: 315px;">
@@ -160,5 +160,7 @@
 
 
 <br>
+<link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@19.4.2/dist/css/suggestions.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/suggestions-jquery@19.4.2/dist/js/jquery.suggestions.min.js"></script>
 <script src="{% static 'devicelist/js/fire.js' %}"></script>
 {% endblock %}
