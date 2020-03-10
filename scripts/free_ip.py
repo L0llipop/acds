@@ -13,39 +13,10 @@ import subprocess
 import datetime
 from datetime import datetime, timedelta
 import template_check
-import argparse
-import astu_data
-import astu_check
+
 
 from transliterate import translit, get_available_language_codes
 # from websocket import create_connection
-
-def createParser ():
-	# args= {'ip':'10.228.130.6', 'mask':'255.255.255.0', 'pppoe':'413', 'tv':'992', 'ims':'65', 'tr069':'3050', 'login':'yuzhakov-da', 'uplink':'72-TUMEN-AGG035-BBAGG-1'}
-	parametr = {
-		0:{'key_f':'--up',			'key_l':'-u',	'key_typ':str,	'key_sub':'up',},
-		1:{'key_f':'--model',		'key_l':'-m',	'key_typ':str,	'key_sub':'model',},
-		2:{'key_f':'--sn',			'key_l':'-s',	'key_typ':str,	'key_sub':'sn',},
-		3:{'key_f':'--office',	'key_l':'-o',	'key_typ':str,	'key_sub':'office',},
-		4:{'key_f':'--sd',			'key_l':'-d',	'key_typ':str,	'key_sub':'sd',},
-		5:{'key_f':'--nodeid',	'key_l':'-n',	'key_typ':int,	'key_sub':'nodeid',},
-		6:{'key_f':'--freeip',	'key_l':'-f',	'key_typ':str,	'key_sub':'freeip',},
-		7:{'key_f':'--idacds',	'key_l':'-i',	'key_typ':str,	'key_sub':'idacds',},
-	}
-
-	parser = argparse.ArgumentParser(
-		prog = 'Find free ip',
-		description = '''Ищет свободный IP addres по аплинку и модели устанавливаемого оборудования.''',
-		epilog = '''(c) January 2019. Автор программы, как всегда,
-			не несет никакой ответственности ни за что.'''
-		)
-	# subparsers = parser.add_subparsers (dest='command')
-
-	for n in range(len(parametr)):
-		# subparsers.add_parser (parametr[n]['key_sub'])
-		parser.add_argument (parametr[n]['key_l'], parametr[n]['key_f'], type=parametr[n]['key_typ'], nargs='?')
-
-	return parser
 
 def translate_to_en(text):
 	text = text.replace(" ", "")
@@ -109,7 +80,7 @@ def get_data(uplink_ip, model, vrf, t):
 
 	if not summary:
 		error_free_ip = 'Error id_101: no found vlan template for uplink'
-		t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID, WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
+		# t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID, WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
 		return error_free_ip, None
 
 	ipfree = ipaddress.IPv4Network(f"{summary[0][0]}/{summary[0][1]}", strict=False)
@@ -127,7 +98,7 @@ def ping(ip):
 		return ip
 
 def ping_check(hosts):
-	# multiprocessing.set_start_method("spawn") #для корректного дебага в vscode
+	multiprocessing.set_start_method("spawn") #для корректного дебага в vscode
 	pool = Pool(50)
 	hosts_unreacheble = list(filter(None, pool.map(ping, hosts)))
 	pool.close()
@@ -150,18 +121,10 @@ def get_free_ip(hosts_unreacheble, vrf, search_type, t):
 
 		astu_host_check = t.sql_select(f"SELECT DEVICEID, NETWORKNAME, DATEMODIFY, DEVICESTATUSID from guspk.host where IPADDMGM like '{ip_in_hosts}'", 'full')
 		if astu_host_check:
-			deviceid, hostname, datemodify, status = astu_host_check[0]
-			# for deviceid, hostname,datemodify, status in astu_host_check:
-			# print (deviceid, hostname, datemodify, status)
-			if datemodify < data_chek and status == 6:
-				# print (ip_in_hosts)
-				free_ip = ip_in_hosts
-				out_of_exp = 'update'
-				break
+			continue
 
 		else:
 			hosts_free.append(ip_in_hosts)
-			out_of_exp = 'insert'
 
 	if not free_ip and hosts_free:
 		free_ip = hosts_free[0]
@@ -169,7 +132,7 @@ def get_free_ip(hosts_unreacheble, vrf, search_type, t):
 	print (f"def get_free_ip | hosts_free: {hosts_free}")
 
 	# print (hosts_free)
-	return free_ip, out_of_exp
+	return free_ip
 
 
 def create_hostname(id_acds, ip_uplink, search_type, vrf, free_ip, t):
@@ -353,17 +316,12 @@ def main(data_key, t, error_free_ip):
 	else:
 		error_free_ip = 'Error id_100: The model does not fit the conditions'
 		t.ws_send_message(error_free_ip)
-		t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID, WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
+		# t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID, WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
 		return error_free_ip
 
 	# =========== Выделение IP ===========
 	#Блок изменении ключевых параметров на случай когда ранее выделенный ip не совпадает с сетью характерной для этой модели
 	if data_key.get('freeip'):
-		data_query = t.sql_select(f"""SELECT IPADDMGM FROM guspk.host WHERE IPADDMGM LIKE '{data_key['freeip']}'""", 'full')
-		if data_query:
-			out_of_exp = 'update'
-		else:
-			out_of_exp = 'insert'
 		free_ip = data_key['freeip']
 			
 		reply = t.sql_select(f"""SELECT h.NETWORKNAME, hm.DEVICEMODELNAME, CONCAT((SELECT NETWORKNAME FROM guspk.host WHERE DEVICEID = top.parent), '_', top.parent_port), 
@@ -408,12 +366,12 @@ def main(data_key, t, error_free_ip):
 		t.ws_send_message(f"scanning network {hosts}")
 		hosts_unreacheble = ping_check(hosts)
 		t.ws_send_message("define free ip")
-		free_ip, out_of_exp = get_free_ip(hosts_unreacheble, vrf, search_type, t)
+		free_ip = get_free_ip(hosts_unreacheble, vrf, search_type, t)
 		t.ws_send_message(f"selected ip: {free_ip}")
 		if not free_ip:
 			error_free_ip = 'Error id_103: no free ip in the network'
 			t.ws_send_message(error_free_ip)
-			t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID, WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
+			# t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID, WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
 			return error_free_ip
 
 	# hosts, summary = get_data(data_key['up'], data_key['model'], vrf, t)
@@ -455,47 +413,12 @@ def main(data_key, t, error_free_ip):
 
 	if type_id and vendor_id and model_id:
 
-		astu_data_dic = {out_of_exp: {
-			'ip': free_ip, 
-			'hostname': new_hostname, 
-			'sd': f"{data_key['id_acds']} {data_key['sd']}", 
-			'uplink': nodeid, 
-			'office': data_key['office'], 
-			'structura': structura, 
-			'classid': type_id, 
-			'vendor': vendor_id, 
-			'model': model_id, 
-			'serial': serial_number, 
-			'status': 2,
-		}}
-
-		print (f"def main | astu_data_dic: {astu_data_dic}")
-		t.ws_send_message(f"insert data in astu: {free_ip}, hostname:{new_hostname}, sd:{data_key['sd']}, node:{nodeid}, address:{data_key['office']}")
-		res = astu_data.main(astu_data_dic)
-		if res != 'ok':
-			error_free_ip = f'Error id_105: def main | res: {res}'
-			t.ws_send_message(error_free_ip)
-			t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID, WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
-			return error_free_ip
-		print (f"def main | res: {res}")
-		# if not 'OK' in res:
-			# error_free_ip = 'Error id_105: Not add data in ASTU'
-		# t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID , WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
-			# return error_free_ip
-
-		print (datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
-		print ("Запуск синхронизации astu")
-		t.ws_send_message("syncing astu db")
-		
-		# Запус синхронизации баз данных
-		astu_check.start()
-		print (datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
-
-
-		# subprocess.check_output(["python3", "/var/scripts/system/astu_check.py"], universal_newlines=True)
-		# после синхронизации занести данные по новому устройству в таблицу host_acsw_node
-		# print ("Send 'y' for next settings: ", end='')
-		# next_settings = input()
+		#INSERT IN host table
+		t.ws_send_message(f"""INSERT INTO guspk.host (IPADDMGM, NETWORKNAME, MODELID, DEVICEDESCR, OFFICE, DEVICESTATUSID, SERIALNUMBER) 
+						VALUES ('{free_ip}','{new_hostname}', '{model_id}', '{data_key['id_acds']} {data_key['sd']}', '{data_key['office']}', 2, '{serial_number}')""")
+		deviceid = t.sql_update(f"""INSERT INTO guspk.host (IPADDMGM, NETWORKNAME, MODELID, DEVICEDESCR, OFFICE, DEVICESTATUSID, SERIALNUMBER) 
+						VALUES ('{free_ip}','{new_hostname}', '{model_id}', '{data_key['id_acds']} {data_key['sd']}', '{data_key['office']}', 2, '{serial_number}')
+						""")
 
 		network = summary[0][0]
 		mask = summary[0][1]
@@ -517,7 +440,7 @@ def main(data_key, t, error_free_ip):
 		t.sql_connect('connect')
 
 		data_query = t.sql_select(query, 'full')
-		t.sql_update(f"INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `new`) VALUES({data_query[0][0]}, '{user}', 'ALL', 'FREE_IP');")
+		t.sql_update(f"INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `new`) VALUES({deviceid}, '{user}', 'ALL', 'FREE_IP');")
 
 		if search_type == 'O':
 			vlan_template_id = 206
@@ -525,8 +448,8 @@ def main(data_key, t, error_free_ip):
 			vlan_template_id = data_query[0][2]
 
 		for data in data_query:
-			print (f"INSERT INTO guspk.host_acsw_node (DEVICEID, NETWORK_ID, VLAN_TEMPLATE_ID) VALUES ({data[0]}, {data[1]}, {vlan_template_id});")
-			t.sql_update(f"INSERT INTO guspk.host_acsw_node (DEVICEID, NETWORK_ID, VLAN_TEMPLATE_ID) VALUES ({data[0]}, {data[1]}, {vlan_template_id});")
+			print (f"INSERT INTO guspk.host_acsw_node (DEVICEID, NETWORK_ID, VLAN_TEMPLATE_ID) VALUES ({deviceid}, {data[1]}, {vlan_template_id});")
+			t.sql_update(f"INSERT INTO guspk.host_acsw_node (DEVICEID, NETWORK_ID, VLAN_TEMPLATE_ID) VALUES ({deviceid}, {data[1]}, {vlan_template_id});")
 
 		query = f"""SELECT an.ACSD_NODE_ID
 			FROM guspk.host_acsw_node an, guspk.host h
@@ -539,7 +462,7 @@ def main(data_key, t, error_free_ip):
 	else:
 		error_free_ip = 'Error id_104: The model does not fit the conditions'
 		t.ws_send_message(error_free_ip)
-		t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID, WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
+		# t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID, WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
 		return error_free_ip
 
 	if __name__ == "__main__":
@@ -592,13 +515,7 @@ and a.id={id_acds};
 
 		print(error_free_ip)
 		# t.ws_send_message(error_free_ip)
-		if error_free_ip == 'ok':
-			status = 'init'
-		elif 'Error' in error_free_ip:
-			status = 'error(f)'
 
-		t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID, WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
-		t.sql_update(f"UPDATE guspk.acds SET status='{status}', report='{error_free_ip}' WHERE id={id_acds};")
 		t.ws_send_message("=== END ===")
 		# ws.close()
 	else:

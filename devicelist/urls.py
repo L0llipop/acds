@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from django.urls import include, path
-from . import views, wbs, maps, topology, tests, szo,fire
+from . import views, wbs, maps, tests, szo,fire
 
 
 urlpatterns = [
@@ -19,8 +19,6 @@ urlpatterns = [
 	path('maps/', maps.mainmap, name='maps'),
 	path('maps/get_data', maps.get_data_for_map, name='get_data_for_map'),
 	path('maps/get_service_data', maps.get_service_for_map, name='get_service_for_map'),
-	path('topology/', topology.start, name='topology'),
-	path('create_vlan/', topology.create_vlan, name='create_vlan'),
-	path('create_vlan/get_create_vlan/', topology.get_create_vlan, name='get_create_vlan'),
+	path('topology/', views.topology, name='topology'),
 	path('szo/', szo.start, name='szo'),
 ]

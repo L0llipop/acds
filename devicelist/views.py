@@ -11,7 +11,6 @@ import jinja2
 import json
 import multimodule
 import fias_import
-import astu_data
 import subprocess
 
 from acds import configuration
@@ -144,7 +143,6 @@ def get_devicelist(request):
 			AND ({column_name[0]})
 			AND ({column_name[1]})
 			AND hs.status_name LIKE '%{data_req['status']}%'
-			AND ({column_name[2]})
 			AND ({column_name[3]})
 			AND (({column_name[4]})
 				AND ({column_name[5]})
@@ -283,7 +281,7 @@ def device_update(request):
 		# keys = ['ip', 'hostname', 'model', 'description', 'addres', 'info', 'status', 'uplink', 'port', 'mac']
 		if not all_data.get('id'):
 			values['status'] = "Error"
-			values['message'] = f"Небыл передан ID"
+			values['message'] = f"Deviceid not found"
 			return JsonResponse(values, safe=False)
 
 		query_astu = f"""SELECT h.IPADDMGM, h.NETWORKNAME, hm.DEVICEMODELNAME, h.DEVICEDESCR, h.OFFICE, hs.status_name, h.MAC, h.SERIALNUMBER, 
@@ -321,7 +319,8 @@ def device_update(request):
 				request_sql[0][i] = 'Null'
 
 		print(f"device_update|address: {address}")
-
+		
+		#dict of all values received from DB
 		sql_hesh = {
 			'ip': request_sql[0][0],
 			'hostname': request_sql[0][1],
@@ -352,12 +351,7 @@ def device_update(request):
 			'port_uplink': 'None',
 		}
 
-		if sql_hesh['status'] == 'Выведен из эксплуатации':
-			sql_hesh['status'] = 'Выведен'
-
-
-		model = all_data['model']
-		astu_data_dic = {'update': {}}
+		#diff between db and web
 		for key in sql_hesh:
 			if all_data[key] == sql_hesh[key]:
 				pass
@@ -368,14 +362,14 @@ def device_update(request):
 				if all_data[key] == 'Null':
 					all_data[key] = 'None'
 
-				astu_data_dic['update']['ip'] = all_data['ip']
 				if key == 'ip':
 					ipaddmgm = t.sql_select(f"SELECT IPADDMGM, DEVICEID FROM guspk.host WHERE IPADDMGM = '{all_data['ip']}'", 'full')
 					if ipaddmgm:
 						values['status'] = "Error"
 						values['message'] = f"This IP '{ipaddmgm[0][0]}' занят, ID {ipaddmgm[0][1]}"
-						del astu_data_dic['update']['ip']
 						break
+					else:
+						t.sql_update(f"UPDATE guspk.host SET IPADDMGM = '{all_data['ip']}' WHERE DEVICEID = '{all_data['id']}'")
 
 				if key == 'hostname':
 					networkname = t.sql_select(f"SELECT NETWORKNAME, DEVICEID FROM guspk.host WHERE NETWORKNAME = '{all_data['hostname']}'", 'full')
@@ -383,30 +377,28 @@ def device_update(request):
 						values['status'] = "Error"
 						values['message'] = f"This Hostname '{networkname[0][0]}' занят, ID {networkname[0][1]}"
 						break
-					astu_data_dic['update']['hostname'] = all_data['hostname']
+					else:
+						t.sql_update(f"""UPDATE guspk.host SET NETWORKNAME = '{all_data['hostname']}' WHERE DEVICEID = '{all_data['id']}'""")
 
 				if key == 'model':
-					model_id = t.sql_select(f"SELECT MODELID, VENDORID, TYPE_ID FROM guspk.host_model WHERE DEVICEMODELNAME = '{all_data['model']}'", 'full')
-					if model_id:
-						all_data['model'] = int(model_id[0][0])
-						astu_data_dic['update']['model'] = model_id[0][0]
-						astu_data_dic['update']['vendor'] = model_id[0][1]
-						astu_data_dic['update']['classid'] = model_id[0][2]
+					t.sql_update(f"""UPDATE guspk.host h
+									INNER JOIN guspk.host_model m on m.MODELID = h.MODELID 
+									SET h.MODELID = (SELECT MODELID from host_model where DEVICEMODELNAME = '{all_data['model']}')
+									WHERE h.DEVICEID = '{all_data['id']}'""")
 
 				if key == 'description':
-					astu_data_dic['update']['sd'] = all_data['description']
+					t.sql_update(f"""UPDATE guspk.host SET DEVICEDESCR = '{all_data['description']}' WHERE DEVICEID = '{all_data['id']}'""")
 
 				if key == 'info':
-					astu_data_dic['update']['office'] = all_data['info']
+					t.sql_update(f"""UPDATE guspk.host SET OFFICE = '{all_data['office']}' WHERE DEVICEID = '{all_data['id']}'""")
 
 				if key == 'serial':
-					astu_data_dic['update']['serial'] = all_data['serial']
+					t.sql_update(f"""UPDATE guspk.host SET SERIALNUMBER = '{all_data['serial']}' WHERE DEVICEID = '{all_data['id']}'""")
 
 				if key == 'status':
 					status_id = t.sql_select(f"SELECT status_id FROM guspk.host_status WHERE status_name LIKE '{all_data['status']}%'", 'full')
 					if status_id:
-						all_data[key] = status_id[0][0]
-						astu_data_dic['update']['status'] = int(status_id[0][0])
+						t.sql_update(f"""UPDATE guspk.host SET DEVICESTATUSID = '{status_id[0][0]}' WHERE DEVICEID = '{all_data['id']}'""")
 
 				if key == 'mac':
 					mac = t.sql_select(f"SELECT MAC, DEVICEID FROM guspk.host WHERE MAC = '{all_data['mac']}'", 'full')
@@ -414,6 +406,8 @@ def device_update(request):
 						values['status'] = "Error"
 						values['message'] = f"Данный Mac '{mac[0][0]}' занят, ID {mac[0][1]}"
 						break
+					else:
+						t.sql_update(f"""UPDATE guspk.host SET MAC = '{all_data['mac']}' WHERE DEVICEID = '{all_data['id']}'""")
 
 				if key == 'addres':
 					if all_data['addres'] != 'null':
@@ -429,7 +423,10 @@ def device_update(request):
 
 				if key == 'uplink':
 					if all_data['uplink'] != 'null':
-						device_id = t.sql_select(f"SELECT DEVICEID FROM guspk.host WHERE DEVICEID = '{all_data['uplink']}' OR IPADDMGM = '{all_data['uplink']}' OR NETWORKNAME = '{all_data['uplink']}'", 'full')
+						device_id = t.sql_select(f"""SELECT DEVICEID FROM guspk.host 
+												WHERE DEVICEID = '{all_data['uplink']}' 
+												OR IPADDMGM = '{all_data['uplink']}' 
+												OR NETWORKNAME = '{all_data['uplink']}'""", 'full')
 						if device_id:
 							device_id = device_id[0][0]
 							child = t.sql_select(f"SELECT child FROM guspk.topology WHERE child = {all_data['id']}", 'full')
@@ -440,7 +437,6 @@ def device_update(request):
 
 							t.sql_update(f"INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `old`, `new`) VALUES({all_data['id']}, '{user}', 'parent', '{sql_hesh[key]}', '{all_data[key]}');")
 					if not all_data['uplink']:
-						print(f"""DELETE from guspk.topology WHERE child = {all_data['id']}""")
 						t.sql_update(f"""DELETE from guspk.topology WHERE child = {all_data['id']}""")
 					continue
 
@@ -449,7 +445,8 @@ def device_update(request):
 						child = t.sql_select(f"SELECT child FROM guspk.topology WHERE child = {all_data['id']}", 'full')
 						if child:
 							t.sql_update(f"UPDATE guspk.topology SET parent_port='{all_data['port']}' WHERE child={all_data['id']};")
-							t.sql_update(f"INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `old`, `new`) VALUES({all_data['id']}, '{user}', 'parent_port', '{sql_hesh[key]}', '{all_data[key]}');")
+							t.sql_update(f"""INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `old`, `new`) 
+											VALUES ({all_data['id']}, '{user}', 'parent_port', '{sql_hesh[key]}', '{all_data[key]}');""")
 					continue
 
 				if key == 'port_uplink':
@@ -457,42 +454,13 @@ def device_update(request):
 						child = t.sql_select(f"SELECT child FROM guspk.topology WHERE child = {all_data['id']}", 'full')
 						if child:
 							t.sql_update(f"UPDATE guspk.topology SET child_port='{all_data['port_uplink']}' WHERE child={all_data['id']};")
-							t.sql_update(f"INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `old`, `new`) VALUES({all_data['id']}, '{user}', 'child_port', '{sql_hesh[key]}', '{all_data[key]}');")
+							t.sql_update(f"""INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `old`, `new`) 
+											VALUES ({all_data['id']}, '{user}', 'child_port', '{sql_hesh[key]}', '{all_data[key]}');""")
 					continue
 
-				# t.ws_send_message(f"UPDATE guspk.host SET {sql_col[key]}='{all_data[key]}' WHERE DEVICEID={all_data['id']};")
-				# t.ws_send_message(f"INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `old`, `new`) VALUES({all_data['id']}, '{user}', '{sql_col[key]}', '{sql_hesh[key]}', '{all_data[key]}');")
-				t.sql_update(f"UPDATE guspk.host SET {sql_col[key]}='{all_data[key]}' WHERE DEVICEID={all_data['id']};")
-				t.sql_update(f"INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `old`, `new`) VALUES({all_data['id']}, '{user}', '{sql_col[key]}', '{sql_hesh[key]}', '{all_data[key]}');")
-				# t.sql_update(f"INSERT INTO guspk.count (name, `user`, count) VALUES('devicelist', '{user}', 1);")
-
-		# t.ws_send_message(f"values: {values}")
-		# t.ws_send_message(f"astu_data_dic: {astu_data_dic['update']}")
-		if astu_data_dic['update'].get('ip'):
-
-			olt  = [1771,2752,2774,2812,2829,2880,3075,3098,3100,3101,3189,3229]
-			fttb = [1270,1272,1297,1304,1305,1345,1788,2365,2742,2750,2753,2754,2755,2758,2759,2763,2766,2767,2834,2839,2847,2867,2884,2887,2903,2939,2974,3006,3020,3022,3024,3055,3078,3086,3112,3113,3115,3124,3125,3133,3134,3136,3137,3138,3142,3148,3149,3150,3152,3158,3159,3161,3162,3163,3164,3165,3166,3167,3168,3169,3176,3180,3181,3182,3183,3184,3185,3187,3195,3196,3197,3198,3199,3200,3202,3204,3205,3217,3219,3222,3224,3225,3226,3231,3232,3233,3234,3235,3236,3239,3240,3242,3245,3247,3248,3249,3250,3253,3254,3255,3256,3257,3258,3259,3260,3262,3263,3264,3265,3269,3273,3276,3278,3279,3281,3282,3283,3286,3288,3291,3295,3302,3303,3304,3305,3306,3308,3309,3310]
-			adsl = [1451,1455,1458,1460,1461,1464,1472,1473,1479,1482,1487,1491,1492,1499,1504,1505,1507,1509,1511,1518,1519,1521,1523,1690,1691,1709,1712,1713,1723,1724,1750,1767,1768,2788,2789,2797,2810,2815,2831,2832,2853,2855,2856,2857,2868,2870,2883,3103,3147,3175,3228,3268,3292,3293]
-			acsw = [1101,1102,1104,1105,1111,1113,1120,1121,1123,1125,1149,1166,1181,1182,1202,1204,1249,1255,1257,1274,1278,1279,1280,1282,1284,1286,1288,1290,1291,1296,1300,1307,1322,1335,1337,1344,1346,1348,1353,1359,1366,1367,1377,1393,1395,1397,1402,1414,1415,1430,1445,1537,1554,1571,1599,1602,1605,1609,1614,1657,1701,1707,1721,1778,1779,1791,1815,1816,1817,1819,1820,1821,1834,1843,1848,2364,2366,2376,2377,2378,2379,2380,2382,2383,2727,2734,2735,2738,2743,2764,2769,2770,2779,2780,2784,2785,2786,2830,2844,2848,2882,2891,2894,2904,2905,2926,2946,2949,2953,2970,2971,2973,2997,3005,3017,3019,3021,3023,3027,3036,3037,3041,3046,3047,3052,3087,3088,3089,3102,3109,3110,3111,3120,3123,3134,3145,3153,3155,3156,3160,3190,3191,3192,3194,3208,3209,3211,3212,3213,3216,3218,3220,3221,3237,3243,3244,3246,3252,3272,3274,3290,3301]
-
-			if type(all_data['model']) == int:
-				if all_data['model'] in fttb:
-					astu_data_dic['update']['structura'] = 71
-				elif all_data['model'] in olt:
-					astu_data_dic['update']['structura'] = 218
-				elif all_data['model'] in adsl:
-					astu_data_dic['update']['structura'] = 64
-				elif all_data['model'] in acsw:
-					astu_data_dic['update']['structura'] = 16
-				else:
-					values['status'] = "Error"
-					values['message'] = f"Для данной модели '{model}' {all_data['model']} не указан ID структуры"
-					# t.ws_send_message(f"ERROR")
-					# t.sql_update(f"insert into guspk.logs (scr_name, DEVICEID, WHO, message) values ('free_ip','Null','{user}', '{error_free_ip}');")
-
-			if values['status'] == 'ok':
-				# t.ws_send_message(f"START: astu_data_dic")
-				res = astu_data.main(astu_data_dic)
+				t.sql_update(f"UPDATE guspk.host SET {sql_col[key]} = '{all_data[key]}' WHERE DEVICEID = {all_data['id']};")
+				t.sql_update(f"""INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `old`, `new`) 
+				VALUES ({all_data['id']}, '{user}', '{sql_col[key]}', '{sql_hesh[key]}', '{all_data[key]}');""")
 
 		t.sql_connect('disconnect')
 
@@ -542,8 +510,6 @@ def device_add(request):
 			values['message'] = f"Для модели '{all_data['model']}' не найден ID"
 			return JsonResponse(values, safe=False)
 
-		if all_data['status'] == 'Выведен':
-			all_data['status'] = 'Выведен из эксплуатации'
 		status_id = t.sql_select(f"SELECT status_id FROM guspk.host_status WHERE status_name = '{all_data['status']}'", 'full')
 		if status_id:
 			all_data['status'] = int(status_id[0][0])
@@ -551,82 +517,24 @@ def device_add(request):
 			values['status'] = "Error"
 			values['message'] = f"Для статуса '{all_data['model']}' не найден ID"
 			return JsonResponse(values, safe=False)
+
+
+		deviceid = t.sql_update(f"""INSERT INTO guspk.host (IPADDMGM, NETWORKNAME, MODELID, DEVICEDESCR, OFFICE, DEVICESTATUSID, SERIALNUMBER) 
+									VALUES ('{all_data['ip']}', '{all_data['hostname']}', '{all_data['model']}', '{all_data['description']}', '{all_data['info']}', {all_data['status']}, '{all_data['serial']}')""")
+		if deviceid:
+			device_info = {'id': deviceid, 'address': all_data['addres'], 'dest': 'host_fias'}
+			fias_import.host_fias_insert(device_info)
+		else:
+			values['status'] = "Error"
+			values['message'] = "ID не найден"
+
+		t.sql_update(f"INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `new`) VALUES({deviceid}, '{user}', 'ALL', '{all_data['ip']} added');")
 		t.sql_connect('disconnect')
-		# return JsonResponse(values, safe=False)
-
-		olt  = [1771,2752,2774,2812,2829,2880,3075,3098,3100,3101,3189,3229]
-		fttb = [1270,1272,1297,1304,1305,1345,1788,2365,2742,2750,2753,2754,2755,2758,2759,2763,2766,2767,2834,2839,2847,2867,2884,2887,2903,2939,2974,3006,3020,3022,3024,3055,3078,3086,3112,3113,3115,3124,3125,3133,3134,3136,3137,3138,3142,3148,3149,3150,3152,3158,3159,3161,3162,3163,3164,3165,3166,3167,3168,3169,3176,3180,3181,3182,3183,3184,3185,3187,3195,3196,3197,3198,3199,3200,3202,3204,3205,3217,3219,3222,3224,3225,3226,3231,3232,3233,3234,3235,3236,3239,3240,3242,3245,3247,3248,3249,3250,3253,3254,3255,3256,3257,3258,3259,3260,3262,3263,3264,3265,3269,3273,3276,3278,3279,3281,3282,3283,3286,3288,3291,3295,3302,3303,3304,3305,3306,3308,3309,3310]
-		adsl = [1451,1455,1458,1460,1461,1464,1472,1473,1479,1482,1487,1491,1492,1499,1504,1505,1507,1509,1511,1518,1519,1521,1523,1690,1691,1709,1712,1713,1723,1724,1750,1767,1768,2788,2789,2797,2810,2815,2831,2832,2853,2855,2856,2857,2868,2870,2883,3103,3147,3175,3228,3268,3292,3293]
-		acsw = [1101,1102,1104,1105,1111,1113,1120,1121,1123,1125,1149,1166,1181,1182,1202,1204,1249,1255,1257,1274,1278,1279,1280,1282,1284,1286,1288,1290,1291,1296,1300,1307,1322,1335,1337,1344,1346,1348,1353,1359,1366,1367,1377,1393,1395,1397,1402,1414,1415,1430,1445,1537,1554,1571,1599,1602,1605,1609,1614,1657,1701,1707,1721,1778,1779,1791,1815,1816,1817,1819,1820,1821,1834,1843,1848,2364,2366,2376,2377,2378,2379,2380,2382,2383,2727,2734,2735,2738,2743,2764,2769,2770,2779,2780,2784,2785,2786,2830,2844,2848,2882,2891,2894,2904,2905,2926,2946,2949,2953,2970,2971,2973,2997,3005,3017,3019,3021,3023,3027,3036,3037,3041,3046,3047,3052,3087,3088,3089,3102,3109,3110,3111,3120,3123,3134,3145,3153,3155,3156,3160,3190,3191,3192,3194,3208,3209,3211,3212,3213,3216,3218,3220,3221,3237,3243,3244,3246,3252,3272,3274,3290,3301]
-
-		if all_data['model'] in fttb:
-			structura = 71
-		elif all_data['model'] in olt:
-			structura = 218
-		elif all_data['model'] in adsl:
-			structura = 64
-		elif all_data['model'] in acsw:
-			structura = 16
-		else:
-			values['status'] = "Error"
-			values['message'] = f"Для данной модели '{all_data['ip']}' {all_data['model']} не указан ID структуры"
-			return JsonResponse(values, safe=False)
-
-		if re.match(r'^45-', all_data['hostname']):
-			nodeid = 33294
-		elif re.match(r'^59-', all_data['hostname']):
-			nodeid = 33513
-		elif re.match(r'^89-', all_data['hostname']):
-			nodeid = 33510
-		elif re.match(r'^86-', all_data['hostname']):
-			nodeid = 33511
-		elif re.match(r'^74-', all_data['hostname']):
-			nodeid = 33512
-		else:
-			nodeid = 33270
-
-		astu_data_dic = {'insert': {
-			'ip': all_data['ip'],
-			'hostname': all_data['hostname'],
-			'model': all_data['model'],
-			'vendor': vendor,
-			'classid': classid,
-			'sd': all_data['description'],
-			'office': all_data['info'],
-			'serial': all_data['serial'],
-			'status': all_data['status'],
-			'structura': structura,
-			'uplink': nodeid,
-		}}
-
-		# t.sql_update(f"""INSERT INTO guspk.host
-		# 	(IPADDMGM, NETWORKNAME, MODELID, DEVICEDESCR, OFFICE, DEVICESTATUSID, MAC, SERIALNUMBER)
-		# 	VALUES('{all_data['ip']}', '{all_data['hostname']}', {all_data['model']}, '{all_data['description']}', '{all_data['info']}', {all_data['status']}, '{all_data['mac']}', '{all_data['serial']}');
-		# 	""")
-
-		res = astu_data.main(astu_data_dic)
-		# values['message'] = f"{res}"
-		# return JsonResponse(values, safe=False)
-		if res == 'ok':
-
-			subprocess.check_output(["python3", "/var/scripts/system/astu_check.py"], universal_newlines=True)
-
-			t.sql_connect('connect')
-			deviceid = t.sql_select(f"SELECT DEVICEID FROM guspk.host WHERE IPADDMGM = '{all_data['ip']}'", 'full')
-			if deviceid:
-				deviceid = deviceid[0][0]
-				device_info = {'id': deviceid, 'address': all_data['addres'], 'dest': 'host_fias'}
-				fias_import.host_fias_insert(device_info)
-			else:
-				values['status'] = "Error"
-				values['message'] = "ID не найден"
-
-			# t.sql_update(f"INSERT INTO guspk.logs (scr_name, DEVICEID, WHO, message) values ('device_update','{deviceid}','{user}', '{all_data['ip']}|{all_data['hostname']}|{all_data['model']}|{all_data['description']}|{all_data['addres']}|{all_data['info']}|{all_data['status']}|{all_data['serial']}');")
-			t.sql_update(f"INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `new`) VALUES({deviceid}, '{user}', 'ALL', '{all_data['ip']}');")
-			t.sql_connect('disconnect')
-		else:
-			values['status'] = "Error"
-			values['message'] = res
-
 
 	return JsonResponse(values, safe=False)
+
+def topology(request):
+	if not request.user.is_authenticated:
+		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+	return render(request, 'devicelist/topology.html')

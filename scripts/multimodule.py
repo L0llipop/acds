@@ -4,7 +4,7 @@ import mysql.connector
 import cx_Oracle
 from mysql.connector import Error
 from configparser import ConfigParser
-import pexpect, struct, fcntl, termios, signal
+import pexpect
 import datetime
 import threading
 import websocket
@@ -164,7 +164,7 @@ class FastModulAut:
 		else:
 			alldic = {}
 			try:
-				select_query = f"""SELECT h.DEVICEID, h.IPADDMGM, h.NETWORKNAME, m.DEVICEMODELNAME, h.DEVICEDESCR, h.OFFICE, h.DATEMODIFY, h.DEVICESTATUSID, h.UPLINK, h.MAC, h.NODEID
+				select_query = f"""SELECT h.DEVICEID, h.IPADDMGM, h.NETWORKNAME, m.DEVICEMODELNAME, h.DEVICEDESCR, h.OFFICE, h.DATEMODIFY, h.DEVICESTATUSID, h.MAC
 					FROM guspk.host h, guspk.host_model m
 					WHERE h.MODELID LIKE m.MODELID AND {request}"""
 				# print (select_query)
@@ -273,7 +273,9 @@ class FastModulAut:
 		else:
 			self.new_telnet.sendline(command+self.dop)
 
-		time.sleep(timeout_expect)
+		if 'timeout_expect' in hash_prompt:
+			time.sleep(timeout_expect)
+
 		try:
 			i = self.new_telnet.expect(prompt, timeout=timeout_sendline)
 		except:
@@ -318,9 +320,10 @@ class FastModulAut:
 			if self.temp_data:
 				data = self.temp_data + data
 				self.temp_data = ''
+
 		return data
 
-	def aut(self, ip, model='default', logging=True, errors = True, **hash_aut):
+	def aut(self, ip, model='default', logging=True, errors = True, proxy = False, **hash_aut):
 		""" Для авторизации на оборудоваии достаточно передать IP и model.
 		Остальные данные подтягиваются из конфигурационных файлов
 		В данной функции реализован метод telnet авторизации для: 
@@ -345,7 +348,10 @@ class FastModulAut:
 
 		self.ip = ip
 		self.model = model
-		self.new_telnet = pexpect.spawn('telnet ' + self.ip, encoding='utf-8', timeout=self.timeout)
+		if proxy == False:
+			self.new_telnet = pexpect.spawn('telnet ' + self.ip, encoding='utf-8', timeout=self.timeout)
+		else:
+			self.new_telnet = pexpect.spawn('socksify telnet ' + self.ip, encoding='utf-8', timeout=self.timeout)
 		self.new_telnet.setwinsize(50,150)
 		# print (f"""/tmp/scripts/log_pexpect_authorization/{self.login}/{self.ip}.txt""")
 		""" Проверка пути до каталога для telnet логов, и создание каталога в случае его отсутствия """

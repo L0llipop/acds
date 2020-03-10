@@ -141,7 +141,7 @@ class getTopology(object):
 				tunnel_vlan = None
 
 			# Определяем хостнейм нижестоящего коммутатора
-			check = self.check_search(t, f"show interfaces description | include {port_pe} ", r'(\d{2}-[-\da-z]+)', 'peagg_cisco|не найден description', re.I)
+			check = self.check_search(t, f"show interfaces description | include {port_pe} ", r'(\d{2}-[-\da-z]+)', f"peagg_cisco|incorrect description port {port_pe}", re.I)
 			if type(check) == dict:
 				result.update(check)
 				return result
@@ -187,16 +187,18 @@ class getTopology(object):
 
 		check_aut = t.aut(ip = result[1]['ip'], model = result[1]['model'], login = 'tum_support', password = 'hEreR2Mu3E', logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
 		if check_aut != 0:
-			result.update({'status': 'error','message_error': f"Can't connect {result[1]['ip']}"})
-			return result
+			check_aut = t.aut(ip = result[1]['ip'], model = result[1]['model'], login = 'tum_support', password = 'hEreR2Mu3E', logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}", proxy = True)
+			if check_aut != 0:
+				result.update({'status': 'error','message_error': f"Can't connect {result[1]['ip']}"})
+				return result
 
 		if result['ip']:
-			if re.search(r'CISCO7606', result[1]['model']):
+			if re.search(r'7606|7609', result[1]['model']):
 				result = find_in_cisco(result, t)
-			elif re.search(r'MX480', result[1]['model']):
+			elif re.search(r'MX480|QFX', result[1]['model']):
 				result = find_in_juniper(result, t)
 			else:
-				result.update({'status': 'error','message_error': "def peagg | There is no algorithm for this model"})
+				result.update({'status': 'error','message_error': "def peagg | no algorithm for this model"})
 		else:
 			result.update({'status': 'error','message_error': "def peagg | Algorithm not developed"})
 
@@ -276,7 +278,7 @@ class getTopology(object):
 						return result
 
 			# определяем port Uplink
-			check = self.check_findall(t, f"show interfaces descriptions | match {result[num - 1]['desc']} ", r"([\w\/-]+)\s+up\s+up", 'bbagg_upe_juniper|не удалось определить порт uplink', prompt='@')
+			check = self.check_findall(t, f"show interfaces descriptions | match {result[num - 1]['desc']} ", r"([\w\/-]+)\s+up\s+up", f"bbagg_upe_juniper {result[num]['ip']}|не удалось определить порт uplink", prompt='@')
 			if type(check) == dict:
 				result.update(check)
 				return result
@@ -298,14 +300,14 @@ class getTopology(object):
 
 			if result['status'] != 'end_device':
 				# Определяем порт нижестоящего коммутатора
-				check = self.check_search(t, f"show mac address-table address {result['mac']}", rf"\w+\s+{result['mac']}\s+([\w\/-]+)\s+dynamic", 'eltex|не найден mac')
+				check = self.check_search(t, f"show mac address-table address {result['mac']}", rf"\w+\s+{result['mac']}\s+([\w\/-]+)\s+dynamic", f"eltex {result[num]['ip']}|не найден mac")
 				if type(check) == dict:
 					result.update(check)
 					return result
 				result[num].update({'port': check[0]})
 
 				# Определяем имя устройтсва
-				check = self.check_search(t, f"show interfaces {result[num]['port']} | i Description", r"Description:.*?((\d+|[A-Z]+-UCN)-[A-Z0-9-]+)", 'eltex_x3xx|не найден description')
+				check = self.check_search(t, f"show interfaces {result[num]['port']} | i Description", r"Description:.*?((\d+|[A-Z]+-UCN)-[A-Z0-9-]+)", f"eltex_x3xx {result[num]['ip']}|не найден description")
 				# check = self.check_search(t, f"show interfaces description | include {result[num]['port']} ", rf"{result[num]['port']}.+Up.+?((\d+|[A-Z]+-UCN)-[A-Z0-9-]+)", 'eltex|не найден description')
 				if type(check) == dict:
 					result.update(check)
@@ -314,16 +316,16 @@ class getTopology(object):
 
 			# Определяем IP адрес шлюза
 			if re.search(r'2208', result[num]['model']):
-				check = self.check_search(t, "sho ip interface | i Act", r"(1\S+)\s+", 'eltex2208|не найден gateway')
+				check = self.check_search(t, "sho ip interface | i Act", r"(1\S+)\s+", f"eltex2208 {result[num]['ip']}|не найден gateway")
 			else:
-				check = self.check_search(t, "show ip route static | include 0.0.0.0", r"[SA].+via\s+([\d\.]+).+vlan\s+\d+", 'eltex33xx|не найден gateway')
+				check = self.check_search(t, "show ip route static | include 0.0.0.0", r"[SA].+via\s+([\d\.]+).+vlan\s+\d+", f"eltex33xx {result[num]['ip']}|не найден gateway")
 			if type(check) == dict:
 				result.update(check)
 				return result
 			gateway = check[0]
 
 			# определяем port Uplink
-			check = self.check_search(t, f"show arp | include {gateway}", r"vlan\s+\d+\s+([\w\/]+)\s+", 'eltex|не удалось определить порт uplink')
+			check = self.check_search(t, f"show arp | include {gateway}", r"vlan\s+\d+\s+([\w\/]+)\s+", f"eltex {result[num]['ip']}|не удалось определить порт uplink")
 			if type(check) == dict:
 				result.update(check)
 				return result
@@ -336,7 +338,7 @@ class getTopology(object):
 
 			if result['status'] != 'end_device':
 				# Определяем порт нижестоящего коммутатора
-				check = self.check_search(t, f"show mac-address-table address {result['mac']}", rf"{result['mac']}\s+Learnt\s+([\w\/]+)", 'eltex_24xx|не найден mac')
+				check = self.check_search(t, f"show mac-address-table address {result['mac']}", rf"{result['mac']}\s+Learnt\s+([\w\/]+)", f"eltex_24xx {result[num]['ip']}|не найден mac")
 				if type(check) == dict:
 					result.update(check)
 					return result
@@ -356,13 +358,13 @@ class getTopology(object):
 			# 	return result
 
 			# определяем vlan, mac шлюза
-			check = self.check_search(t, "show ip arp", rf"(\S+)\s+ARPA\s+vlan(\d+)", 'eltex_24xx|не найден mac шлюза')
+			check = self.check_search(t, "show ip arp", rf"(\S+)\s+ARPA\s+vlan(\d+)", f"eltex_24xx {result[num]['ip']}|не найден mac шлюза")
 			if type(check) == dict:
 				result.update(check)
 				return result
 
 			# определяем port Uplink
-			check = self.check_search(t, f"show mac-address-table vlan {check[1]} address {check[0]}", rf"{check[1]}\s+{check[0]}\s+Learnt\s+([\w\/]+)", 'eltex_24xx|не удалось определить порт uplink')
+			check = self.check_search(t, f"show mac-address-table vlan {check[1]} address {check[0]}", rf"{check[1]}\s+{check[0]}\s+Learnt\s+([\w\/]+)", f"eltex_24xx {result[num]['ip']}|не удалось определить порт uplink")
 			if type(check) == dict:
 				result.update(check)
 				return result
@@ -375,7 +377,7 @@ class getTopology(object):
 
 			if result['status'] != 'end_device':
 				# Определяем порт нижестоящего коммутатора
-				check = self.check_search(t, f"show mac address-table address {result['mac']}", r"\d+[\s\w\.]+DYNAMIC\s+([\w\/]+)[\+]?", 'cisco|не найден mac')
+				check = self.check_search(t, f"show mac address-table address {result['mac']}", r"\d+[\s\w\.]+DYNAMIC\s+([\w\/]+)[\+]?", f"cisco {result[num]['ip']}|не найден mac")
 				if type(check) == dict:
 					result.update(check)
 					return result
@@ -477,7 +479,7 @@ class getTopology(object):
 			if result['status'] != 'end_device':
 				# Определяем порт нижестоящего коммутатора
 				format_mac = result['mac'].replace(':', '-')
-				check = self.check_search(t, f"show mac-address-table address {format_mac}", rf"\d+\s+Eth\s+([\d\/]+ ?\d+)", 'edgecore|не найден mac')
+				check = self.check_search(t, f"show mac-address-table address {format_mac}", rf"\d+\s+Eth\s+([\d\/]+ ?\d+)", f"edgecore {result[num]['ip']}|не найден mac")
 				if type(check) == dict:
 					result.update(check)
 					return result
@@ -485,7 +487,7 @@ class getTopology(object):
 				result[num].update({'port': port})
 
 				# Определяем имя устройтсва
-				check = self.check_search(t, f"show interfaces status ethernet {port}", r"Name\s*:.*?((\d+|[A-Z]+-UCN)-[A-Z0-9-]+)", 'edgecore|не найден description')
+				check = self.check_search(t, f"show interfaces status ethernet {port}", r"Name\s*:.*?((\d+|[A-Z]+-UCN)-[A-Z0-9-]+)", f"edgecore {result[num]['ip']}|не найден description")
 				if type(check) == dict:
 					result.update(check)
 					return result
@@ -493,14 +495,14 @@ class getTopology(object):
 
 			# Определяем mac gateway, vlan mng
 			if re.search(r'3528M' ,result[num]['model']):
-				check = self.check_search(t, "show arp", r"([\w-]+)\s+dynamic\s+(\d+)", 'edgecore|не найден gateway')
+				check = self.check_search(t, "show arp", r"([\w-]+)\s+dynamic\s+(\d+)", f"edgecore {result[num]['ip']}|не найден gateway")
 				if type(check) == dict:
 					result.update(check)
 					return result
 				mac_gateway, vlan_mng = check
 
 				# определяем port Uplink
-				check = self.check_search(t, f"show mac-address-table address {mac_gateway}", rf"\s+{vlan_mng}\s+Eth\s+([\d\/]+ ?\d+)", 'edgecore|не найден mac')
+				check = self.check_search(t, f"show mac-address-table address {mac_gateway}", rf"\s+{vlan_mng}\s+Eth\s+([\d\/]+ ?\d+)", f"edgecore {result[num]['ip']}|не найден mac")
 				if type(check) == dict:
 					result.update(check)
 					return result
@@ -738,6 +740,11 @@ class getTopology(object):
 
 		# print(f"---- AUT IN {result[num]['ip']} ----")
 		check_aut = t.aut(ip = result[num]['ip'], model = result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
+		if check_aut != 0:
+			check_aut = t.aut(ip = result[num]['ip'], model = result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}", proxy = True)
+			if check_aut != 0:
+				result.update({'status': 'error','message_error': f"Can't connect {result[1]['ip']}"})
+				return result
 
 		if re.search(r'MES-3528|MGS-3712|MES3500-24|4728|4012', result[num]['model']) and check_aut != 0:
 			"""Дурацкие зиксиля, иногда авторизация не проходит с первого раза. 
@@ -780,7 +787,7 @@ class getTopology(object):
 		elif re.search(r'7330|7302', result[num]['model']):
 			result = alcatel_dslam(result, num, next_num, t)
 		else:
-			result.update({'status': 'error','message_error': f"def switch | There is no algorithm for this model {result[num]['model']}"})
+			result.update({'status': 'error','message_error': f"def switch | no algorithm for this model {result[num]['model']}"})
 
 		if next_num in result and 'desc' in result[next_num]:
 			data = t.sql_select(f"SELECT h.IPADDMGM, m.DEVICEMODELNAME, h.DEVICEID FROM guspk.host h, guspk.host_model m WHERE h.MODELID = m.MODELID AND NETWORKNAME = '{result[next_num]['desc']}'", 'full')
@@ -804,7 +811,7 @@ class getTopology(object):
 		await asyncio.sleep(0.01)
 
 		# result['ip'] = 10.224.1.135
-
+		print(f"topology start")
 		if result['count'] == 1:
 			result = self.peagg(result, t, dir_name)
 
