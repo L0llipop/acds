@@ -387,13 +387,13 @@ def device_update(request):
 									WHERE h.DEVICEID = '{all_data['id']}' """)
 
 				if key == 'description':
-					t.sql_update(f"""UPDATE guspk.host SET DEVICEDESCR = '{all_data['description']}' WHERE DEVICEID = '{all_data['id']}'""")
+					t.sql_update(f"""UPDATE guspk.host SET DEVICEDESCR = "{all_data['description']}" WHERE DEVICEID = '{all_data['id']}'""")
 
 				if key == 'info':
-					t.sql_update(f"""UPDATE guspk.host SET OFFICE = '{all_data['office']}' WHERE DEVICEID = '{all_data['id']}'""")
+					t.sql_update(f"""UPDATE guspk.host SET OFFICE = "{all_data['office']}" WHERE DEVICEID = '{all_data['id']}'""")
 
 				if key == 'serial':
-					t.sql_update(f"""UPDATE guspk.host SET SERIALNUMBER = '{all_data['serial']}' WHERE DEVICEID = '{all_data['id']}'""")
+					t.sql_update(f"""UPDATE guspk.host SET SERIALNUMBER = "{all_data['serial']}" WHERE DEVICEID = '{all_data['id']}'""")
 
 				if key == 'status':
 					status_id = t.sql_select(f"SELECT status_id FROM guspk.host_status WHERE status_name LIKE '{all_data['status']}%'", 'full')
