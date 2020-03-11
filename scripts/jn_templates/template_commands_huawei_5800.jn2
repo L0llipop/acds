@@ -998,7 +998,7 @@ ont-lineprofile gpon profile-id 210 profile-name "ERIC:TR+0MMI+VOIP"
   gem add 2 eth tcont 3
   gem add 3 eth tcont 4
   gem mapping 0 0 iphost vlan {{pppoe['vlan']}}
-  gem mapping 0 1 iphost vlan {{tr069['vlan']}}
+  gem mapping 5 5 iphost vlan {{tr069['vlan']}}
   gem mapping 2 2 ippath 0
   commit
   quit
