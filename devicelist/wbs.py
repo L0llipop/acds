@@ -61,7 +61,7 @@ def wbsdevicelist(request):
     return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
   t = multimodule.FastModulAut()
   t.sql_connect('connect')
-  sqldata= t.sql_select("select IPADDMGM, NETWORKNAME, MAC, DEVICEMODELNAME, wlan0_fr, wlan0_ssid, wlan0_azimuth, wlan0_mac, wlan1_fr, wlan1_ssid, wlan1_azimuth, wlan1_mac, wlan2_fr, wlan2_ssid, wlan2_azimuth, wlan2_mac, geo_lat, geo_lon, serial  from guspk.WBS_Frecuency", "full")
+  sqldata= t.sql_select("select address, IPADDMGM, NETWORKNAME, MAC, DEVICEMODELNAME, wlan0_fr, wlan0_ssid, wlan0_azimuth, wlan0_mac, wlan1_fr, wlan1_ssid, wlan1_azimuth, wlan1_mac, wlan2_fr, wlan2_ssid, wlan2_azimuth, wlan2_mac, geo_lat, geo_lon, serial  from guspk.WBS_Frecuency", "full")
   t.count_website(t, page='wbsdevicelist', username=request.user.username)
   t.sql_connect('disconnect')
   return render(request, 'wbs/wbs_list.html', locals())
