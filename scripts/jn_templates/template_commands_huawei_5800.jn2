@@ -603,10 +603,11 @@ port-bundle eth 1 port 2,3,4
 gem add 0 eth tcont 1
 gem add 1 eth tcont 2
 gem add 2 eth tcont 3
+gem add 5 eth tcont 1  
 gem mapping 0 0 iphost vlan {{pppoe['vlan']}}
-gem mapping 0 1 iphost vlan {{tr069['vlan']}}
 gem mapping 1 1 eth-bundle 1
 gem mapping 2 2 ippath 0
+gem mapping 5 5 iphost vlan {{tr069['vlan']}} 
 multicast gemport tcont 2 port-bundle 1
 commit
 quit   
