@@ -388,9 +388,10 @@ def free_ip_refresh(request):
 							LEFT JOIN guspk.host h ON an.DEVICEID = h.DEVICEID
 							WHERE a.id = {acds_id}""", 'full')
 				deviceid, ip = deviceid[0]
-				device_info2 = {'id': deviceid, 'address': address, 'dest': 'host_fias'}
+				device_info2 = {'id': deviceid, 'address': address[0][0], 'dest': 'host_fias'}
+				# Присвоение адреса устройству через функцию ФИАС
 				fias_import.host_fias_insert(device_info2)
-				##
+				
 				mail_data, email, data_settings, header, footer = mail_generator(acds_id)
 				mail_data = '\n'.join(mail_data)
 
