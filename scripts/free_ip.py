@@ -98,7 +98,7 @@ def ping(ip):
 		return ip
 
 def ping_check(hosts):
-	multiprocessing.set_start_method("spawn") #для корректного дебага в vscode
+	# multiprocessing.set_start_method("spawn") #для корректного дебага в vscode
 	pool = Pool(50)
 	hosts_unreacheble = list(filter(None, pool.map(ping, hosts)))
 	pool.close()
