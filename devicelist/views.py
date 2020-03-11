@@ -383,8 +383,8 @@ def device_update(request):
 				if key == 'model':
 					t.sql_update(f"""UPDATE guspk.host h
 									INNER JOIN guspk.host_model m on m.MODELID = h.MODELID 
-									SET h.MODELID = (SELECT MODELID from host_model where DEVICEMODELNAME = '{all_data['model']}')
-									WHERE h.DEVICEID = '{all_data['id']}'""")
+									SET h.MODELID = (SELECT MODELID from guspk.host_model where DEVICEMODELNAME = '{all_data['model']}')
+									WHERE h.DEVICEID = '{all_data['id']}' """)
 
 				if key == 'description':
 					t.sql_update(f"""UPDATE guspk.host SET DEVICEDESCR = '{all_data['description']}' WHERE DEVICEID = '{all_data['id']}'""")
@@ -458,7 +458,7 @@ def device_update(request):
 											VALUES ({all_data['id']}, '{user}', 'child_port', '{sql_hesh[key]}', '{all_data[key]}');""")
 					continue
 
-				t.sql_update(f"UPDATE guspk.host SET {sql_col[key]} = '{all_data[key]}' WHERE DEVICEID = {all_data['id']};")
+				# t.sql_update(f"UPDATE guspk.host SET {sql_col[key]} = '{all_data[key]}' WHERE DEVICEID = {all_data['id']};")
 				t.sql_update(f"""INSERT INTO guspk.host_logs (DEVICEID, `user`, `column`, `old`, `new`) 
 				VALUES ({all_data['id']}, '{user}', '{sql_col[key]}', '{sql_hesh[key]}', '{all_data[key]}');""")
 
