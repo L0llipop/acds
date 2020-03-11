@@ -698,7 +698,7 @@ gem add 1 eth tcont 2
 gem add 2 eth tcont 3
 gem add 3 eth tcont 4
 gem mapping 0 0 iphost vlan {{pppoe['vlan']}}
-gem mapping 0 1 iphost vlan {{tr069['vlan']}}
+gem mapping 5 5 iphost vlan {{tr069['vlan']}}
 gem mapping 1 1 eth 2 vlan {{iptv['vlan']}}
 gem mapping 2 2 ippath 0
 multicast gemport tcont 2 eth 2
@@ -720,7 +720,7 @@ gem add 1 eth tcont 2
 gem add 2 eth tcont 3
 gem add 3 eth tcont 4
 gem mapping 0 0 iphost vlan {{pppoe['vlan']}}
-gem mapping 0 1 iphost vlan {{tr069['vlan']}}
+gem mapping 5 5 iphost vlan {{tr069['vlan']}}
 gem mapping 1 1 eth-bundle 1
 gem mapping 2 2 ippath 0
 multicast gemport tcont 2 port-bundle 1
@@ -740,11 +740,11 @@ ont-lineprofile gpon profile-id 210 profile-name "ERIC:TR+0MMI+VOIP"
    gem add 2 eth tcont 3
    gem add 5 eth tcont 1
    gem add 7 eth tcont 4
-   gem mapping 0 0 iphost vlan 3500  
+   gem mapping 0 0 iphost vlan {{pppoe['vlan']}}  
    gem mapping 1 1 eth-bundle 1                                                                                           
    gem mapping 2 2 ippath 0                                                                                            
-   gem mapping 5 5 iphost vlan 3580 
-   gem mapping 7 7 eth 4 vlan 3500 
+   gem mapping 5 5 iphost vlan {{tr069['vlan']}} 
+   gem mapping 7 7 eth 4 vlan {{pppoe['vlan']}} 
    multicast gemport tcont 2 port-bundle 1                                                                                 
    commit                                                                                                                  
    quit
@@ -765,7 +765,7 @@ ont-lineprofile gpon profile-id 210 profile-name "ERIC:TR+0MMI+VOIP"
    gem mapping 1 1 eth-bundle 1
    gem mapping 2 2 ippath 0
    gem mapping 3 3 eth 1
-   gem mapping 7 7 eth 4 vlan 3500
+   gem mapping 7 7 eth 4 vlan {{pppoe['vlan']}} 
    multicast gemport tcont 2 port-bundle 1
    commit
    quit
@@ -836,10 +836,10 @@ ont-lineprofile gpon profile-id 210 profile-name "ERIC:TR+0MMI+VOIP"
    gem add 1 eth tcont 2
    gem add 2 eth tcont 3
    gem add 5 eth tcont 1
-   gem mapping 0 0 iphost vlan 3500
+   gem mapping 0 0 iphost vlan {{pppoe['vlan']}} 
    gem mapping 1 1 eth-bundle 1
    gem mapping 2 2 ippath 0
-   gem mapping 5 5 iphost vlan 3580
+   gem mapping 5 5 iphost vlan {{tr069['vlan']}}
    multicast gemport tcont 2 port-bundle 1
    commit
    quit
@@ -912,10 +912,10 @@ ont-lineprofile gpon profile-id 210 profile-name "ERIC:TR+0MMI+VOIP"
    gem add 2 eth tcont 3
    gem add 5 eth tcont 1
    gem add 7 eth tcont 4
-   gem mapping 0 0 iphost vlan 3500
+   gem mapping 0 0 iphost vlan {{pppoe['vlan']}}
    gem mapping 1 1 eth 2
    gem mapping 2 2 ippath 0
-   gem mapping 5 5 iphost vlan 3580
+   gem mapping 5 5 iphost vlan {{tr069['vlan']}}
    gem mapping 7 7 eth-bundle 0
    multicast gemport tcont 2 port-bundle 0
    commit
