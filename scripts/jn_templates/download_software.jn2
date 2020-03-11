@@ -34,7 +34,7 @@ boot system image-2
 copy tftp://{{ ftp_server }}/FTP/FTTb/franchise_boot-0017.rfb boot 
 reload
 
-{% elif model == '31xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes3000-25482.ros flash://image
+{% elif model == '31xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes3000-25486.ros flash://image
 
 {% elif model == 'x3xx' %}boot system tftp://{{ ftp_server }}/FTP/FTTb/mes3300-4013-3R1.ros
 

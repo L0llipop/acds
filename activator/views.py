@@ -13,7 +13,6 @@ import time
 import multimodule
 import free_ip
 import conf_routing
-import astu_data
 import fias_import
 from ipaddress import IPv4Network
 
@@ -61,10 +60,10 @@ def get_acds_id(request): #УБРАТЬ КОСТЫЛИ С ТАИМАУТОМ О�
 		t.sql_connect('connect')
 		t.ws_connect('chat/log_free_ip/')
 
-		t.ws_send_message(f"""INSERT INTO guspk.acds (ticket, reason, uplink, modelid, nodeid, serial, office, status, online, argus, email) 
-						VALUES ('{sd}', '{mip}', '{uplink}', (SELECT MODELID FROM guspk.host_model WHERE DEVICEMODELNAME like '{model}'), '33270', '{serial}', '{office}', 'new', 0, 0, '{email}')""")
-		acds_id = t.sql_update(f"""INSERT INTO guspk.acds (ticket, reason, uplink, modelid, nodeid, serial, office, status, online, argus, email) 
-						VALUES ('{sd}', '{mip}', '{uplink}', (SELECT MODELID FROM guspk.host_model WHERE DEVICEMODELNAME like '{model}'), '33270', '{serial}', '{office}', 'new', 0, 0, '{email}')""")
+		t.ws_send_message(f"""INSERT INTO guspk.acds (ticket, reason, uplink, modelid, serial, office, status, online, argus, email) 
+						VALUES ("{sd}", '{mip}', "{uplink}", (SELECT MODELID FROM guspk.host_model WHERE DEVICEMODELNAME like "{model}"), "{serial}", "{office}", 'new', 0, 0, "{email}")""")
+		acds_id = t.sql_update(f"""INSERT INTO guspk.acds (ticket, reason, uplink, modelid, serial, office, status, online, argus, email) 
+						VALUES ("{sd}", "{mip}", "{uplink}", (SELECT MODELID FROM guspk.host_model WHERE DEVICEMODELNAME like "{model}"), "{serial}", "{office}", 'new', 0, 0, "{email}")""")
 		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'new', '{user}', 'Инициирована заявка на ввод нового оборудования')""")
 		# acds_id = acds_id[0][0]
 		# t.sql_connect('disconnect')
@@ -84,12 +83,14 @@ def get_acds_id(request): #УБРАТЬ КОСТЫЛИ С ТАИМАУТОМ О�
 		t.ws_send_message(f"free_ip_run - {free_ip_run}")
 
 		if free_ip_run == 'ok':
-			# Присвоение адреса устройству через функцию ФИАС
-			deviceid = t.sql_select(f"""SELECT an.DEVICEID
+			deviceid = t.sql_select(f"""SELECT an.DEVICEID, h.IPADDMGM
 							FROM guspk.host_acsw_node an
 							LEFT JOIN guspk.acds a ON a.acsw_node_id = an.ACSD_NODE_ID
+							LEFT JOIN guspk.host h ON an.DEVICEID = h.DEVICEID
 							WHERE a.id = {acds_id}""", 'full')
-			device_info2 = {'id': deviceid[0][0], 'address': address, 'dest': 'host_fias'}
+			deviceid, ip = deviceid[0]
+			device_info2 = {'id': deviceid, 'address': address, 'dest': 'host_fias'}
+			# Присвоение адреса устройству через функцию ФИАС
 			fias_import.host_fias_insert(device_info2)
 
 			# Отправка почты
@@ -97,7 +98,6 @@ def get_acds_id(request): #УБРАТЬ КОСТЫЛИ С ТАИМАУТОМ О�
 			mail_data = '\n'.join(mail_data)
 
 			device_info.update({"acds_data": data_settings})
-			##Уберите это когда откажетесь от АСТУ
 
 			mail_sender(f"""Ваша заявка на ввод оборудования {acds_id}""",
 						f"""Здравствуй {user}!\n\n Реквизиты по вашей заявке № {acds_id}.\nОжидается установка на сеть.\n{header}\n{mail_data}\n{footer}""",
@@ -108,13 +108,17 @@ def get_acds_id(request): #УБРАТЬ КОСТЫЛИ С ТАИМАУТОМ О�
 
 			t.sql_update(f"UPDATE guspk.acds SET status = 'init', report = '{free_ip_run}' WHERE id like {acds_id}")
 			print(f"UPDATE guspk.acds SET status = 'init', report = '{free_ip_run}' WHERE id like {acds_id}")
-			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'init', '{user}', 'Предоставлены реквизиты {data_settings['ipaddmgm']}\t{data_settings['networkname']}\t{data_settings['serial']}\t{data_settings['model']}\t{address}')""")
+			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', 'init', '{user}', 'Предоставлены реквизиты {data_settings['ipaddmgm']}\t{data_settings['networkname']}\t{data_settings['serial']}\t{data_settings['model']}\t{address}')""")
+			t.sql_update(f"UPDATE guspk.acds_logs SET ip = '{ip}' WHERE id like {acds_id}")
 		else:
 			device_info.update({"error": "Вы получите данные в течении нескольких минут на вашу почту"})
-			mail_sender(f"""Заявка {acds_id} [ERROR]""",
-						f"""free_ip_run  {free_ip_run}""", admins=True)
 			mail_sender(f"""Ваша заявка на ввод оборудования {acds_id}""",
-						f"""Здравствуй {user}!\n\n Ваша заявка № {acds_id} выполняется, чуть позже вы получите все реквизиты""", f'{email}')
+						f"""Здравствуй {user}!\n\n Ваша заявка № {acds_id} выполняется, чуть позже вы получите все реквизиты""",
+						f'{email}')
+			mail_sender(f"""Заявка {acds_id} [ERROR]""",
+						f"""free_ip_run  {free_ip_run}""",
+						admins=True)
+
 			t.sql_update(f"""UPDATE guspk.acds SET status = 'error(f)', report = '{free_ip_run}' WHERE id like '{acds_id}'""")
 			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'error(f)', '{user}', '{free_ip_run}')""")
 
@@ -170,11 +174,11 @@ def get_acds_id_deactivator(request):
 			model, address, uplink, serial, deviceid = ip_data[0]
 
 			acswnodeid = t.sql_update(f"""INSERT INTO guspk.host_acsw_node (DEVICEID, NETWORK_ID, VLAN_TEMPLATE_ID) VALUES ('{deviceid}', '860', '206')""")
-			acds_id = t.sql_update(f"""INSERT INTO guspk.acds (ticket, reason, uplink, modelid, nodeid, serial, office, acsw_node_id, status, online, argus, email, report) 
-							VALUES ('{comment}', '{mip}', '{uplink}', '{model}', '33270', '{serial}', '{address}', '{acswnodeid}', 'del', 0, 2, '{email}', 'removing')""")
-			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'del', '{user}', 'Инициирована заявка на вывод оборудования {ip} {model}')""")
+			acds_id = t.sql_update(f"""INSERT INTO guspk.acds (ticket, reason, uplink, modelid, serial, office, acsw_node_id, status, online, argus, email, report) 
+							VALUES ('{comment}', '{mip}', '{uplink}', '{model}', '{serial}', '{address}', '{acswnodeid}', 'del', 0, 2, '{email}', 'removing')""")
+			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip,  status, user, message) VALUES ('{acds_id}', '{ip}', 'del', '{user}', 'Инициирована заявка на вывод оборудования {model}. {comment}. {mip}')""")
 			# t.ws_send_message(f"acds_id - {acds_id}")
-			mail_admins(f"""Заявка {acds_id} [DEL]""", f"""Пришла заявка на вывод оборудования""")
+			mail_admins(f"""Заявка {acds_id} [DEL]""", f"""Пришла заявка на вывод оборудования {ip}""")
 			time.sleep(2)
 			send_mail(f"""Заявка на вывод в Аргус № {acds_id}""", f"""Поступила новая заявка № {acds_id}.""", 'acds@ural.rt.ru', ['zaripova-ak@ural.rt.ru'])
 			time.sleep(2)
@@ -234,12 +238,9 @@ def get_device_move(request):
 			model, address, uplink, serial, deviceid = ip_data[0]
 
 			acswnodeid = t.sql_update(f"""INSERT INTO guspk.host_acsw_node (DEVICEID, NETWORK_ID, VLAN_TEMPLATE_ID) VALUES ('{deviceid}', '860', '206')""")
-			# t.ws_send_message(f"acswnodeid - {acswnodeid}")
-			# t.ws_send_message(f"""INSERT INTO guspk.acds (ticket, reason, uplink, modelid, nodeid, serial, office, acsw_node_id,  status, online, argus, email, report) 
-			# 			VALUES ('{comment}', '{mip}', '{uplink}', '{model}', '33270', '{serial}', '{address}', '{acswnodeid}', 'del', 0, 2, '{email}', 'removing')""")
-			acds_id = t.sql_update(f"""INSERT INTO guspk.acds (ticket, reason, uplink, modelid, nodeid, serial, office, acsw_node_id, status, online, argus, email, report) 
-							VALUES ('{comment}', 'other', '{uplink}', '{model}', '33270', '{serial}', '{address}', '{acswnodeid}', 'other', 0, 0, '{email}', '{comment}')""")
-			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'del', '{user}', 'Инициирована заявка на {comment}, {ip}')""")
+			acds_id = t.sql_update(f"""INSERT INTO guspk.acds (ticket, reason, uplink, modelid, serial, office, acsw_node_id, status, online, argus, email, report) 
+							VALUES ('{comment}', 'other', '{uplink}', '{model}', '{serial}', '{address}', '{acswnodeid}', 'other', 0, 0, '{email}', '{comment}')""")
+			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', 'del', '{user}', 'Инициирована заявка внесение изменений. {comment}.')""")
 			# t.ws_send_message(f"acds_id - {acds_id}")
 			mail_admins(f"""Заявка {acds_id} [OTHER]""", f"""Пришла заявка, читайте комментарий""")
 			time.sleep(2)
@@ -372,11 +373,6 @@ def free_ip_refresh(request):
 				t.sql_update(f"""UPDATE guspk.acds SET status = '{values['status']}', report = '{values['report']}' WHERE id like '{acds_id}'""")
 				t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'error(f)', '{user}', '{free_ip_run}')""")
 			elif free_ip_run == 'ok':
-				##Уберите это когда откажетесь от АСТУ
-				deviceid = t.sql_select(f"""SELECT an.DEVICEID
-								FROM guspk.host_acsw_node an
-								LEFT JOIN guspk.acds a ON a.acsw_node_id = an.ACSD_NODE_ID
-								WHERE a.id = {acds_id}""", 'full')
 				address = t.sql_select(f"""SELECT  CONCAT(COALESCE(fc.city, ''), COALESCE(fs.settlement, ''), COALESCE(CONCAT(' ул. ', fstr.street), ''), COALESCE(CONCAT(' д. ', fhouse.house), ''), COALESCE(CONCAT(' к. ', fhouse.block), '')) as address
 										FROM guspk.acds a
 										LEFT JOIN guspk.acds_fias af ON af.id = a.id
@@ -385,14 +381,25 @@ def free_ip_refresh(request):
 										LEFT JOIN guspk.fias_street fstr ON af.street_fias_id = fstr.street_fias_id
 										LEFT JOIN guspk.fias_house fhouse ON af.house_fias_id = fhouse.house_fias_id
 										WHERE a.id = {acds_id}""", 'full')
-				device_info2 = {'id': deviceid[0][0], 'address': address[0][0], 'dest': 'host_fias'}
+				##Уберите это когда откажетесь от АСТУ
+				deviceid = t.sql_select(f"""SELECT an.DEVICEID, h.IPADDMGM
+							FROM guspk.host_acsw_node an
+							LEFT JOIN guspk.acds a ON a.acsw_node_id = an.ACSD_NODE_ID
+							LEFT JOIN guspk.host h ON an.DEVICEID = h.DEVICEID
+							WHERE a.id = {acds_id}""", 'full')
+				deviceid, ip = deviceid[0]
+				device_info2 = {'id': deviceid, 'address': address, 'dest': 'host_fias'}
 				fias_import.host_fias_insert(device_info2)
 				##
 				mail_data, email, data_settings, header, footer = mail_generator(acds_id)
 				mail_data = '\n'.join(mail_data)
-				send_mail(f"""Ваша заявка на ввод оборудования {acds_id}""", f"""Здравствуй {user}!\n\n Реквизиты по вашей заявке № {acds_id}.\nОжидается установка на сеть.\n{header}\n{mail_data}\n{footer}""", 'acds@ural.rt.ru', [f'{email}'])
-				time.sleep(4)
-				mail_admins(f"""Заявка {acds_id} [INIT]""", f"""Отработано успешно\nIP\t{data_settings['ipaddmgm']}\nnetname\t{data_settings['networkname']}\nGW\t{data_settings['gw']}\nMASK\t{data_settings['mask']}\nmgmvlan\t{data_settings['mgmvlan']}\nvlans\t{data_settings['vlans']}\noffice\t{data_settings['office']}\nserial\t{data_settings['serial']}\nmodel\t{data_settings['model']}""")
+
+				mail_sender(f"""Ваша заявка на ввод оборудования {acds_id}""",
+							f"""Здравствуй {user}!\n\n Реквизиты по вашей заявке № {acds_id}.\nОжидается установка на сеть.\n{header}\n{mail_data}\n{footer}""",
+							f'{email}')
+				mail_sender(f"""Заявка {acds_id} [INIT]""", 
+							f"""Отработано успешно\nIP\t{data_settings['ipaddmgm']}\nnetname\t{data_settings['networkname']}\nGW\t{data_settings['gw']}\nMASK\t{data_settings['mask']}\nmgmvlan\t{data_settings['mgmvlan']}\nvlans\t	{data_settings['vlans']}\noffice\t{data_settings['office']}\nserial\t{data_settings['serial']}\nmodel\t{data_settings['model']}""",
+							 admins=True)				
 				values.update({'status': 'init'})
 				values.update({'report': free_ip_run})
 				values.update({'badge': 'warning'})
@@ -404,8 +411,11 @@ def free_ip_refresh(request):
 				values.update({'address': address[0][0]})
 				t.sql_update(f"""UPDATE guspk.acds SET status = '{values['status']}', report = '{values['report']}' WHERE id like '{acds_id}'""")
 				t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'init', '{user}', 'Предоставлены реквизиты {data_settings['ipaddmgm']}\t{data_settings['networkname']}\t{data_settings['serial']}\t{data_settings['model']}')""")
+				t.sql_update(f"UPDATE guspk.acds_logs SET ip = '{ip}' WHERE id like {acds_id}")
 			else:
-				mail_admins(f"""Заявка {acds_id} [ERROR]""", f"""free_ip_run  {free_ip_run}""")
+				mail_sender(f"""Заявка {acds_id} [ERROR]""",
+							f"""free_ip_run  {free_ip_run}""",
+							admins=True)
 				t.sql_update(f"""UPDATE guspk.acds SET status = '{values['status']}', report = '{values['report']}' WHERE id like '{acds_id}'""")
 				t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', '{values['status']}', '{user}', '{values['report']}')""")
 
@@ -444,12 +454,11 @@ def device_configure(request):
 
 		if status == 'ok' and argus == 1:
 			values.update({'status': 'finished'})
-			astu_data_dic = {'update': {'ip': ip, 'status': 3,}} #'uplink': nodeid, 
-			res = astu_data.main(astu_data_dic)
 			t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('device_configure', '{ip}', '{user}', 'device status changed 2->3 acds_id {acds_id} ip {ip}')""")
-			t.sql_update(f"""UPDATE guspk.acds SET status = 'closed' WHERE id like '{acds_id}'""")
-			send_mail(f"""Заявка на ввод № {acds_id}""", f"""Оборудование по заявке № {acds_id} введено в эксплуатацию.""", 'acds@ural.rt.ru', [f'{email}'])
 			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', '{status}', '{user}', 'Все работы по вводу завершены')""")
+			t.sql_update(f"""UPDATE guspk.acds SET status = 'closed' WHERE id like '{acds_id}'""")
+			t.sql_update(f"""UPDATE guspk.ahot SET DEVICESTATUSID = '3' WHERE IPADDMGM = '{ip}'""")
+			send_mail(f"""Заявка на ввод № {acds_id}""", f"""Оборудование по заявке № {acds_id} введено в эксплуатацию.""", 'acds@ural.rt.ru', [f'{email}'])
 		elif status == 'ok' and argus == 0:
 				values.update({'status': 'ok'})
 				values.update({'badge': 'success'})
@@ -469,15 +478,15 @@ def device_configure(request):
 					values.update({'status': 'error(c)'})
 					values.update({'badge': 'danger'})
 					values.update({'report': conf_routing_run})
-					t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('device_configure', '{ip}', '{user}', 'acds_id {acds_id} configure error {conf_routing_run}')""")
-					t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'error(c)', '{user}', '{conf_routing_run}')""")
+					t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('device_configure', '{ip}', '{user}', "acds_id {acds_id} configure error {conf_routing_run}")""")
+					t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'error(c)', '{user}', "{conf_routing_run}")""")
 					t.sql_update(f"""UPDATE guspk.acds SET status = '{values['status']}', report = '{values['report']}' WHERE id like '{acds_id}'""")
 					mail_admins(f"""Заявка {acds_id} [ERROR]""", f"""Конфигурирование не выполнено {conf_routing_run}""")
 				elif conf_routing_run == 'ok':
 					values.update({'status': 'ok'})
 					values.update({'badge': 'success'})
 					values.update({'report': 'configured'})
-					t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('device_configure', '{ip}', '{user}', 'acds_id {acds_id} configure ok')""")
+					t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('device_configure', '{ip}', '{user}', "acds_id {acds_id} configure ok")""")
 					t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'ok', '{user}', 'Конфигурирование выполнено успешно, передано в Аргус')""")
 					t.sql_update(f"""UPDATE guspk.acds SET status = '{values['status']}', report = '{values['report']}' WHERE id like '{acds_id}'""")
 					# mail_admins(f"""Заявка {acds_id} [OK]""", f"""Конфигурирование выполнено успешно""")
@@ -486,13 +495,10 @@ def device_configure(request):
 					send_mail(f"""Заявка на ввод в Аргус № {acds_id}""", f"""Ваша заявка № {acds_id} передана в Аргус.""", 'acds@ural.rt.ru', [f'{email}'])
 		elif status == 'del' and argus == 3:
 			values.update({'status': 'finished'})
-			astu_data_dic = {'update': {'ip': ip, 'status': 6,}} #'uplink': nodeid, 
-			res = astu_data.main(astu_data_dic)
 			t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('device_configure', '{ip}', '{user}', 'device status changed 3->6 acds_id {acds_id} ip {ip}')""")
-			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', '{status}', '{user}', 'Устройство выведено из эксплуатации')""")
+			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', '{status}', '{user}', 'Устройство выведено из эксплуатации {ip}')""")
 			t.sql_update(f"""UPDATE guspk.acds SET status = 'closed', report = 'removed' WHERE id like '{acds_id}'""")
-			t.sql_update(f"""DELETE from guspk.topology WHERE child = '{deviceid}'""")
-			t.sql_update(f"""DELETE from guspk.host_acsw_node WHERE DEVICEID = '{deviceid}'""")
+			t.sql_update(f"""DELETE from guspk.host WHERE DEVICEID = '{deviceid}'""")
 			# mail_admins(f"""Заявка {acds_id} [DEL]""", f"""Выведено успешно""")
 			send_mail(f"""Заявка на вывод оборудования из Аргус № {acds_id}""", f"""Устройство по заявке № {acds_id} выведено из эксплуатации.""", 'acds@ural.rt.ru', [f'{email}'])
 			time.sleep(2)
@@ -571,7 +577,7 @@ def get_acsw_node_id_update(request):
 
 	t = multimodule.FastModulAut()
 	t.sql_connect('connect')
-	ip = request.META.get('HTTP_X_FORWARDED_FOR')
+
 	user = request.user.username
 	acds_id = ''.join(list(request.GET.get('id', str(False))))
 	acsw_node_id = ''.join(list(request.GET.get('acsw_node_id', str(False))))
@@ -608,7 +614,6 @@ def get_acds_id_remove(request):
 	t = multimodule.FastModulAut()
 	t.sql_connect('connect')
 	t.oracle_connect('connect')
-	ip = request.META.get('HTTP_X_FORWARDED_FOR')
 	user = request.user.username
 	acds_id = ''.join(list(request.GET.get('id', str(False))))
 	# ipaddmgm = ''.join(list(request.GET.get('ip', str(False))))
@@ -620,18 +625,17 @@ def get_acds_id_remove(request):
 							WHERE id = {acds_id}""", 'full')
 	email = data[0][0]
 	status = data[0][1]
-	ipaddmgm = data[0][2]
+	ip = data[0][2]
 	if status == 'new' or status == 'init':
-		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_id_remove', '{acds_id}', '{user}', 'delete acds_id {acds_id} ip {ipaddmgm} in status {status}')""")
-		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'removed', '{user}', 'Заявка аннулирована')""")
+		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_id_remove', '{acds_id}', '{user}', 'delete acds_id {acds_id} ip {ip} in status {status}')""")
+		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', 'removed', '{user}', 'Заявка аннулирована')""")
 		t.sql_update(f"""DELETE FROM guspk.acds WHERE id = {acds_id}""")
-		t.sql_update(f"""DELETE FROM guspk.host WHERE IPADDMGM = '{ipaddmgm}'""")
-		t.oracle_update(f"""DELETE FROM ASTU.DEVICE WHERE IPADDMGM  = '{ipaddmgm}'""")
+		t.sql_update(f"""DELETE FROM guspk.host WHERE IPADDMGM = '{ip}'""")
 		send_mail(f"""Заявка на ввод в эксплуатацию № {acds_id}""", f"""Ваша заявка № {acds_id} аннулирована.""", 'acds@ural.rt.ru', [f'{email}'])
 		answer = {'answer': 'deleted'}
 	elif status == 'other' or status == 'error(f)' or status == 'error(c)':
-		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_id_remove', '{acds_id}', '{user}', 'delete acds_id {acds_id} ip {ipaddmgm} in status {status}')""")
-		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'removed', '{user}', 'Заявка аннулирована')""")
+		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_id_remove', '{acds_id}', '{user}', 'delete acds_id {acds_id} ip {ip} in status {status}')""")
+		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', 'removed', '{user}', 'Заявка аннулирована')""")
 		t.sql_update(f"""DELETE FROM guspk.acds WHERE id = {acds_id}""")
 		answer = {'answer': 'deleted'}
 	else:
@@ -670,32 +674,16 @@ def get_acds_argus_status(request):
 	id_status = t.sql_select(f"""SELECT status, argus from guspk.acds WHERE id like {acds_id}""", 'full')
 	status, argus = id_status[0]
 	if status == 'ok':
-		# t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_argus_status', '{acds_id}', '{user}', 'argus status changed to 1 acds_id {acds_id}')""")
-		# t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'init', '{user}', 'Устройство внесено в Аргус')""")
-		# t.sql_update(f"""UPDATE guspk.acds SET argus = 1 WHERE id = {acds_id}""")
-		# mail_admins(f"""Заявка {acds_id} [ARGUS]""", f"""Устройство занесено в Аргус""")
-
-		astu_data_dic = {'update': {'ip': ip, 'status': 3,}} #'uplink': nodeid, 
-		res = astu_data.main(astu_data_dic)
-		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('device_configure', '{ip}', '{user}', 'device status changed 2->3 acds_id {acds_id} ip {ip}')""")
+		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_argus_status', '{ip}', '{user}', 'device status changed 2->3 acds_id {acds_id} ip {ip}')""")
+		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', '{status}', '{user}', 'Все работы по вводу завершены')""")
 		t.sql_update(f"""UPDATE guspk.acds SET status = 'closed', argus = '1' WHERE id like '{acds_id}'""")
 		t.sql_update(f"""UPDATE guspk.host SET DEVICESTATUSID = '3' WHERE IPADDMGM like '{ip}'""")
-		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', '{status}', '{user}', 'Все работы по вводу завершены')""")
 		send_mail(f"""Заявка на ввод № {acds_id}""", f"""Оборудование по заявке № {acds_id} введено в эксплуатацию.""", 'acds@ural.rt.ru', [f'{email}'])
 
 	elif status == 'del':
-		# t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_argus_status', '{acds_id}', '{user}', 'argus status changed to 3 acds_id {acds_id}')""")
-		# t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'del', '{user}', 'Устройство удалено из Аргус')""")
-		# t.sql_update(f"""UPDATE guspk.acds SET argus = 3 WHERE id = {acds_id}""")
-		# mail_admins(f"""Заявка {acds_id} [ARGUS]""", f"""Устройство удалено из Аргус, закройте заявку""")
-
-
-		astu_data_dic = {'update': {'ip': ip, 'status': 6,}} #'uplink': nodeid, 
-		res = astu_data.main(astu_data_dic)
-		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('device_configure', '{ip}', '{user}', 'device status changed 3->6 acds_id {acds_id} ip {ip}')""")
-		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', '{status}', '{user}', 'Устройство выведено из эксплуатации')""")
-		t.sql_update(f"""UPDATE guspk.acds SET status = 'closed', argus = '3', report = 'removed' WHERE id like '{acds_id}'""")
-		t.sql_update(f"""UPDATE guspk.host SET DEVICESTATUSID = '6' WHERE IPADDMGM like '{ip}'""")
+		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_argus_status', '{ip}', '{user}', 'device deleted {acds_id} ip {ip}')""")
+		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', '{status}', '{user}', 'Устройство выведено из эксплуатации')""")
+		t.sql_update(f"""DELETE FROM guspk.host WHERE IPADDMGM like '{ip}'""")
 		# mail_admins(f"""Заявка {acds_id} [DEL]""", f"""Выведено успешно""")
 		send_mail(f"""Удалить из ИНИТИ""", f"""Устройство выведено из эксплуатации, прошу удалить из ИНИТИ. ip - {ip}.""", 'acds@ural.rt.ru', [f'monitoring@ural.rt.ru'])
 		time.sleep(4)
@@ -703,7 +691,7 @@ def get_acds_argus_status(request):
 
 	elif status == 'other':
 		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_argus_status', '{acds_id}', '{user}', 'argus status changed to 5 acds_id {acds_id}')""")
-		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'other', '{user}', 'Изменения внесены в Аргус, заявка закрыта')""")
+		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', 'other', '{user}', 'Изменения внесены в Аргус, заявка закрыта')""")
 		t.sql_update(f"""UPDATE guspk.acds SET argus = 5, status = 'closed' WHERE id = {acds_id}""")
 		mail_admins(f"""Заявка {acds_id} [OTHER]""", f"""Устройство изменено в Аргус, заявка закрыта""")		
 
@@ -733,7 +721,6 @@ def admin(request):
 	tickets_db = t.sql_select(f"""SELECT host.IPADDMGM, host.NETWORKNAME, CONCAT(net.GW,'/',net.MASK, '; ', net.VLAN) AS net, a.id, a.ticket, a.reason, a.uplink, m.DEVICEMODELNAME, a.serial, CONCAT(COALESCE(fc.city, ''), COALESCE(fs.settlement, ''), COALESCE(CONCAT(' ул. ', fstr.street), ''), COALESCE(CONCAT(' д. ', fhouse.house), ''), COALESCE(CONCAT(' к. ', fhouse.block), '')) as address, a.office, CONCAT(vt.HSI, ';', vt.IPTV, ';', vt.IMS, ';', vt.TR069) AS vlans, a.status, a.online, a.email, a.time_create, a.report, a.argus
 	FROM guspk.acds a
 	INNER JOIN guspk.host_model m ON a.modelid = m.MODELID
-	LEFT JOIN guspk.host_node n ON a.nodeid = n.NODEID
 	LEFT JOIN guspk.host_acsw_node an ON a.acsw_node_id = an.ACSD_NODE_ID
 	LEFT JOIN guspk.host_vlan_template vt ON an.VLAN_TEMPLATE_ID = vt.VLAN_TEMPLATE_ID 
 	LEFT JOIN guspk.host_networks net ON an.NETWORK_ID = net.NETWORK_ID
@@ -828,7 +815,6 @@ def mail_generator(acds_id):
 	device_data = t.sql_select(f"""SELECT host.IPADDMGM, host.NETWORKNAME, CONCAT(net.GW,'/',net.MASK) AS network, net.VLAN, vt.HSI, vt.IPTV, vt.IMS, vt.TR069, m.DEVICEMODELNAME, a.SERIAL, a.OFFICE, a.email, a.ticket, CONCAT(COALESCE(fc.city, ''), COALESCE(fs.settlement, ''), COALESCE(CONCAT(' ул. ', fstr.street), ''), COALESCE(CONCAT(' д. ', fhouse.house), ''), COALESCE(CONCAT(' к. ', fhouse.block), '')) as address
 					FROM guspk.acds a
 					INNER JOIN guspk.host_model m ON a.modelid = m.MODELID
-					LEFT JOIN guspk.host_node n ON a.nodeid = n.NODEID
 					LEFT JOIN guspk.host_acsw_node an ON a.acsw_node_id = an.ACSD_NODE_ID
 					LEFT JOIN guspk.host_vlan_template vt ON an.VLAN_TEMPLATE_ID = vt.VLAN_TEMPLATE_ID 
 					LEFT JOIN guspk.host_networks net ON an.NETWORK_ID = net.NETWORK_ID

@@ -74,11 +74,8 @@ def authorization_in_zyxel(t, data_mes):
 		print(f"authorization_in_zyxel|add: {add}")
 		if topology_result['status'] == 'end_device':
 			uplink = add[0][0]
-			data_mes['uplink'] = uplink
-			print(f"authorization_in_zyxel|data_mes['uplink']: {data_mes['uplink']}")
 			t.ws_send_message(f"uplink: {uplink}")
 		else:
-			print("authorization_in_zyxel|Не отстроилась топология")
 			t.ws_send_message(f"topology error {topology_result['message_error']}")
 
 	if not uplink:

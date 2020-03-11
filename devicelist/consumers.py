@@ -170,7 +170,6 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 			result.update({'status': 'error', 'message_error': f"def main | Don't find {result['input_data']} in devicelist"})
 
 
-
 		top = topology.getTopology()
 		print(f"===== online: {online}")
 
@@ -203,7 +202,7 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 					if online:
 						t.sql_update(f"UPDATE guspk.host SET mac = '{result['mac']}' WHERE IPADDMGM = '{result['ip']}'") ##
 
-				if result['status'] != 'full_topology':
+				if not result[result['count']].get('port_uplink') and result['status'] != 'full_topology':
 					result = await top.main(result, t, 'consumer')
 					if result['status'] == 'error':
 						self.send(text_data=json.dumps({

@@ -12,9 +12,8 @@ import ipaddress
 
 
 rr = {72: '10.234.128.1', 45: '10.225.128.13', 59: '10.222.240.121', 86: '10.236.128.136', 74: '10.223.80.12', 66: '10.231.0.13'}
-t = multimodule.FastModulAut(login='yuzhakov-da')
-# answer = dict.fromkeys(['ok', 'results'])
-# answer['results'] = dict.fromkeys(['routerip'])
+t = multimodule.FastModulAut()
+
 
 def error_handler(text, answer):
 	# answer = {}
@@ -44,8 +43,36 @@ def peagg_cisco(t, answer):
 				# print(f'gw finded {vlan_network[1]}')
 				answer['results'].update({'gw': vlan_network[1]})
 				break
-			# else:
-				# return error_handler(f'gw not found', answer)
+		if not answer['results'].get('gw'):
+			return error_handler(f'netwok not found on {match_intvlan[1]}', answer)
+
+	return answer
+
+def peagg_juniper(t, answer):
+	intvlan = t.data_split()
+	match_intvlan = re.findall(rf"""\svia\s(.+)""", intvlan)
+	match_vlan = re.findall(rf".(\d+)", match_intvlan[0])
+	if match_vlan:
+		# print(f'{match_intvlan[1]}')
+		answer['results'].update({'intvlan': match_vlan[0]})
+	else:
+		return error_handler(f'intvlan not found', answer)
+	t.new_sendline(f"show configuration interface {match_intvlan[0]}", prompt = "> $")
+	runvlan = t.data_split("list")
+	for vline in runvlan:
+		# print(vline)
+		vlan_network = re.search(rf"""(\S+)\/(\d+)""", vline)
+		if vlan_network:
+			search_network = ipaddress.IPv4Interface(f'{vlan_network[1]}/{vlan_network[2]}')
+			# print(search_network.network)
+			if str(search_network.network) == answer['results']['network']:
+				# print(f'gw finded {vlan_network[1]}')
+				answer['results'].update({'gw': vlan_network[1]})
+				break
+		if not answer['results'].get('gw'):
+			return error_handler(f'netwok not found on {match_intvlan[0]}', answer)
+
+			
 	return answer
 
 
@@ -66,7 +93,11 @@ def select_pe(ip):
 		return error_handler('region in host_fias not found', answer)
 	hostname, region = data[0]
 	mask = 0
-	telnet = t.aut(f'{rr[region]}')
+	try:
+		telnet = t.aut(f'{rr[region]}')
+	except:
+		return error_handler(f"""incorrect region {region}""", answer) 
+
 	if telnet != 0:
 		return error_handler(f"""telnet connection error {rr[region]}""", answer) 
 
@@ -126,10 +157,12 @@ def peagg_data(answer):
 	t.sql_connect('connect')
 	i = t.aut(answer['results']['routerip'])
 	if i != 0:
-		return error_handler(f"""{answer['results']['routerip']} not connected""", answer)
+		i = t.aut(answer['results']['routerip'], proxy = True)
+		if i != 0:
+			return error_handler(f"""{answer['results']['routerip']} not connected""", answer)
 
 	prompt = t.data_split()
-	match = re.search(r'(\d+-[A-Z0-9-]+-\d+)', prompt)
+	match = re.search(r'(\d+-\D[A-Z0-9-]+-\d+)', prompt)
 	answer['results'].update({'routername': match[1]})
 	data = t.sql_select(f"""SELECT hm.DEVICEMODELNAME, h.DEVICEID
 					FROM guspk.host h
@@ -144,7 +177,7 @@ def peagg_data(answer):
 
 	model, deviceid = data[0]
 	answer['results'].update({'deviceid': deviceid, 'model': model})
-	if model == 'CISCO7606' or model == 'CISCO7606-S' or model == 'ASR1006':
+	if model == 'CISCO7606' or model == 'CISCO7606-S' or model == 'CISCO7609-S' or model == 'ASR1006':
 		t.new_sendline('terminal length 0')
 		if answer.get('vrf'):
 			t.new_sendline(f"""show ip vrf | i {answer['vrf']['asid']}:{answer['vrf']['vrfid']}""")
@@ -161,10 +194,27 @@ def peagg_data(answer):
 			t.new_sendline(f"""show ip route {answer['ip']} | i Vla""")
 			answer = peagg_cisco(t, answer)
 
-	elif model == 'MX480':
-		return error_handler(f'MX480 not support now', answer)
+	elif 'MX480' in model or 'QFX' in model or 'EX' in model:
+		t.new_sendline("set cli screen-length 10000", prompt = '> ')
+		if answer.get('vrf'):
+			t.new_sendline(f"""show configuration | display set | match "route-distinguisher {answer['vrf']['asid']}:{answer['vrf']['vrfid']}" """, prompt = '> ')
+			vrf = t.data_split() 
+			match_vrf = re.search(rf"""instances\s+(.+)\s+route-distinguisher\s+{answer['vrf']['asid']}:{answer['vrf']['vrfid']}""", vrf[1])
+			if match_vrf:
+				answer['vrf'].update({'vrfname': match_vrf[1]})
+			else:
+				return error_handler(f'vrfname not found', answer)
+			t.new_sendline(f"show route table {answer['vrf']['vrfname']}.inet.0 {answer['ip']} ", prompt = "> $")
+			answer = peagg_juniper(t, answer)
+		else:
+			t.new_sendline(f"show route table inet.0 {answer['ip']} ", prompt = '> $')
+			answer = peagg_juniper(t, answer)
+		# return error_handler(f"Jun MX not support now {answer['results']['routerip']}", answer)
+
+
 	elif model == 'Nokia-7750-SR-7':
 		return error_handler(f'Nokia not support now', answer)
+
 	else:
 		return error_handler(f'{model} not support now', answer)
 
@@ -197,13 +247,6 @@ def start(ip):
 	return summary
 
 
-# testip = ['10.228.130.6', '10.224.1.23', '10.224.69.34', '10.232.240.18', '10.228.21.20'] #, '10.224.1.23'
-# testip = ['10.229.168.43'] #, '10.224.1.23'
-# for ip in testip:
-# 	print(ip.center(20, '='))
-# 	a = start(ip)
-# 	print(a)
-
 if __name__ == "__main__":
-	# start('10.4.31.24')
-	start('10.228.130.6')
+	a = start("10.222.58.24")
+	print(a)

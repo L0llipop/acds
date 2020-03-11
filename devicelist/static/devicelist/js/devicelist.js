@@ -64,14 +64,8 @@ async function get_devicelist() {
         // console.log(ip_address);
         if (ip_address && ip_address != 'access'){
           let class_bg = '';
-          if (data[ip_address]['status'] == "Выведен"){
-            class_bg = "class=\"table-secondary\"";
-          }
-          else if (data[ip_address]['status'] == "Монтаж"){
+          if (data[ip_address]['status'] == "Монтаж"){
             class_bg = "class=\"table-warning\"";
-          }
-          else if (data[ip_address]['status'] == "Проект"){
-            class_bg = "class=\"table-info\"";
           }
           // if("this_device_id" in sessionStorage){
           //   let deviceid = sessionStorage.getItem('this_device_id');
@@ -149,7 +143,8 @@ $(document).on('click', '.edit_device', function(){
   }
   let deviceid = this.id;
   sessionStorage.setItem('this_device_id', deviceid);
-
+  let uplink_modal = $('#uplink_modal').html();
+  console.log(`${uplink_modal}`)
   // test zone  getElementById(deviceid). getElementsByClassName
   // let select = document.getElementById('102379').getElementsByClassName('device_addres').innerHTML;
   // console.log(`select: ${select}`);
@@ -183,6 +178,9 @@ $(document).on('click', '.edit_device', function(){
     if (res.length == 4){
       port_uplink = res[3];
     }
+    if (res.length == 5) {
+      port_uplink = res[3]+res[4];
+    }
   };
 
   $('#edit_device').modal('show');
@@ -202,7 +200,7 @@ $(document).on('click', '.edit_device', function(){
   $('#portuplink_modal').val(port_uplink);
   $('#mac_modal').val(mac);
   $('#serial_modal').val(serial);
-  if (uplink_and_port == "Null") {
+  if (uplink_and_port == "Null" && uplink_modal != "Null") {
     $("#port_modal").prop("disabled", true);
     $("#portuplink_modal").prop("disabled", true);
   }
@@ -285,11 +283,15 @@ $('#save_data_device').on('click', function(){
         $('.spinner_load_update').addClass('d-none');
       }
       if (data['status'] == 'ok') {
-        get_devicelist();
         $('.spinner_load_update').addClass('d-none');
+        $('#ip_address').val(`${all_data['ip']}`)
+        get_devicelist();
       }
     }
   });
+  $("#uplink_modal").prop("disabled", false);
+  $("#port_modal").prop("disabled", false);
+  $("#portuplink_modal").prop("disabled", false);
 });
 
 
@@ -312,6 +314,9 @@ $('#add_new_device').on('click', function(){
   $("#check_argus").hide();
   $("#clear_forms").show();
   $('#device_id').html('New device');
+  $("#uplink_modal").prop("disabled", true);
+  $("#port_modal").prop("disabled", true);
+  $("#portuplink_modal").prop("disabled", true);
 
   let all_data = {
         'ip': $('#ip_modal').val(),
@@ -324,20 +329,7 @@ $('#add_new_device').on('click', function(){
         'mac': $('#mac_modal').val(),
         'serial': $('#serial_modal').val()
       };
-  let json_data = JSON.stringify(all_data)
-
-  // $.ajax({
-  //   url: "http://10.180.7.34/devicelist/device_add/",
-  //   method: "GET",
-  //   data: {all_data: json_data},
-  //   cache: false,
-  //   fail: function(){alert("fail");},
-  //   success: function(data){
-  //     console.log(`message: ${data['message']}`);
-  //     console.log(`error: ${data['error']}`);
-  //     get_devicelist();
-  //   }
-  // });
+  let json_data = JSON.stringify(all_data);
 });
 
 $('#clear_forms').on('click', function(){
@@ -516,7 +508,7 @@ $('.spinner_load_update').modal('hide');
 
 $('#uplink_modal').keyup(function () {
   modal_uplink = $('#uplink_modal').val();
-  console.log(modal_uplink);
+  console.log(`modal_uplink ${modal_uplink}`);
   if (!modal_uplink) {
     $("#port_modal").prop("disabled", true);
     $("#portuplink_modal").prop("disabled", true);
