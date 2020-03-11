@@ -61,9 +61,9 @@ def get_acds_id(request): #УБРАТЬ КОСТЫЛИ С ТАИМАУТОМ О�
 		t.ws_connect('chat/log_free_ip/')
 
 		t.ws_send_message(f"""INSERT INTO guspk.acds (ticket, reason, uplink, modelid, serial, office, status, online, argus, email) 
-						VALUES ('{sd}', '{mip}', '{uplink}', (SELECT MODELID FROM guspk.host_model WHERE DEVICEMODELNAME like '{model}'), '{serial}', '{office}', 'new', 0, 0, '{email}')""")
+						VALUES ("{sd}", '{mip}', "{uplink}", (SELECT MODELID FROM guspk.host_model WHERE DEVICEMODELNAME like "{model}"), "{serial}", "{office}", 'new', 0, 0, "{email}")""")
 		acds_id = t.sql_update(f"""INSERT INTO guspk.acds (ticket, reason, uplink, modelid, serial, office, status, online, argus, email) 
-						VALUES ('{sd}', '{mip}', '{uplink}', (SELECT MODELID FROM guspk.host_model WHERE DEVICEMODELNAME like '{model}'), '{serial}', '{office}', 'new', 0, 0, '{email}')""")
+						VALUES ("{sd}", "{mip}", "{uplink}", (SELECT MODELID FROM guspk.host_model WHERE DEVICEMODELNAME like "{model}"), "{serial}", "{office}", 'new', 0, 0, "{email}")""")
 		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'new', '{user}', 'Инициирована заявка на ввод нового оборудования')""")
 		# acds_id = acds_id[0][0]
 		# t.sql_connect('disconnect')
