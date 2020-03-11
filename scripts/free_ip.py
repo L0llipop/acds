@@ -177,11 +177,6 @@ def create_hostname(id_acds, ip_uplink, search_type, vrf, free_ip, t):
 		t.ws_send_message(f"{error_free_ip}")
 		return final_hostname, error_free_ip, None
 
-	if region_code == 45:
-		nodeid = 33294
-	elif region_code == 72:
-		nodeid = 33270
-
 	if not city_en:
 		city_en = translate_to_en(city_ru)
 
@@ -206,13 +201,13 @@ def create_hostname(id_acds, ip_uplink, search_type, vrf, free_ip, t):
 		else:
 			error_free_ip = f"Error id_115: No template CORE for {ip_uplink}"
 			t.ws_send_message(f"{error_free_ip}")
-			return final_hostname, error_free_ip, nodeid
+			return final_hostname, error_free_ip
 
 
 	if temp_ip == None:
 		error_free_ip = "Error id_112: Not in core network uplink or not templates in host_acsw_node"
 		t.ws_send_message(f"{error_free_ip}")
-		return final_hostname, error_free_ip, nodeid
+		return final_hostname, error_free_ip
 
 	match = re.search(r'\.(\d+)\.\d+$', temp_ip)
 	if match:
@@ -223,7 +218,7 @@ def create_hostname(id_acds, ip_uplink, search_type, vrf, free_ip, t):
 	else:
 		error_free_ip = "Error id_113: regex doesn't work"
 		t.ws_send_message(f"{error_free_ip}")
-		return final_hostname, error_free_ip, nodeid
+		return final_hostname, error_free_ip
 
 
 	match = re.search(r'(\d+)\.(\d+)$', free_ip)
@@ -235,7 +230,7 @@ def create_hostname(id_acds, ip_uplink, search_type, vrf, free_ip, t):
 	else:
 		error_free_ip = "Error id_114: regex doesn't work"
 		t.ws_send_message(f"{error_free_ip}")
-		return final_hostname, error_free_ip, nodeid
+		return final_hostname, error_free_ip
 
 
 	if search_type == 'ACSW':
@@ -260,7 +255,7 @@ def create_hostname(id_acds, ip_uplink, search_type, vrf, free_ip, t):
 			final_hostname = f"{region_code}-{city_en}-{code_type_node}{first_num_fsw}{index1}-{search_type}-{index2}"
 		t.ws_send_message(f"final_hostname: {final_hostname}")
 
-	return final_hostname, error_free_ip, nodeid
+	return final_hostname, error_free_ip
 
 
 
@@ -275,7 +270,7 @@ def main(data_key, t, error_free_ip):
 # UCN			 -	   242
 
 	olt  = ['LTP-4X', 'LTP-8X', 'MA-4000px', 'MA5800-X17']
-	fttb = ['MES1124','MES1124M','MES2124','MES2124M','MES2124P','MES2124MB','MES2428','MES2408','MES2408C','MES2408P','MES2408B','MES2428B','MES2324B','MES3108F','MES3116F','MES2208P','MES2308','MES2308P','MES2324','MES2324F','MES2324P','MES3508P','MES3524F','MGS-3712','DES-3200-10','DES-3200-18','DES-3200-28','DES-3200-58','GS-3012', 'ES-2024a', '4024','ES-2108G','MGS-3712F','MES-3528','MGS-3712','MES3500-24','ES-3124','XGS-4728F','DES-2110','DES-3526','DES-3828','DGS-3700-12G','DGS-3200-10G','DES-3200-10','DES-3528','DES-3550','DES-1210-28/ME','DES-3200-28','DES-3200-18','DGS-3120-24SC','DGS-3627G','DES-3028','DES-3026','DES-3010G','DES-2108','DGS-3612G','DGS-1100-06','DGS-1210-10/ME','DGS-1210-12TS/ME','DGS-1210-20/ME','DES-3200-10/C','DGS-1210-28/ME','DES-3200-28/C','DGS-3000-28SC','DES-3226S','DGS-3100-24','DES-3552','DGS-3420-52T','DGS-3100-24TG','DXS-3400-24SC','DGS-3120-24SC/B1','DES-3200-52','DGS-3120-48TC','DES-3200-18/C','DGS-3200-10','DES-3028G','DGS-3420-26SC','DES-1210-52/ME','GS-4012F','ES3528M', 'ES3526XA', 'WS-C2950-12', 'SNR-S2985G-8T']
+	fttb = ['MES1124','MES1124M','MES2124','MES2124M','MES2124P','MES2124MB','MES2428','MES2408','MES2408C','MES2408P','MES2408B','MES2428B','MES2324B','MES3108F','MES3116F','MES2208P','MES2308','MES2308P','MES2324','MES2324F','MES2324P','MES3508P','MES3524F','MGS-3712','DES-3200-10','DES-3200-18','DES-3200-28','DES-3200-58','GS-3012', 'ES-2024a', '4024','ES-2108G','MGS-3712F','MES-3528','MGS-3712','MES3500-24','ES-3124','XGS-4728F','DES-2110','DES-3526','DES-3828','DGS-3700-12G','DGS-3200-10G','DES-3200-10','DES-3528','DES-3550','DES-1210-28/ME','DES-3200-28','DES-3200-18','DGS-3120-24SC','DGS-3627G','DES-3028','DES-3026','DES-3010G','DES-2108','DGS-3612G','DGS-1100-06','DGS-1210-10/ME','DGS-1210-12TS/ME','DGS-1210-20/ME','DES-3200-10/C','DGS-1210-28/ME','DES-3200-28/C','DGS-3000-28SC','DES-3226S','DGS-3100-24','DES-3552','DGS-3420-52T','DGS-3100-24TG','DXS-3400-24SC','DGS-3120-24SC/B1','DES-3200-52','DGS-3120-48TC','DES-3200-18/C','DGS-3200-10','DES-3028G','DGS-3420-26SC','DES-1210-52/ME','GS-4012F','ES3528M', 'ES3526XA', 'WS-C2950-12', 'SNR-S2985G-8T', 'SNR-S2965-8T']
 	wbs  = ['ePMP 1000', 'WOP-2AC-LR5', 'WOP-12ac-LR']
 	vg   = ['SMG2016', 'MG-8FXS', 'MG-16FXS', 'MG-24FXS', 'MG-32FXS', 'MG-36FXS', 'MG-44FXS', 'MG-52FXS', 'MG-60FXS', 'MG-72FXS','TAU-72.IP','TAU-60.IP','TAU-24.IP','TAU-16.IP','TAU-36.IP','TAU-8.IP','TAU-4.IP']
 	adsl = ['AAM1212-51','DSL IES-1248-51','AAM1008-61','DSL IES-5000', '7330 FD', '7302 FD', 'C300', 'C350MB']
@@ -385,13 +380,11 @@ def main(data_key, t, error_free_ip):
 	# =========== Выделение Hostname ===========
 	if free_ip and search_type:
 		t.ws_send_message("creating hostname")
-		new_hostname, error_free_ip, nodeid = create_hostname(data_key['id_acds'], data_key['up'], search_type, vrf, free_ip, t)
+		new_hostname, error_free_ip = create_hostname(data_key['id_acds'], data_key['up'], search_type, vrf, free_ip, t)
 		if 'Error' in error_free_ip:
 			return error_free_ip
 		t.ws_send_message(f"selected hostname: {new_hostname}")
-		# new_hostname = '45-SHAT-ACC3310-DSL-5'
-		# nodeid = 33270
-		# print (new_hostname)
+
 	# =========== =========== ===========
 
 
@@ -486,7 +479,7 @@ def get_free_data(id_acds):
 
 	t.sql_connect('connect')
 	user = getpass.getuser()
-	query = f"""SELECT a.uplink, m.DEVICEMODELNAME, a.serial, a.office, a.ticket, a.nodeid, a.status, a.oldip, a.reason
+	query = f"""SELECT a.uplink, m.DEVICEMODELNAME, a.serial, a.office, a.ticket, a.status, a.oldip, a.reason
 FROM guspk.acds a, guspk.host_model m
 WHERE m.MODELID = a.modelid
 and a.id={id_acds};
@@ -496,20 +489,19 @@ and a.id={id_acds};
 
 	error_free_ip = 'ok'
 	data_request = t.sql_select(query, 'full')
-	if data_request[0][6] == 'new' or data_request[0][6] == 'error(f)':
+	if data_request[0][5] == 'new' or data_request[0][5] == 'error(f)':
 		data_key = {}
 		data_key['up'] = data_request[0][0]
 		data_key['model'] = data_request[0][1]
 		data_key['sn'] = data_request[0][2]
 
 		data_key['office'] = data_request[0][3]
-		data_key['sd'] = f"{data_request[0][4]} {data_request[0][8]}"
-		data_key['nodeid'] = data_request[0][5]
+		data_key['sd'] = f"{data_request[0][4]} {data_request[0][7]}"
 		if oldip[0][0]:
 			t.ws_send_message(f"oldip detected {oldip[0][0]}")
 			data_key['freeip'] = oldip[0][0]
 		data_key['id_acds'] = id_acds
-		data_key['oldip'] = data_request[0][7]
+		data_key['oldip'] = data_request[0][6]
 
 		error_free_ip = main(data_key, t, error_free_ip)
 
@@ -520,7 +512,7 @@ and a.id={id_acds};
 		# ws.close()
 	else:
 		error_free_ip = 'Error id_110: Status incorrect'
-		t.ws_send_message("Error id_110: Status incorrect")
+		t.ws_send_message(f"Error id_110: Status incorrect {data_request}")
 
 	t.sql_connect('disconnect')
 	t.ws_close()
