@@ -480,7 +480,7 @@ def device_configure(request):
 					values.update({'badge': 'danger'})
 					values.update({'report': conf_routing_run})
 					t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('device_configure', '{ip}', '{user}', "acds_id {acds_id} configure error {conf_routing_run}")""")
-					t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'error(c)', '{user}', "{conf_routing_run}")""")
+					t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'error(c)', '{user}', '{conf_routing_run}')""")
 					t.sql_update(f"""UPDATE guspk.acds SET status = '{values['status']}', report = '{values['report']}' WHERE id like '{acds_id}'""")
 					mail_admins(f"""Заявка {acds_id} [ERROR]""", f"""Конфигурирование не выполнено {conf_routing_run}""")
 				elif conf_routing_run == 'ok':

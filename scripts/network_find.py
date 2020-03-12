@@ -21,21 +21,32 @@ def error_handler(text, answer):
 	return answer
 
 
-def peagg_cisco(t, answer):
+def peagg_cisco(t, answer, model):
 	intvlan = t.data_split() 
 	intvlan = intvlan.split('\n')
-	match_intvlan = re.search(rf"""via Vlan(\d+)""", intvlan[1])
+	if '7206' in model:
+		match_int = re.search(rf"""via (\S+)""", intvlan[1])
+		match_intvlan = re.search(rf"""via GigabitEthernet\S+\.(\d+)""", intvlan[1])
+	else:
+		match_intvlan = re.search(rf"""via Vlan(\d+)""", intvlan[1])
+
 	if match_intvlan:
 		# print(f'{match_intvlan[1]}')
 		answer['results'].update({'intvlan': match_intvlan[1]})
 	else:
 		return error_handler(f'intvlan not found', answer)
-	t.new_sendline(f"""show running-config interface vlan {answer['results']['intvlan']}""")
+	
+	if '7206' in model:
+		t.new_sendline(f"""show running-config interface {match_int[1]}""")
+	else:
+		t.new_sendline(f"""show running-config interface vlan {answer['results']['intvlan']}""")
+
 	runvlan = t.data_split() 
 	runvlan = runvlan.split('\n')
 	for vline in runvlan:
-		# print(vline)
+		print(vline)
 		vlan_network = re.search(rf"""address\s(\S+)\s(\S+)""", vline)
+		print(vlan_network)
 		if vlan_network:
 			search_network = ipaddress.IPv4Interface(f'{vlan_network[1]}/{vlan_network[2]}')
 			# print(search_network.network)
@@ -43,8 +54,8 @@ def peagg_cisco(t, answer):
 				# print(f'gw finded {vlan_network[1]}')
 				answer['results'].update({'gw': vlan_network[1]})
 				break
-		if not answer['results'].get('gw'):
-			return error_handler(f'netwok not found on {match_intvlan[1]}', answer)
+	if not answer['results'].get('gw'):
+		return error_handler(f'network not found on {match_intvlan[1]}', answer)
 
 	return answer
 
@@ -69,8 +80,8 @@ def peagg_juniper(t, answer):
 				# print(f'gw finded {vlan_network[1]}')
 				answer['results'].update({'gw': vlan_network[1]})
 				break
-		if not answer['results'].get('gw'):
-			return error_handler(f'netwok not found on {match_intvlan[0]}', answer)
+	if not answer['results'].get('gw'):
+		return error_handler(f'network not found on {match_intvlan[0]}', answer)
 
 			
 	return answer
@@ -177,7 +188,7 @@ def peagg_data(answer):
 
 	model, deviceid = data[0]
 	answer['results'].update({'deviceid': deviceid, 'model': model})
-	if model == 'CISCO7606' or model == 'CISCO7606-S' or model == 'CISCO7609-S' or model == 'ASR1006':
+	if '7606' in model or '7609' in model or '7206' in model or model == 'ASR1006':
 		t.new_sendline('terminal length 0')
 		if answer.get('vrf'):
 			t.new_sendline(f"""show ip vrf | i {answer['vrf']['asid']}:{answer['vrf']['vrfid']}""")
@@ -188,11 +199,17 @@ def peagg_data(answer):
 				answer['vrf'].update({'vrfname': match_vrf[1]})
 			else:
 				return error_handler(f'vrfname not found', answer)
-			t.new_sendline(f"""show ip route vrf {answer['vrf']['vrfname']} {answer['ip']} | i Vla""")
-			answer = peagg_cisco(t, answer)
+			if '7206' in model:
+				t.new_sendline(f"""show ip route vrf {answer['vrf']['vrfname']} {answer['ip']} | i via G""")
+			else:
+				t.new_sendline(f"""show ip route vrf {answer['vrf']['vrfname']} {answer['ip']} | i Vla""")
+			answer = peagg_cisco(t, answer, model)
 		else:
-			t.new_sendline(f"""show ip route {answer['ip']} | i Vla""")
-			answer = peagg_cisco(t, answer)
+			if '7206' in model:
+				t.new_sendline(f"""show ip route {answer['ip']} | i via""")
+			else:
+				t.new_sendline(f"""show ip route {answer['ip']} | i Vla""")
+			answer = peagg_cisco(t, answer, model)
 
 	elif 'MX480' in model or 'QFX' in model or 'EX' in model:
 		t.new_sendline("set cli screen-length 10000", prompt = '> ')
@@ -209,7 +226,6 @@ def peagg_data(answer):
 		else:
 			t.new_sendline(f"show route table inet.0 {answer['ip']} ", prompt = '> $')
 			answer = peagg_juniper(t, answer)
-		# return error_handler(f"Jun MX not support now {answer['results']['routerip']}", answer)
 
 
 	elif model == 'Nokia-7750-SR-7':
