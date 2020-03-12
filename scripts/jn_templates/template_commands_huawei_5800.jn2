@@ -49,6 +49,7 @@ gpon dba bandwidth-assignment-mode max-bandwidth-usage
 xpon ont-interoperability-mode gpon vendor "CIGG" eci multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag
 xpon ont-interoperability-mode gpon vendor "RONT" eric v2 multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag
 xpon ont-interoperability-mode gpon vendor "ERSN" eric v1 multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag         
+xpon ont-interoperability-mode gpon vendor "ERSN" equipment hex "52542D474D2D3120202020202020202020202020" itu-t multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag
 xpon ont-interoperability-mode gpon vendor "ERSN" equipment hex "4154524F4E2D5246543632302D33385820202020" eric v2 multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag                        
 xpon ont-interoperability-mode gpon vendor "ERSN" equipment hex "5053472D35393020202020202020202020202020" eric v2 multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag                        
 xpon ont-interoperability-mode gpon vendor "ERSN" equipment hex "5256363639392020202020202020202020202020" itu-t multicast-auth ont-control ont-wan-config set-by-create vlan-tag-operation-mode modify-single-tag                        
