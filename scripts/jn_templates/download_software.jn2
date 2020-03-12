@@ -45,8 +45,8 @@ firmware select image-alternate
 //after reboot
 firmware confirm
 
-{% elif model == 'LTP' %}copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-8x-revc-3.38.0.1492.fw.bin fs://firmware
-copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-4x-revc-3.38.0.1490.fw.bin fs://firmware
+{% elif model == 'LTP' %}copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-8x-revc-3.38.1.33.fw.bin fs://firmware
+copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-4x-revc-3.38.1.31.fw.bin fs://firmware
 copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-8x-revb-3.38.0.1489.fw.bin fs://firmware
 copy tftp://{{ ftp_server }}/FTP/FTTh/license/license_for_ltp.lic fs://license
 
