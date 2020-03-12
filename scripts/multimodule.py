@@ -169,8 +169,8 @@ class FastModulAut:
 					WHERE h.MODELID LIKE m.MODELID AND {request}"""
 				# print (select_query)
 				self.cursor_mysql.execute(select_query)
-				for (DEVICEID, IPADDMGM, NETWORKNAME, DEVICEMODELNAME, DEVICEDESCR, OFFICE, DATEMODIFY, DEVICESTATUSID, UPLINK, MAC, NODEID) in self.cursor_mysql:
-					alldic[IPADDMGM] = {'id':DEVICEID, 'hostname':NETWORKNAME, 'model':DEVICEMODELNAME, 'ticket':DEVICEDESCR, 'office':OFFICE, 'datemodify':DATEMODIFY, 'status':DEVICESTATUSID, 'uplink':UPLINK, 'mac':MAC, 'nodeid':NODEID}
+				for (DEVICEID, IPADDMGM, NETWORKNAME, DEVICEMODELNAME, DEVICEDESCR, OFFICE, DATEMODIFY, DEVICESTATUSID, MAC) in self.cursor_mysql:
+					alldic[IPADDMGM] = {'id':DEVICEID, 'hostname':NETWORKNAME, 'model':DEVICEMODELNAME, 'ticket':DEVICEDESCR, 'office':OFFICE, 'datemodify':DATEMODIFY, 'status':DEVICESTATUSID, 'mac':MAC}
 			except Error as e:
 				print(e)
 			finally:

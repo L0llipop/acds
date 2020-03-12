@@ -189,7 +189,7 @@ class getTopology(object):
 		if check_aut != 0:
 			check_aut = t.aut(ip = result[1]['ip'], model = result[1]['model'], login = 'tum_support', password = 'hEreR2Mu3E', logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}", proxy = True)
 			if check_aut != 0:
-				result.update({'status': 'error','message_error': f"Can't connect {result[1]['ip']}"})
+				result.update({'status': 'error','message_error': f"Cant connect {result[1]['ip']}"})
 				return result
 
 		if result['ip']:
@@ -241,7 +241,7 @@ class getTopology(object):
 					if re.search(r'ACX2100' ,result[num]['model']):
 						com_show_vlan = f"show bridge domain vlan{result['tunnel_vlan']}"
 
-					check = self.check_findall(t, com_show_vlan, rf"([\w\/-]+)\.\d+\*?", "bbagg_upe_juniper|Can't find description", prompt='@')
+					check = self.check_findall(t, com_show_vlan, rf"([\w\/-]+)\.\d+\*?", "bbagg_upe_juniper|Cant find description", prompt='@')
 					print(f"-----check - {check}")
 					if type(check) == dict:
 						result.update(check)
@@ -257,10 +257,10 @@ class getTopology(object):
 						check = self.check_search(t, com_show_mac, rf"\s+{result['mac']}.+?([\w\/-]+)\.\d+", f"bbagg_upe_juniper {result[num]['ip']}|не найден mac(1)", prompt='@', time=60)
 						result = find_port(check[0], num, next_num, result, t)
 					else:
-						result.update({'status': "error", 'message_error': "bbagg_upe_juniper|Can't find description"})
+						result.update({'status': "error", 'message_error': "bbagg_upe_juniper|Cant find description"})
 
 
-				if not 'tunnel_vlan' in result or result['message_error'] == "bbagg_upe_juniper|Can't find description":
+				if not 'tunnel_vlan' in result or result['message_error'] == "bbagg_upe_juniper|Cant find description":
 					result.update({'status': "wait", 'message_error': "wait"})
 
 					com_show_mac = f"show ethernet-switching table | match {result['mac']}"
@@ -274,7 +274,7 @@ class getTopology(object):
 					result = find_port(check[0], num, next_num, result, t)
 
 					if result['status'] == 'next':
-						result.update({'status': "error", 'message_error': "def bbagg_upe_juniper | Can't find description 2"})
+						result.update({'status': "error", 'message_error': "def bbagg_upe_juniper | Cant find description 2"})
 						return result
 
 			# определяем port Uplink
@@ -291,7 +291,7 @@ class getTopology(object):
 				if len(check) == 1:
 					result[num].update({'port_uplink': check[0]})
 				else:
-					result.update({'status': "error", 'message_error': "def bbagg_upe_juniper | Can't find description 3"})
+					result.update({'status': "error", 'message_error': "def bbagg_upe_juniper | Cant find description 3"})
 
 			return result
 			
@@ -743,8 +743,16 @@ class getTopology(object):
 		if check_aut != 0:
 			check_aut = t.aut(ip = result[num]['ip'], model = result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}", proxy = True)
 			if check_aut != 0:
-				result.update({'status': 'error','message_error': f"Can't connect {result[1]['ip']}"})
-				return result
+				if re.search(r'1212|1248', result[num]['model']):
+					login, password = 'admin', '1234'
+				else:
+					login, password = 'admin', 'admin'
+				check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
+				if check_aut != 0:
+					check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}",proxy = True)
+					if check_aut != 0:
+						result.update({'status': 'error','message_error': f"Cant connect {result[result['count']]['ip']}"})
+						return result
 
 		if re.search(r'MES-3528|MGS-3712|MES3500-24|4728|4012', result[num]['model']) and check_aut != 0:
 			"""Дурацкие зиксиля, иногда авторизация не проходит с первого раза. 
@@ -753,15 +761,9 @@ class getTopology(object):
 			check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login=login, password=password)
 
 
-		if check_aut != 0:
-			if re.search(r'1212|1248', result[num]['model']):
-				login, password = 'admin', '1234'
-			else:
-				login, password = 'admin', 'admin'
-			check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login=login, password=password)
 			
 			if check_aut != 0:
-				result.update({'status': 'error','message_error': f"Can't connect {result[num]['ip']}"})
+				result.update({'status': 'error','message_error': f"Cant connect {result[num]['ip']}"})
 				return result
 
 		if re.search(r'EX4500-40F|EX4550|EX9208|ACX2100|QFX5100', result[num]['model']):
@@ -811,7 +813,6 @@ class getTopology(object):
 		await asyncio.sleep(0.01)
 
 		# result['ip'] = 10.224.1.135
-		print(f"topology start")
 		if result['count'] == 1:
 			result = self.peagg(result, t, dir_name)
 

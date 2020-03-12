@@ -173,7 +173,7 @@ exit
 
 vlan {{pppoe['vlan']}}
 name PPPoE
-tagged port-channel 1
+tagged 10G-front-port 0
 tagged front-port 3
 tagged pon-port 0
 tagged pon-port 1
@@ -184,7 +184,7 @@ exit
 
 vlan {{iptv['vlan']}}
 name IP-TV
-tagged port-channel 1
+tagged 10G-front-port 0
 tagged front-port 3
 tagged pon-port 0
 tagged pon-port 1
@@ -195,7 +195,7 @@ exit
 
 vlan {{ims['vlan']}}
 name IMS
-tagged port-channel 1
+tagged 10G-front-port 0
 tagged front-port 3
 tagged pon-port 0
 tagged pon-port 1
@@ -206,7 +206,7 @@ exit
 
 vlan {{tr069['vlan']}}
 name TR069
-tagged port-channel 1
+tagged 10G-front-port 0
 tagged front-port 3
 tagged pon-port 0
 tagged pon-port 1
