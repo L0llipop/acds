@@ -12,6 +12,7 @@ import json
 import multimodule
 import fias_import
 import subprocess
+import diff_argus_host
 
 from acds import configuration
 # import free_ip
@@ -538,3 +539,11 @@ def topology(request):
 		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
 	return render(request, 'devicelist/topology.html')
+
+def argus_sync(request):
+	if not request.user.is_authenticated:
+		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+	values = diff_argus_host.guspk_sync()
+
+	return render(request, 'devicelist/diff_argus_host.html', values)

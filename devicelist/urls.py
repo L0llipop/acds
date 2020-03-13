@@ -9,6 +9,7 @@ urlpatterns = [
 	path('fias_data_update/', views.fias_data_update, name='fias_data_update'),
 	path('device_update/', views.device_update, name='device_update'),
 	path('device_add/', views.device_add, name='device_add'),
+	path('argus_sync/', views.argus_sync, name='argus_sync'),
 	# path('tests/', tests.devicelist, name='devicelist'),
 	# path('tests/get_devicelist/', tests.get_devicelist, name='get_devicelist'),
 	path('wbs/', wbs.wbsdevicelist, name='wbs'),
