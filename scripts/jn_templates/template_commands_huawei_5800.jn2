@@ -1251,24 +1251,6 @@ vlan packet-policy {{iptv['vlan']}} unicast discard
 vlan packet-policy {{ims['vlan']}} multicast discard
 vlan packet-policy {{tr069['vlan']}} multicast discard
 
-security anti-macduplicate enable
-y
-security anti-macspoofing enable
-y
-security anti-macspoofing vlan {{pppoe['vlan']}} enable
-y
-security anti-macspoofing vlan {{iptv['vlan']}} enable
-y
-security anti-macspoofing vlan {{ims['vlan']}} enable
-y
-
-
-Профиль для влана с опцией 82
-
-dhcp option82 enable
-y
-
-
 
 vlan service-profile profile-id 1 profile-name "dhcp"
   pitp disable
@@ -1347,6 +1329,23 @@ board confirm 0
  raio-anid "{{ hostname }}"
  pitp enable pmode
  
+ 
+security anti-macduplicate enable
+y
+security anti-macspoofing enable
+y
+security anti-macspoofing vlan {{pppoe['vlan']}} enable
+y
+security anti-macspoofing vlan {{iptv['vlan']}} enable
+y
+security anti-macspoofing vlan {{ims['vlan']}} enable
+y
+
+
+Профиль для влана с опцией 82
+
+dhcp option82 enable
+y
  
 ntp-service source-interface vlanif{{ mgmvlan }}
 ntp-service unicast-server {{ default_gateway }}
