@@ -705,7 +705,7 @@ gem add 3 eth tcont 4
 gem add 5 eth tcont 5
 gem mapping 0 0 iphost vlan {{pppoe['vlan']}}
 gem mapping 5 5 iphost vlan {{tr069['vlan']}}
-gem mapping 1 1 eth 2 vlan {{iptv['vlan']}}
+gem mapping 1 1 eth 2
 gem mapping 2 2 ippath 0
 multicast gemport tcont 2 eth 2
 commit
