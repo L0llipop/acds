@@ -23,14 +23,14 @@
 		<tr class="table-success" id="str_{{ key }}" value="warning">
 			<td class="text-center align-middle" style="width: 18%"  id="hostname_{{ key }}">{{ key }}</td>
 			<td class="text-center align-middle" style="width: 41%"  id="hostname_{{ key }}">{{ value.host.hostname }} <br> {{ value.host.model }}</td>
-			<td class="text-center align-middle" style="width: 41%"   id="ip_{{ key }}"><{{ value.argus }}</td>
+			<td class="text-center align-middle" style="width: 41%"   id="ip_{{ key }}">{{ value.argus }}</td>
 		</tr>
 	{% endfor %}
 	{% for key, value in delete.items %}
 		<tr class="table-danger" id="str_{{ key }}" value="warning">
 			<td class="text-center align-middle" style="width: 18%"  id="hostname_{{ key }}">{{ key }}</td>
 			<td class="text-center align-middle" style="width: 41%"  id="hostname_{{ key }}">{{ value.host }}</td>
-			<td class="text-center align-middle" style="width: 41%"   id="ip_{{ key }}"><{{ value.argus.hostname }} <br> {{ value.argus.model }}</td>
+			<td class="text-center align-middle" style="width: 41%"   id="ip_{{ key }}">{{ value.argus.hostname }} <br> {{ value.argus.model }}</td>
 		</tr>
 	{% endfor %}
 	
