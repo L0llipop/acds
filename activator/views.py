@@ -684,7 +684,7 @@ def get_acds_argus_status(request):
 	elif status == 'del':
 		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_argus_status', '{ip}', '{user}', 'device deleted {acds_id} ip {ip}')""")
 		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', '{status}', '{user}', 'Устройство выведено из эксплуатации')""")
-		t.sql_update(f"""DELETE FROM guspk.host WHERE IPADDMGM like '{ip}'""")
+		t.sql_update(f"""DELETE FROM guspk.host WHERE IPADDMGM = '{ip}'""")
 		# mail_admins(f"""Заявка {acds_id} [DEL]""", f"""Выведено успешно""")
 		send_mail(f"""Удалить из ИНИТИ""", f"""Устройство выведено из эксплуатации, прошу удалить из ИНИТИ. ip - {ip}.""", 'acds@ural.rt.ru', [f'monitoring@ural.rt.ru'])
 		time.sleep(4)

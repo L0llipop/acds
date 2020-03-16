@@ -1,0 +1,46 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+<table class="table table-bordered table-sm" id="tickets_table" cellpadding="0" cellspacing="0">
+	<thead>
+		<tr>
+			<th class="text-center" scope="col">ip</th>
+			<th class="text-center" scope="col">host</th>
+			<th class="text-center" scope="col">argus</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for key, value in update.items %}
+		<tr class="table-warning" id="str_{{ key }}" value="warning">
+			<td class="text-center align-middle" style="width: 18%"  id="hostname_{{ key }}">{{ key }}</td>
+			<td class="text-center align-middle" style="width: 41%"  id="hostname_{{ key }}">{{ value.host.hostname }} <br> {{ value.host.model }}</td>
+			<td class="text-center align-middle" style="width: 41%"   id="ip_{{ key }}">{{ value.argus.hostname }} <br> {{ value.argus.model }}</td>
+		</tr>
+	{% endfor %}
+	{% for key, value in insert.items %}
+		<tr class="table-success" id="str_{{ key }}" value="warning">
+			<td class="text-center align-middle" style="width: 18%"  id="hostname_{{ key }}">{{ key }}</td>
+			<td class="text-center align-middle" style="width: 41%"  id="hostname_{{ key }}">{{ value.host.hostname }} <br> {{ value.host.model }}</td>
+			<td class="text-center align-middle" style="width: 41%"   id="ip_{{ key }}">{{ value.argus }}</td>
+		</tr>
+	{% endfor %}
+	{% for key, value in delete.items %}
+		<tr class="table-danger" id="str_{{ key }}" value="warning">
+			<td class="text-center align-middle" style="width: 18%"  id="hostname_{{ key }}">{{ key }}</td>
+			<td class="text-center align-middle" style="width: 41%"  id="hostname_{{ key }}">{{ value.host }}</td>
+			<td class="text-center align-middle" style="width: 41%"   id="ip_{{ key }}">{{ value.argus.hostname }} <br> {{ value.argus.model }}</td>
+		</tr>
+	{% endfor %}
+	
+	</tbody>
+</table>
+
+
+</div>
+
+{% comment %} <script src="{% static 'devicelist/js/admin.js' %}"></script> {% endcomment %}
+{% comment %} <script type="text/javascript" language="javascript" src="{% static 'js/tablefilter/tablefilter.js' %}"></script>   {% endcomment %}
+{% endblock %}
+
