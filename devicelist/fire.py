@@ -104,9 +104,9 @@ def set_fire_data(request):
       firestatus = firedic[all_data['firestatus']]
       fireclass = all_data['fireclass'].split(',')
       if weight =="":
-        insertquery = "INSERT INTO FireSupressor.FireSupressor (serial, inventory, type,  room, comandor, status) VALUES ('"+serial+"', '"+inventory+"', '"+firetype+"', '"+address+" "+room+"', '"+comandor+"', '"+firestatus+"')"
+        insertquery = "INSERT INTO FireSupressor.FireSupressor (serial, inventory, type,  room, comandor, status) VALUES ('"+serial+"', '"+inventory+"', '"+firetype+"', '"+room+"', '"+comandor+"', '"+firestatus+"')"
       else:
-        insertquery = "INSERT INTO FireSupressor.FireSupressor (serial, inventory, type, fullweight, room, comandor, status) VALUES ('"+serial+"', '"+inventory+"', '"+firetype+"', '"+weight+"', '"+address+" "+room+"', '"+comandor+"', '"+firestatus+"')"
+        insertquery = "INSERT INTO FireSupressor.FireSupressor (serial, inventory, type, fullweight, room, comandor, status) VALUES ('"+serial+"', '"+inventory+"', '"+firetype+"', '"+weight+"', '"+room+"', '"+comandor+"', '"+firestatus+"')"
       lastid_ee=db_insert(insertquery)
       fias_rez=fire_fias.fire_fias_insert(lastid_ee,address)
 
