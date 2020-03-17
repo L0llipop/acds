@@ -152,7 +152,7 @@ def firejornal(request):
     return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
   try:
-    wb1 = load_workbook('static/firejornal.xlsx')
+    wb1 = load_workbook('static/devicelist/firejornal.xlsx')
   except Exception as e:
     return JsonResponse({'error': str(e)}, safe=False)
 
