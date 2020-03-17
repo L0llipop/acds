@@ -157,7 +157,7 @@ def fire_fias_insert(fireid,fire_address):
 	
 	
 
-		db_insert(f"""INSERT into FireSupressor.FireFias (id, {db_columns}) VALUES ('{fireid}', '{db_values}')""")
+		db_insert(f"""INSERT into FireSupressor.FireFias (fireid, {db_columns}) VALUES ('{fireid}', '{db_values}')""")
 	
 
 		return 'ok'
