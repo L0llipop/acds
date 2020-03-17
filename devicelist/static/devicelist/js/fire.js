@@ -27,6 +27,7 @@ $(document).on('click','.edit_fire', function () {//показывает мод�
   
   
   document.forms["editfireform"].elements["fireid"].value = deviceid;
+  document.forms["editfireform"].elements["addres_modal"].value = all_data['address'];
   document.forms["editfireform"].elements["room_modal"].value = all_data['room'];
   document.forms["editfireform"].elements["comandor_modal"].value = all_data['comandor'];
   document.forms["editfireform"].elements["serial_modal"].value = all_data['serial'];
