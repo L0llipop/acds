@@ -1,5 +1,6 @@
 import json
 import requests
+import mysql.connector
 try:
 	from acds import configuration
 except:

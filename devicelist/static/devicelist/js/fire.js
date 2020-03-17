@@ -1,4 +1,4 @@
-$(document).on('click','.edit_fire', function () {
+$(document).on('click','.edit_fire', function () {//показывает модальное окно с заполнеными данными
   event.preventDefault();
   let deviceid = this.id;
   let all_data = JSON.parse(document.getElementById("fireid"+deviceid).value);
@@ -37,7 +37,7 @@ $(document).on('click','.edit_fire', function () {
   modal_edit.style.display = "block";
 });
 
-function editfire(){
+function editfire(){ // нужно дописать
   event.preventDefault();
  all_data = {
    'action': "editfire",
