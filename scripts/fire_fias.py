@@ -125,27 +125,27 @@ def fire_fias_insert(fireid,fire_address):
 		db_values = '\', \''.join([sum_data[fireid][values] for values in keys])
 		
 	
-		db_region = db_model_search(f"""SELECT region_fias_id from FireSupressor.fias_region WHERE region_fias_id like '{region_fias_id}'""")
+		db_region = db_model_search(f"""SELECT region_fias_id from FireSupressor.Firefias_region WHERE region_fias_id like '{region_fias_id}'""")
 		if not db_region and region_fias_id:
-			db_insert(f"""INSERT into FireSupressor.fias_region (region_fias_id, region_with_type, region_type_full, region) VALUES ('{region_fias_id}', '{region_with_type}', '{region_type_full}', '{region}')""")
+			db_insert(f"""INSERT into FireSupressor.Firefias_region (region_fias_id, region_with_type, region_type_full, region) VALUES ('{region_fias_id}', '{region_with_type}', '{region_type_full}', '{region}')""")
 
-		db_area = db_model_search(f"""SELECT area_fias_id from FireSupressor.fias_area WHERE area_fias_id like '{area_fias_id}'""")
+		db_area = db_model_search(f"""SELECT area_fias_id from FireSupressor.Firefias_area WHERE area_fias_id like '{area_fias_id}'""")
 		if not db_area and area_fias_id:
-			db_insert(f"""INSERT into FireSupressor.fias_area (area_fias_id, area_with_type, area_type_full, area) VALUES ('{area_fias_id}', '{area_with_type}', '{area_type_full}', '{area}')""")
+			db_insert(f"""INSERT into FireSupressor.Firefias_area (area_fias_id, area_with_type, area_type_full, area) VALUES ('{area_fias_id}', '{area_with_type}', '{area_type_full}', '{area}')""")
 	
-		db_city = db_model_search(f"""SELECT city_fias_id from FireSupressor.fias_city WHERE city_fias_id like '{city_fias_id}'""")
+		db_city = db_model_search(f"""SELECT city_fias_id from FireSupressor.Firefias_city WHERE city_fias_id like '{city_fias_id}'""")
 		if not db_city and city_fias_id:
-			db_insert(f"""INSERT into FireSupressor.fias_city (city_fias_id, city_with_type, city_type_full, city) VALUES ('{city_fias_id}', '{city_with_type}', '{city_type_full}', '{city}')""")
+			db_insert(f"""INSERT into FireSupressor.Firefias_city (city_fias_id, city_with_type, city_type_full, city) VALUES ('{city_fias_id}', '{city_with_type}', '{city_type_full}', '{city}')""")
 	
-		db_settlement = db_model_search(f"""SELECT settlement_fias_id from FireSupressor.fias_settlement WHERE settlement_fias_id like '{settlement_fias_id}'""")
+		db_settlement = db_model_search(f"""SELECT settlement_fias_id from FireSupressor.Firefias_settlement WHERE settlement_fias_id like '{settlement_fias_id}'""")
 		if not db_settlement and settlement_fias_id:
-			db_insert(f"""INSERT into FireSupressor.fias_settlement (settlement_fias_id, settlement_with_type, settlement_type_full, settlement) VALUES ('{settlement_fias_id}', '{settlement_with_type}', '{settlement_type_full}', '{settlement}')""")
+			db_insert(f"""INSERT into FireSupressor.Firefias_settlement (settlement_fias_id, settlement_with_type, settlement_type_full, settlement) VALUES ('{settlement_fias_id}', '{settlement_with_type}', '{settlement_type_full}', '{settlement}')""")
 	
-		db_street = db_model_search(f"""SELECT street_fias_id from FireSupressor.fias_street WHERE street_fias_id like '{street_fias_id}'""")
+		db_street = db_model_search(f"""SELECT street_fias_id from FireSupressor.Firefias_street WHERE street_fias_id like '{street_fias_id}'""")
 		if not db_street and street_fias_id:
-			db_insert(f"""INSERT into FireSupressor.fias_street (street_fias_id, street_with_type, street_type_full, street) VALUES ('{street_fias_id}', '{street_with_type}', '{street_type_full}', '{street}')""")
+			db_insert(f"""INSERT into FireSupressor.Firefias_street (street_fias_id, street_with_type, street_type_full, street) VALUES ('{street_fias_id}', '{street_with_type}', '{street_type_full}', '{street}')""")
 	
-		db_house = db_model_search(f"""SELECT house_fias_id from FireSupressor.fias_house WHERE house_fias_id like '{house_fias_id}'""")
+		db_house = db_model_search(f"""SELECT house_fias_id from FireSupressor.Firefias_house WHERE house_fias_id like '{house_fias_id}'""")
 		if not db_house and house_fias_id:
 			columns_house = ['house_fias_id', 'house_type_full', 'house', 'block_type_full', 'block']
 			keys_house = [values for values in columns_house if sum_data[fireid][values]]
@@ -153,7 +153,7 @@ def fire_fias_insert(fireid,fire_address):
 			db_columns_house = ', '.join(keys_house)
 			db_values_house = '\', \''.join([sum_data[fireid][values] for values in keys_house])
 	
-			db_insert(f"""INSERT into FireSupressor.fias_house ({db_columns_house}) VALUES ('{db_values_house}')""")
+			db_insert(f"""INSERT into FireSupressor.Firefias_house ({db_columns_house}) VALUES ('{db_values_house}')""")
 	
 	
 
