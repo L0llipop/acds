@@ -154,7 +154,7 @@ def firejornal(request):
   try:
     wb1 = load_workbook('static/firejornal.xlsx')
   except Exception as e:
-    return JsonResponse({'error': e}, safe=False)
+    return JsonResponse({'error': str(e)}, safe=False)
 
   buffer = io.BytesIO()
 
