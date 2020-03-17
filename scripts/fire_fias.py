@@ -86,8 +86,6 @@ def fire_fias_insert(fireid,fire_address):
 		house = fias_data['house']
 		block_type_full = fias_data['block_type_full']
 		block = fias_data['block']
-		geo_lat = fias_data['geo_lat']
-		geo_lon = fias_data['geo_lon']
 		fias_id = fias_data['fias_id']
 		sum_data = {}
 		sum_data[fireid] = {
@@ -116,12 +114,10 @@ def fire_fias_insert(fireid,fire_address):
 			'house': house, 
 			'block_type_full': block_type_full, 
 			'block':block, 
-			'geo_lat': geo_lat, 
-			'geo_lon': geo_lon,
 			'fias_id': fias_id,
 		}
 		
-		columns = ['region_fias_id', 'area_fias_id', 'city_fias_id', 'settlement_fias_id', 'street_fias_id', 'house_fias_id', 'geo_lat', 'geo_lon', 'fias_id']
+		columns = ['region_fias_id', 'area_fias_id', 'city_fias_id', 'settlement_fias_id', 'street_fias_id', 'house_fias_id', 'fias_id']
 		keys = [values for values in columns if sum_data[fireid][values]]
 		
 		db_columns = ', '.join(keys)
