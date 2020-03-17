@@ -70,6 +70,9 @@ def start(acds_id, ip, model):
 	elif re.search(r'КУБ-Микро', model):
 		t.ws_send_message(f"conf_routing: CNTR - no script to configure")
 		answer = 'ok'				
+	elif re.search(r'SNR', model):
+		t.ws_send_message(f"conf_routing: CNTR - no script to configure")
+		answer = 'ok'				
 	else:
 		t.ws_send_message(f"conf_routing: Error: dont know this model {model}")
 		answer = f"Error: dont know this model {model}"

@@ -64,6 +64,32 @@ set interfaces {{ downlink }} unit 0 family ethernet-switching filter output OUT
 show | compare
 
 commit
+{% elif 'QFX' in model %}configure private
+
+set interfaces {{ downlink }} apply-groups ACCFLTR
+set interfaces {{ downlink }} apply-groups IF-NODE
+set interfaces {{ downlink }} description "${{ hostname_port }}$"
+set interfaces {{ downlink }} flexible-vlan-tagging
+set interfaces {{ downlink }} mtu 9216
+set interfaces {{ downlink }} encapsulation extended-vlan-bridge
+set interfaces {{ downlink }} unit {{ mgmvlan }} vlan-id {{ mgmvlan }}
+set vlans vlan_{{ mgmvlan }} interface {{ downlink }}.{{ mgmvlan }}
+set interfaces {{ downlink }} unit {{ pppoe['vlan'] }} vlan-id {{ pppoe['vlan'] }}
+set vlans vlan_{{ pppoe['vlan'] }} interface {{ downlink }}.{{ pppoe['vlan'] }}
+set interfaces {{ downlink }} unit {{ iptv['vlan'] }} vlan-id {{ iptv['vlan'] }}
+set vlans vlan_{{ iptv['vlan'] }} interface {{ downlink }}.{{ iptv['vlan'] }}
+set interfaces {{ downlink }} unit {{ ims['vlan'] }} vlan-id {{ ims['vlan'] }}
+set vlans vlan_{{ ims['vlan'] }} interface {{ downlink }}.{{ ims['vlan'] }}
+set interfaces {{ downlink }} unit {{ tr069['vlan'] }} vlan-id {{ tr069['vlan'] }}
+set vlans vlan_{{ tr069['vlan'] }} interface {{ downlink }}.{{ tr069['vlan'] }}
+set class-of-service interfaces {{ downlink }} forwarding-class-set QoS_UC output-traffic-control-profile QoS_UC
+set class-of-service interfaces {{ downlink }} forwarding-class-set QoS_MC output-traffic-control-profile QoS_MC
+set class-of-service interfaces {{ downlink }} unit * classifiers dscp DSCPQoS
+set class-of-service interfaces {{ downlink }} unit * classifiers ieee-802.1 iee802.1p-classifier
+
+show | compare
+
+commit
 {% elif '3124' in model or '3324' in model or '2124' in model or '2324' in model %}configure terminal
 
 interface {{ downlink }}

@@ -10,9 +10,9 @@ def error_handler(text, answer):
 def get_argus_data(multi):
 	answer = dict.fromkeys(['argus'], {})
 	multi.sql_connect('connect')
-	summ = multi.sql_select("""SELECT ip, hostname, model FROM guspk.host_argus""", "full")
+	summ = multi.sql_select("""SELECT ip, title, hostname, model FROM guspk.host_argus""", "full")
 	for n in summ:
-		answer['argus'].update({n[0]: {'hostname': n[1], 'model': n[2]}})
+		answer['argus'].update({n[0]: {'title': n[1], 'hostname': n[2], 'model': n[3]}})
 	multi.sql_connect('disconnect')
 
 	return answer
@@ -25,7 +25,7 @@ def get_host_data(multi):
 							LEFT JOIN  guspk.host_model hm on hm.MODELID = h.MODELID
 							WHERE h.DEVICESTATUSID = 3 or h.DEVICESTATUSID = 2""", "full")
 	for n in summ:
-		answer['host'].update({n[0]: {'hostname': n[1], 'model': n[2]}})
+		answer['host'].update({n[0]: {'title': n[1], 'model': n[2]}})
 	multi.sql_connect('disconnect')
 	
 	return answer

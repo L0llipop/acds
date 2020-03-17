@@ -189,6 +189,7 @@ $('.argus').on('click', function(){
 	let id = $(this).prop("value");
 	// console.log(`delete ${id} ${ip}`);
 	// alert(id);
+	$(`#argus_${id}`).html(`<span id="submit-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
 	$.ajax("get_acds_argus_status/", {
 		method: "GET",
 		data: {id: id}, 

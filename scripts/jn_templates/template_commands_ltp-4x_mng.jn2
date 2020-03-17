@@ -11,7 +11,7 @@ vlan {{ mgmvlan }}
   name MNG
   tagged front-port 3
   tagged 10G-front-port 0
-  untagged mgmt-pon-port 0 , mgmt-pon-port 1
+  untagged mgmt-pon-port 0
   no ip igmp snooping enable
 exit
 commit
