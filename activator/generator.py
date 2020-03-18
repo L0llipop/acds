@@ -29,7 +29,7 @@ def start_page(request):
 		'Dlink_DES-3200-10', 'Dlink_DES-3200-18', 'Dlink_DES-3200-28', 'Dlink_DES-3200-52', 
 		'EdgeCore_ES3528',
 		'Raisecom_ISCOM2608','Raisecom_ISCOM2624',
-		'SNR-S2960','SNR-S298x',
+		'SNR-S2960','S2985G-24T', 'S2985G-8T',
 		'Huawei_5800'
 	]
 
@@ -213,7 +213,7 @@ def get_template(request):
 			path_file = f"{main_path_template}/template_commands_snr_s2960.jn2"
 			path_file_mng = f"{main_path_template}/template_commands_snr_s2960_mng.jn2"
 
-		elif re.search(r'S2985G-24T', model):
+		elif re.search(r'S2985G-24T|S2985G-8T', model):
 			port_downlink = '1/1-26'
 			port_uplink = '1/28'
 			if re.search(r'S2985G-8T', model):
