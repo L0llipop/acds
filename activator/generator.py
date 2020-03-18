@@ -29,7 +29,7 @@ def start_page(request):
 		'Dlink_DES-3200-10', 'Dlink_DES-3200-18', 'Dlink_DES-3200-28', 'Dlink_DES-3200-52', 
 		'EdgeCore_ES3528',
 		'Raisecom_ISCOM2608','Raisecom_ISCOM2624',
-		'SNR-S2960',
+		'SNR-S2960','SNR-S298x',
 		'Huawei_5800'
 	]
 
@@ -199,19 +199,32 @@ def get_template(request):
 			path_file_mng = f"{main_path_template}/template_commands_iscom_26xx_mng.jn2"
 
 		elif re.search(r'SNR-S2960', model):
-			port_downlink = '1/1-24'
+			port_downlink = '1/1-26'
 			port_uplink = '1/28'
 			# if re.search(r'SNR-S2960-24', model):
 			# 	port_downlink = '1/1-24'
 			# 	port_uplink = '1/28'
 			if re.search(r'SNR-S2960-8T', model):
-				port_downlink = '1/1-7'
-				port_uplink = '1/88'
+				port_downlink = '1/1-8'
+				port_uplink = '1/10'
 
 			values['mask'] = netmask
 
 			path_file = f"{main_path_template}/template_commands_snr_s2960.jn2"
 			path_file_mng = f"{main_path_template}/template_commands_snr_s2960_mng.jn2"
+
+		elif re.search(r'S2985G-24T', model):
+			port_downlink = '1/1-26'
+			port_uplink = '1/28'
+			if re.search(r'S2985G-8T', model):
+				port_downlink = '1/1-8'
+				port_uplink = '1/10'
+
+			values['mask'] = netmask
+
+			path_file = f"{main_path_template}/template_commands_snr_s298x.jn2"
+			path_file_mng = f"{main_path_template}/template_commands_snr_s298x_mng.jn2"
+
 
 		elif re.search(r'C300', model):
 			# port_downlink = '1/1-24'
