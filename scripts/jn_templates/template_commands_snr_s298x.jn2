@@ -1,0 +1,152 @@
+enable
+configure
+no service password-encryption
+hostname {{ hostname }}
+
+username wizard privilege 15 password 0 nlFgw3Uh
+username admin privilege 15 password 7 8f3bf42bb1e250bdde22955ef3832996
+username inity2016 privilege 2 password 7 78d23bcf430170696f0a6e784a2834b0
+username support privilege 15 password 7 8937b32358dee9ec25bee7a48c037fab
+username rcuss privilege 15 password 7 a5b8d9b682122f5f4cab8c1dcef277e3
+username psic privilege 15 password 7 eab917f7aefc68afec9decb43bba42da
+
+authentication line console login local
+authentication line vty login local tacacs
+authorization line console exec local
+authorization line vty exec local tacacs
+authorization line vty command 7 tacacs none
+authorization line vty command 15 tacacs none
+accounting line vty exec start-stop tacacs
+accounting line vty command 7 start-stop tacacs
+accounting line vty command 15 start-stop tacacs
+
+clock timezone UTC5 add 5 0
+
+logging executed-commands enable
+logging flash level informational
+
+tacacs-server authentication host 10.178.199.4 key 7 qcsfdpZJKpQ= primary
+tacacs-server authentication host 10.184.121.4 key 7 qcsfdpZJKpQ=
+
+snmp-server enable
+snmp-server securityip disable
+snmp-server host 10.184.88.169 v2c inity2016
+snmp-server host 10.184.88.173 v2c inity2016
+snmp-server community ro 7 wFbcsoAfrRQ=
+snmp-server community ro 7 NgJKYcw5I+F1eg1OzUyXug== access 18
+snmp-server community ro 7 n1xv8AOpo+s= access 11
+
+ip dhcp relay information option
+
+
+ip dhcp snooping enable
+ip dhcp snooping vlan 65
+ip dhcp snooping binding enable
+
+ip dhcp snooping information enable
+ip dhcp snooping information option allow-untrusted
+
+lldp enable
+!
+no ip http server
+no ip http secure-server
+!
+mtu 10222
+
+vlan 1;{{ mgmvlan }};{{ pppoe['vlan'] }};{{ iptv['vlan'] }};{{ ims['vlan'] }};{{ tr069['vlan'] }}
+
+vlan {{ mgmvlan }}
+name MNG
+
+vlan {{ pppoe['vlan'] }}
+name PPPoE
+
+vlan {{ iptv['vlan'] }}
+name IP-TV
+
+vlan {{ ims['vlan'] }}
+name IMS
+
+vlan {{ tr069['vlan'] }}
+name TR069
+
+access-list 11 permit 10.0.0.0 0.0.0.255
+
+mac-access-list extended pppoeONLY
+  permit any-source-mac any-destination-mac vlanId {{ pppoe['vlan'] }} ethertype 34916
+  permit any-source-mac any-destination-mac vlanId {{ pppoe['vlan'] }} ethertype 34915
+  deny any-source-mac any-destination-mac
+  exit
+
+pppoe intermediate-agent
+pppoe intermediate-agent delimiter :
+pppoe intermediate-agent type self-defined circuit-id id switch-id hostname port vlan
+
+mls qos map cos-intp  0 1 1 3 2 3 3 3
+mls qos map dscp-intp  34 to 1
+mls qos map dscp-intp  32 33 35 36 37 38 39 to 2
+mls qos map dscp-intp  40 41 42 43 44 45 46 47 to 3
+mls qos map dscp-intp  48 49 50 51 52 53 54 55 to 3
+mls qos map dscp-intp  56 57 58 59 60 61 62 63 to 3
+
+Interface Ethernet{{ port_downlink }}
+shutdown
+ storm-control broadcast 1504
+ storm-control multicast 5008
+ shutdown
+ mls qos queue wrr weight 35 25 25 15 0 0 0 0 
+ lldp disable
+ switchport mode hybrid
+ switchport hybrid allowed vlan {{ ims['vlan'] }};{{ iptv['vlan'] }} tag
+ switchport hybrid allowed vlan {{tr069['vlan']}};{{ pppoe['vlan'] }}  untag
+ pppoe intermediate-agent
+ loopback-detection specified-vlan {{ pppoe['vlan'] }} 
+ loopback-detection control block
+ ip dhcp snooping information option subscriber-id "59-XXXX-ACCXXXX-ACSW-XX eth 1/0/1:{{ ims['vlan'] }}"
+
+
+
+Interface Ethernet{{ port_uplink }}
+description "#UPLINK#${{ uplink_and_port }}$"
+description "#UPLINK# $Host-DL_If_Name$"
+transceiver-monitoring enable
+mls qos trust dscp
+mls qos queue wrr weight 35 25 25 15 0 0 0 0 
+lldp transmit optional tlv portDesc sysName sysDesc sysCap
+lldp management-address tlv
+switchport mode trunk
+switchport trunk allowed vlan {{ ims['vlan'] }};{{tr069['vlan']}};{{ pppoe['vlan'] }};{{ iptv['vlan'] }}
+mac-notification moved log
+pppoe intermediate-agent trust
+pppoe intermediate-agent vendor-tag strip
+ip dhcp snooping trust
+
+
+
+interface Vlan{{ iptv['vlan'] }}
+!
+ip igmp snooping
+ip igmp snooping vlan {{ iptv['vlan'] }}
+no ip igmp snooping vlan {{ iptv['vlan'] }} mrouter-port learnpim
+ip igmp snooping vlan {{ iptv['vlan'] }} immediately-leave
+ip igmp snooping vlan {{ iptv['vlan'] }}mrouter-port interface {{ port_uplink }}
+
+ntp enable
+ntp server {{ default_gateway }}
+
+no login
+
+protocol-vlan mode ethernetII etype 34916 vlan {{ pppoe['vlan'] }} priority 0
+protocol-vlan mode ethernetII etype 34915 vlan {{ pppoe['vlan'] }} priority 0
+protocol-vlan mode ethernetII etype 2054 vlan {{tr069['vlan']}} priority 0
+
+isolate-port group 1 switchport interface Ethernet1/0/9
+isolate-port group 1 switchport interface Ethernet1/0/8
+isolate-port group 1 switchport interface Ethernet1/0/7
+isolate-port group 1 switchport interface Ethernet1/0/6
+isolate-port group 1 switchport interface Ethernet1/0/5
+isolate-port group 1 switchport interface Ethernet1/0/4
+isolate-port group 1 switchport interface Ethernet1/0/3
+isolate-port group 1 switchport interface Ethernet1/0/2
+isolate-port group 1 switchport interface Ethernet1/0/1
+captive-portal

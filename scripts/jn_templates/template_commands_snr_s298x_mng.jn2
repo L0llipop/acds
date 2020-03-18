@@ -1,0 +1,33 @@
+enable
+configure
+
+vlan {{ mgmvlan }}
+name MNG
+
+interface Vlan{{ mgmvlan }}
+ip address {{ ipaddmgm }} {{ mask }}
+exit
+
+ip default-gateway {{ default_gateway }}
+
+Interface Ethernet{{ port_uplink }}
+switchport mode trunk
+exit
+
+copy running-config startup-config
+Y
+
+-----------------------------------
+# Убедитесь что команда на сохранение конфигурации прошла успешно
+-------Для проверки доступности управления  использовать ping---
+
+ping {{gw}}
+
+Успешный ответ выглядит так 
+Pinging {{gw}} with 18 bytes of data:
+18 bytes from {{gw}}: icmp_seq=1. time=5 ms
+18 bytes from {{gw}}: icmp_seq=2. time=34 ms
+18 bytes from {{gw}}: icmp_seq=3. time=9 ms
+----{{gw}} PING Statistics----
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip (ms) min/avg/max = 4/13/34
