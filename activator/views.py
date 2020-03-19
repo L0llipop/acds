@@ -505,7 +505,7 @@ def device_configure(request):
 			time.sleep(2)
 			send_mail(f"""Удалить из ИНИТИ""", f"""Устройство выведено из эксплуатации, прошу удалить из ИНИТИ. ip - {ip}.""", 'acds@ural.rt.ru', [f'monitoring@ural.rt.ru'])
 		elif status == 'other': 
-			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', '{status}', '{user}', 'Работы в ЗО ГУСД завершены, передана в Аргус.')""")
+			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', '{status}', '{user}', 'Работы в ЗО ГУСД завершены, передана в Аргус.')""")
 			t.sql_update(f"""UPDATE guspk.acds SET argus = '4' WHERE id like '{acds_id}'""")
 			values.update({'status': 'finished'})
 			send_mail(f"""Заявка № {acds_id}""", f"""Поступила новая заявка № {acds_id}.""", 'acds@ural.rt.ru', ['zaripova-ak@ural.rt.ru'])
@@ -585,7 +585,11 @@ def get_acsw_node_id_update(request):
 	comment = ''.join(list(request.GET.get('comment', str(False))))
 	acswnodeid = {}
 
-	old_acsw_node_id = t.sql_select(f"""SELECT acsw_node_id from guspk.acds WHERE id = {acds_id}""", 'full')
+	old_acsw_node_id = t.sql_select(f"""SELECT a.acsw_node_id, h.IPADDMGM 
+										FROM guspk.acds a
+										LEFT JOIN guspk.host_acsw_node an on an.ACSD_NODE_ID = a.acsw_node_id 
+										LEFT JOIN guspk.host h on h.DEVICEID = an.DEVICEID  
+										WHERE id = {acds_id}""", 'full')
 
 	if comment != "False":
 		db_comment = t.sql_select(f"SELECT ticket from guspk.acds WHERE id = {acds_id}", 'full')
@@ -598,7 +602,7 @@ def get_acsw_node_id_update(request):
 	if acsw_node_id != "False" and old_acsw_node_id[0][0] != int(acsw_node_id):
 		t.sql_update(f"""UPDATE guspk.acds SET acsw_node_id = {acsw_node_id} WHERE id = {acds_id}""")
 		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acsw_node_id_update', '{acds_id}', '{user}', 'update acsw_node_id {old_acsw_node_id[0][0]} to {acsw_node_id}')""")
-		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'init', '{user}', 'Выполнена замена шаблонов - {old_acsw_node_id[0][0]} to {acsw_node_id}')""")
+		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{old_acsw_node_id[0][1]}', 'init', '{user}', 'Выполнена замена шаблонов - {old_acsw_node_id[0][0]} to {acsw_node_id}')""")
 		acswnodeid.update({'status': 'updated', 'message': f'template changed {old_acsw_node_id[0][0]} to {acsw_node_id}'})
 
 	t.sql_connect('disconnect')
