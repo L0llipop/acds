@@ -60,6 +60,8 @@ def get_devicelist(request):
 
 	if request.method == 'GET':
 		limit = request.GET['limit']
+		if not limit:
+			limit = 1000
 		for col in data:
 			if col == 'date' or col == 'serial':
 				continue
@@ -391,7 +393,7 @@ def device_update(request):
 					t.sql_update(f"""UPDATE guspk.host SET DEVICEDESCR = "{all_data['description']}" WHERE DEVICEID = '{all_data['id']}'""")
 
 				if key == 'info':
-					t.sql_update(f"""UPDATE guspk.host SET OFFICE = "{all_data['office']}" WHERE DEVICEID = '{all_data['id']}'""")
+					t.sql_update(f"""UPDATE guspk.host SET OFFICE = "{all_data['info']}" WHERE DEVICEID = '{all_data['id']}'""")
 
 				if key == 'serial':
 					t.sql_update(f"""UPDATE guspk.host SET SERIALNUMBER = "{all_data['serial']}" WHERE DEVICEID = '{all_data['id']}'""")
