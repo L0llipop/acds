@@ -30,8 +30,7 @@ tacacs-server authentication host 10.184.121.4 key 7 qcsfdpZJKpQ=
 
 snmp-server enable
 snmp-server securityip disable
-snmp-server host 10.184.88.169 v2c inity2016
-snmp-server host 10.184.88.173 v2c inity2016
+snmp-server host 10.184.88.174 v2c inity2016
 snmp-server community ro 7 wFbcsoAfrRQ=
 snmp-server community ro 7 NgJKYcw5I+F1eg1OzUyXug== access 18
 snmp-server community ro 7 n1xv8AOpo+s= access 11
@@ -78,6 +77,8 @@ mac-access-list extended pppoeONLY
   deny any-source-mac any-destination-mac
   exit
 
+vacl mac access-group pppoeONLY in vlan {{pppoe['vlan']}}
+
 pppoe intermediate-agent
 pppoe intermediate-agent delimiter :
 pppoe intermediate-agent type self-defined circuit-id id switch-id hostname port vlan
@@ -108,8 +109,7 @@ shutdown
 
 
 Interface Ethernet{{ port_uplink }}
-description "#UPLINK#${{ uplink_and_port }}$"
-description "#UPLINK# $Host-DL_If_Name$"
+description "#UPLINK# ${{ uplink_and_port }}$"
 transceiver-monitoring enable
 mls qos trust dscp
 mls qos queue wrr weight 35 25 25 15 0 0 0 0 
@@ -140,6 +140,7 @@ no login
 protocol-vlan mode ethernetII etype 34916 vlan {{ pppoe['vlan'] }} priority 0
 protocol-vlan mode ethernetII etype 34915 vlan {{ pppoe['vlan'] }} priority 0
 protocol-vlan mode ethernetII etype 2054 vlan {{tr069['vlan']}} priority 0
+protocol-vlan mode ethernetII etype 2048 vlan {{tr069['vlan']}} priority 0
 
 isolate-port group 1 switchport interface Ethernet1/0/9
 isolate-port group 1 switchport interface Ethernet1/0/8
