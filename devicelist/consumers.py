@@ -177,6 +177,9 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 		if result['status'] != 'error':
 			while True and data:
 				count = result['count']
+				if count > 12:
+					result.update({'status': 'error', 'message_error': 'loop detected'})
+					return result
 				# if result['status'] == 'error':
 				# 	await self.send(text_data=json.dumps({
 				# 		'message': json.dumps(result)

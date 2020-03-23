@@ -737,6 +737,8 @@ class getTopology(object):
 			login, password = 'admin', 'Cdbnx0AA'
 		if re.search(r'UCN', result[num]['desc']):
 			login, password = 'admin', 'admin'
+		if re.search(r'LTP', result[num]['model']):
+			login, password = 'admin', 'password'
 
 		# print(f"---- AUT IN {result[num]['ip']} ----")
 		check_aut = t.aut(ip = result[num]['ip'], model = result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
