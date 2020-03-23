@@ -62,7 +62,7 @@ def firelist(request):
   if not request.user.is_authenticated:
     return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
   if request.method == 'GET':
-    fire_address = request.GET.get("fire_address", "")
+    fire_fias = request.GET.get("fire_fias", "")
     fire_serial = request.GET.get("fire_serial", "")
     fire_inventory = request.GET.get("fire_inventory", "")
 
@@ -159,7 +159,7 @@ def firejornal(request):
   buffer = io.BytesIO()
 
   sheet1 = wb1['fire1']
-  firedic={}
+  #firedic={}
   sqldata= db_model_search("select fireid, type, serial, inventory, room, fullweight, status, comandor, address, ClassList from FireSupressor.FireList")
   cellnn=0
   for iii in sqldata:
