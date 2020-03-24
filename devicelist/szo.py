@@ -78,6 +78,7 @@ def start(request):
 
 	stat_list = []
 
+	t.sql_update("SET sql_mode = '';")
 	request_sql = t.sql_select(query_astu, 'full')
 	values = {'key': key}
 	values['data'] = {}
