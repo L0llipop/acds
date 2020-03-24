@@ -5,12 +5,14 @@ from channels.auth import AuthMiddlewareStack
 
 from chat.consumers import ChatConsumer
 from devicelist.consumers import TopologyConsumer
+from activator.consumers import VPNConsumer
 
 application = ProtocolTypeRouter({
     'websocket': AuthMiddlewareStack(
         URLRouter([
             url(r'^ws/chat/(?P<room_name>[^/]+)/$', ChatConsumer),
             url(r'^ws/topology/(?P<user_name>[^/]+)/$', TopologyConsumer),
+            url(r'^ws/vpn/(?P<user_name>[^/]+)/$', VPNConsumer),
         ])
     ),
 })

@@ -47,7 +47,10 @@
 </div>
 </div>
 
-{% comment %} <script src="{% static 'devicelist/js/admin.js' %}"></script> {% endcomment %}
-{% comment %} <script type="text/javascript" language="javascript" src="{% static 'js/tablefilter/tablefilter.js' %}"></script>   {% endcomment %}
+<!-- {% comment %} <script src="{% static 'devicelist/js/admin.js' %}"></script> {% endcomment %}
+{% comment %} <script type="text/javascript" language="javascript" src="{% static 'js/tablefilter/tablefilter.js' %}"></script>   {% endcomment %} -->
+<script>
+	document.title = `{{ lenght.update }}/{{ lenght.insert }}/{{ lenght.delete }}`;
+</script>
 {% endblock %}
 

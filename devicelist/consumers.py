@@ -160,7 +160,7 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 
 
 				else:
-					result.update({'status': 'error', 'message_error': res['error']})
+					result.update({'status': 'error', 'message_error': res['error'], 'vrf': res['vrf']})
 		
 		else:
 			if input_type == 'ip':

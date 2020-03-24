@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from activator import vpn
 
 urlpatterns = [
     path('', include('devicelist.urls')),
@@ -23,4 +24,5 @@ urlpatterns = [
     path('activator/', include('activator.urls')),
     path('accounts/', include('allauth.urls')),
     path('chat/', include('chat.urls')),
+    path('vpn/', vpn.main, name='vpn'),
 ]

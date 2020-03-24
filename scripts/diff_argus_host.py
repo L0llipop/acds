@@ -63,7 +63,6 @@ def guspk_sync():
 		if key != 'update' and key != 'insert' and key != 'delete':
 			del answer[key]
 
-	return answer
+	answer['lenght'] = {'update': len(answer['update']), 'insert': len(answer['insert']), 'delete': len(answer['delete'])}
 
-answer = guspk_sync()
-# print(answer)
+	return answer

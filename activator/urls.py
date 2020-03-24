@@ -1,10 +1,11 @@
 from django.conf.urls import url, include
 from django.urls import include, path
-from . import views, massconfig, generator, patterns_checking
+from . import views, massconfig, generator, patterns_checking, vpn
 
 
 urlpatterns = [
 	path('', views.activator, name='activator'),
+	path('vpn/', vpn.main, name='vpn'),
 	path('generator/', generator.start_page, name='generator'),
 	path('deactivator/', views.deactivator, name='deactivator'),
 	path('other/', views.device_move, name='device_move'),
