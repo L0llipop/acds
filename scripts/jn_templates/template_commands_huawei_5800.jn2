@@ -792,7 +792,7 @@ ont-lineprofile gpon profile-id 210 profile-name "ERIC:TR+0MMI+VOIP"
   commit                             
   quit
 
- ont-lineprofile gpon profile-id 215 profile-name "ERIC:TR+0III+VOIP"
+ ont-lineprofile gpon profile-id 215 profile-name "ERIC:TR+0III+VOIP_2"
   qos-mode gem-car
   mapping-mode port-vlan
   tcont 1 dba-profile-id 11
@@ -1259,8 +1259,8 @@ port vlan {{tr069['vlan']}} 0/10 0
 display port vlan 0/10/0
 
 vlan packet-policy {{pppoe['vlan']}} multicast discard
-vlan packet-policy {{iptv['vlan']}} multicast discard
-vlan packet-policy {{iptv['vlan']}} unicast discard
+// vlan packet-policy {{iptv['vlan']}} multicast discard
+// vlan packet-policy {{iptv['vlan']}} unicast discard
 vlan packet-policy {{ims['vlan']}} multicast discard
 vlan packet-policy {{tr069['vlan']}} multicast discard
 
