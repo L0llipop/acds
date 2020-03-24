@@ -25,7 +25,7 @@ def start(acds_id, ip, model):
 		t.ws_send_message(f"conf_routing: start_config_eltex_mes_24xx")
 		answer = eltexsw24xx.start_config(device)
 		# answer = 'ok'
-	elif re.search(r'MA-4000|LTP-8X|LTP-4X', model):
+	elif re.search(r'MA4000|LTP-8X|LTP-4X', model):
 		t.ws_send_message(f"conf_routing: start_config_ma4000")
 		answer = eltexolt.start_config(device)
 	elif re.search(r'WOP-2AC-LR5|ePMP 1000', model):
@@ -35,7 +35,7 @@ def start(acds_id, ip, model):
 		t.ws_send_message(f"conf_routing: start_config_zyxel_12xx")
 		answer = zyxeladsl.start_config(device)
 		# answer = 'ok'
-	elif re.search(r'AAM1008', model):
+	elif re.search(r'AAM-1008', model):
 		t.ws_send_message(f"conf_routing: ADSL Zyxel - no script to configure")
 		answer = 'ok'
 	elif re.search(r'7330|7302', model):

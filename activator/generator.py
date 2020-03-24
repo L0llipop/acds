@@ -535,7 +535,7 @@ def get_data_device(request):
 		elif re.search(r'MES2428', values['model']):
 			values['model_select'] = 'Eltex_MES2428'
 
-		elif re.search(r'MA-4000', values['model']):
+		elif re.search(r'MA4000', values['model']):
 			values['model_select'] = 'Eltex_MA-4000'
 
 		elif re.search(r'LTP-\d', values['model']):
@@ -575,5 +575,7 @@ def get_data_device(request):
 			values['model_select'] = 'Huawei_5800'
 
 		t.sql_connect('disconnect')
+	else:
+		values = {'error': 'not found ip'}
 
 	return JsonResponse(values, safe=False)

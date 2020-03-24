@@ -8,6 +8,7 @@ import multimodule
 import json
 import pexpect
 import ipaddress
+import configuration
 # from ipaddress import IPv4Network
 
 
@@ -82,10 +83,33 @@ def peagg_juniper(t, answer):
 				break
 	if not answer['results'].get('gw'):
 		return error_handler(f'network not found on {match_intvlan[0]}', answer)
-
 			
 	return answer
 
+def peagg_nokia(t, answer):
+	intvlan = t.data_split()
+	match_vlan = re.findall(rf"""\sIFL(\d+)""", intvlan)
+	if match_vlan:
+		# print(f'{match_intvlan[1]}')
+		answer['results'].update({'intvlan': match_vlan[0]})
+	else:
+		return error_handler(f'intvlan not found', answer)
+	t.new_sendline(f"show router 3{answer['vrf']['vrfid']} interface IFL{answer['results']['intvlan']}")
+	runvlan = t.data_split("list")
+	for vline in runvlan:
+		# print(vline)
+		vlan_network = re.search(rf"""(\S+)\/(\d+)""", vline)
+		if vlan_network:
+			search_network = ipaddress.IPv4Interface(f'{vlan_network[1]}/{vlan_network[2]}')
+			# print(search_network.network)
+			if str(search_network.network) == answer['results']['network']:
+				# print(f'gw finded {vlan_network[1]}')
+				answer['results'].update({'gw': vlan_network[1]})
+				break
+	if not answer['results'].get('gw'):
+		return error_handler(f'network not found on {match_intvlan[0]}', answer)
+			
+	return answer
 
 def select_pe(ip):
 	answer = {}
@@ -105,7 +129,7 @@ def select_pe(ip):
 	hostname, region = data[0]
 	mask = 0
 	try:
-		telnet = t.aut(f'{rr[region]}')
+		telnet = t.aut(f'{rr[region]}', logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/network_find")
 	except:
 		return error_handler(f"""incorrect region {region}""", answer) 
 
@@ -166,9 +190,9 @@ def select_pe(ip):
 	
 def peagg_data(answer):
 	t.sql_connect('connect')
-	i = t.aut(answer['results']['routerip'])
+	i = t.aut(answer['results']['routerip'], logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/network_find")
 	if i != 0:
-		i = t.aut(answer['results']['routerip'], proxy = True)
+		i = t.aut(answer['results']['routerip'], proxy = True, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/network_find")
 		if i != 0:
 			return error_handler(f"""{answer['results']['routerip']} not connected""", answer)
 
@@ -229,7 +253,19 @@ def peagg_data(answer):
 
 
 	elif model == 'Nokia-7750-SR-7':
-		return error_handler(f'Nokia not support now', answer)
+		if answer.get('vrf'):
+			t.new_sendline(f"""show service service-using vprn | match 3{answer['vrf']['vrfid']}""")
+			vrf = t.data_split('list')
+			match_vrf = re.search(rf"""Up\s+Up\s+\d+\s+(\S+)""", vrf[1])
+			if match_vrf:
+				answer['vrf'].update({'vrfname': match_vrf[1]})
+			else:
+				return error_handler(f'vrfname not found', answer)
+			t.new_sendline(f"show router 3{answer['vrf']['vrfid']}  arp {answer['ip']}")
+			answer = peagg_nokia(t, answer)
+		else:
+			t.new_sendline(f"show router arp {answer['ip']}")
+			answer = peagg_nokia(t, answer)
 
 	else:
 		return error_handler(f'{model} not support now', answer)
