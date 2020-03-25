@@ -55,6 +55,7 @@ exit
 vlan {{pppoe['vlan']}} 
  name {{pppoe['name']}}
  tagged port-channel 1
+ 
 {%- for slot_num in range(16) %}
  tagged slot-channel {{slot_num}}
 {%- endfor %}
@@ -70,6 +71,7 @@ vlan {{iptv['vlan']}}
  no ip igmp snooping mrouter learning
  ip igmp snooping pp4x enable
  ip igmp snooping mrouter add port-channel 1
+ ip igmp snooping mrouter add front-port 1/1
 exit
 
 vlan {{ims['vlan']}}

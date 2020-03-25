@@ -62,9 +62,20 @@ def firelist(request):
   if not request.user.is_authenticated:
     return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
   if request.method == 'GET':
-    fire_fias = request.GET.get("fire_fias", "")
+    fire_fias = json.loads(request.GET.get("fire_fias", ""))
     fire_serial = request.GET.get("fire_serial", "")
     fire_inventory = request.GET.get("fire_inventory", "")
+#fire_fias={"region_fias_id":"54049357-326d-4b8f-b224-3c6dc25d6dd3","area_fias_id":null,"city_fias_id":"9ae64229-9f7b-4149-b27a-d1f6ec74b5ce","settlement_fias_id":null,"street_fias_id":"b5701907-1537-4e52-b93a-d566a47086f7","house_fias_id":"76bedc4e-a5cb-42d3-bbea-8b2765bdd14c"}
+    query_dic={}
+    if !(fire_fias == ""):
+
+
+  query_fire = f"""select fl.fireid, fl.type, fl.serial, fl.inventory, fl.room, fl.fullweight, fl.status, fl.comandor, fl.address, fl.ClassList 
+      from FireSupressor.FireList as fl
+			LEFT JOIN FireSupressor.FireFias as ff on fl.fireid = ff.fireid
+			WHERE (fl.serial LIKE '%{fire_serial}%' or ) OR fl.inventory = '{fire_inventory}')
+	 """
+			
 
   firedic={}
   sqldata= db_model_search("select fireid, type, serial, inventory, room, fullweight, status, comandor, address, ClassList from FireSupressor.FireList")
