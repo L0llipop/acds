@@ -191,6 +191,8 @@ tagged pon-port 1
 tagged pon-port 2
 tagged pon-port 3
 ip igmp snooping querier enable
+ip igmp snooping mrouter add front-port 3
+ip igmp snooping mrouter add 10G-front-port 0
 exit
 
 vlan {{ims['vlan']}}
