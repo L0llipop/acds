@@ -188,6 +188,7 @@ exit
 vlan {{iptv['vlan']}}
 name IP-TV
 tagged port-channel 1
+tagged front-port 3
 tagged pon-port 0
 tagged pon-port 1
 tagged pon-port 2
@@ -197,6 +198,8 @@ tagged pon-port 5
 tagged pon-port 6
 tagged pon-port 7
 ip igmp snooping querier enable
+ip igmp snooping mrouter add front-port 3
+ip igmp snooping mrouter add 10G-front-port 0
 exit
 
 vlan {{ims['vlan']}}
