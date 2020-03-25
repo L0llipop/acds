@@ -62,8 +62,7 @@ interface {{ port_uplink }}
  port-security-state trusted 
  no shutdown
   set port-role uplink 
- storm-control broadcast level pps 1000
- storm-control multicast level pps 100000    
+ 
  lldp tlv-select basic-tlv port-descr
  lldp tlv-select basic-tlv sys-name
  lldp tlv-select basic-tlv sys-descr
