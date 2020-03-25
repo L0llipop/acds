@@ -44,8 +44,6 @@ vlan {{ tr069['vlan'] }}
 
 interface range {{ port_downlink }}
  switchport protected
- storm-control broadcast level pps 100
- storm-control multicast level pps 100  
  no lldp transmit 
  no lldp receive   
  loopback-detection enable
