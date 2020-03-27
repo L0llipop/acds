@@ -392,7 +392,7 @@ class getTopology(object):
 
 			# Определяем IP адрес шлюза
 			com_show_route = "show ip route | include gateway"
-			if re.search(r'3750|3400' ,result[num]['model']):
+			if re.search(r'3750|3400|3600' ,result[num]['model']):
 				com_show_route = "show ip route static"
 			if re.search(r'2950|2960' ,result[num]['model']):
 				com_show_route = "show running-config | include default-gateway"
