@@ -117,7 +117,7 @@ class getTopology(object):
 			mac, vlan = check
 
 			# Определяем порт в сторону нижестоящего коммутатора и сервисинстанс
-			check = self.check_search(t, f"show mac address-table address {mac} | include {vlan}", r'Yes\s+\d+\s+(.*?)\s.+?\s(\d+)/?', 'peagg_cisco|не найден mac')
+			check = self.check_search(t, f"show mac address-table address {mac} vlan {vlan}", r'Yes\s+\d+\s+(.*?)\s.+?\s(\d+)/?', 'peagg_cisco|не найден mac')
 			if type(check) == dict:
 				result.update(check)
 				return result
@@ -737,24 +737,46 @@ class getTopology(object):
 			login, password = 'admin', 'Cdbnx0AA'
 		if re.search(r'UCN', result[num]['desc']):
 			login, password = 'admin', 'admin'
-		if re.search(r'LTP', result[num]['model']):
-			login, password = 'admin', 'password'
+
 
 		# print(f"---- AUT IN {result[num]['ip']} ----")
 		check_aut = t.aut(ip = result[num]['ip'], model = result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
 		if check_aut != 0:
-			check_aut = t.aut(ip = result[num]['ip'], model = result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}", proxy = True)
+			if re.search(r'1212|1248', result[num]['model']):
+				login, password = 'admin', '1234'
+			elif re.search(r'LTP', result[num]['model']):
+				login, password = 'admin', 'password'
+			elif re.search(r'BC|Lumia', result[num]['model']):
+				login, password = 'admin', 'admin'
+			elif re.search(r'UCN', result[num]['desc']):
+				login, password = 'admin', 'admin'
+			else:
+				login, password = 'admin', 'admin'
+			check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
+
 			if check_aut != 0:
-				if re.search(r'1212|1248', result[num]['model']):
-					login, password = 'admin', '1234'
-				else:
-					login, password = 'admin', 'admin'
-				check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
+				login, password = 'tum_support', 'hEreR2Mu3E'
+				check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}", proxy = True)
 				if check_aut != 0:
-					check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}",proxy = True)
+					if re.search(r'1212|1248', result[num]['model']):
+						login, password = 'admin', '1234'
+					elif re.search(r'LTP', result[num]['model']):
+						login, password = 'admin', 'password'
+					elif re.search(r'BC|Lumia', result[num]['model']):
+						login, password = 'admin', 'admin'
+					elif re.search(r'UCN', result[num]['desc']):
+						login, password = 'admin', 'admin'
+					else:
+						login, password = 'admin', 'admin'
+					check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}", proxy = True)
+					
 					if check_aut != 0:
 						result.update({'status': 'error','message_error': f"Cant connect {result[result['count']]['ip']}"})
 						return result
+
+
+
+
 
 		if re.search(r'MES-3528|MGS-3712|MES3500-24|4728|4012', result[num]['model']) and check_aut != 0:
 			"""Дурацкие зиксиля, иногда авторизация не проходит с первого раза. 
