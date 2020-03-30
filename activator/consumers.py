@@ -17,7 +17,7 @@ import network_find
 from acds import configuration
 
 
-class TopologyConsumer(AsyncWebsocketConsumer):
+class VPNConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		await self.accept()
 
@@ -160,9 +160,7 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 
 
 				else:
-					result.update({'status': 'error', 'message_error': res['error']})
-					if res.get['vrf']:
-						result.update({'vrf': res['vrf']})
+					result.update({'status': 'error', 'message_error': res['error'], 'vrf': res['vrf']})
 		
 		else:
 			if input_type == 'ip':
