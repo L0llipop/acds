@@ -8,3 +8,4 @@
 /scripts/__pycache__
 /acds/configuration.py
 /scripts/config_data_local.ini
+dump.rdb
