@@ -1259,8 +1259,8 @@ port vlan {{tr069['vlan']}} 0/10 0
 display port vlan 0/10/0
 
 vlan packet-policy {{pppoe['vlan']}} multicast discard
-// vlan packet-policy {{iptv['vlan']}} multicast discard
-// vlan packet-policy {{iptv['vlan']}} unicast discard
+vlan packet-policy {{iptv['vlan']}} multicast discard
+vlan packet-policy {{iptv['vlan']}} unicast discard
 vlan packet-policy {{ims['vlan']}} multicast discard
 vlan packet-policy {{tr069['vlan']}} multicast discard
 
