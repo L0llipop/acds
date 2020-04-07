@@ -49,7 +49,6 @@ interface range {{ port_downlink }}
  switchport protected
  no lldp transmit 
  no lldp receive 
- switchport acceptable-frame-type untaggedAndPrioritytagged  
  loopback-detection enable
  ip igmp snooping leavemode fastLeave
  ip igmp snooping ratelimit 30
