@@ -6,6 +6,9 @@ snooping multicast-forwarding-mode ip
 snooping leave-process config-level port
 ip igmp snooping
 
+map protocol other 88:63 Enet-v2 protocols-group 1
+map protocol other 88:64 Enet-v2 protocols-group 1
+
 {%- if pppoe %}
 vlan {{ pppoe['vlan'] }}
  vlan active
@@ -45,7 +48,7 @@ vlan {{ tr069['vlan'] }}
 interface range {{ port_downlink }}
  switchport protected
  no lldp transmit 
- no lldp receive   
+ no lldp receive 
  loopback-detection enable
  ip igmp snooping leavemode fastLeave
  ip igmp snooping ratelimit 30
@@ -97,9 +100,11 @@ snmp-server enable traps cpu rate-limit 8
 sntp
 set sntp client enabled
 set sntp client time-zone +05:00
-set sntp unicast-poll-interval 4096
+set sntp unicast-poll-interval 16
 set sntp unicast-server ipv4 {{ default_gateway }}
 !
+
+clock time source ntp 
 
 snmp-server enable traps snmp authentication  
 snmp user inity2016
