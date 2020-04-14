@@ -58,8 +58,8 @@ class getTopology(object):
 			return {"status": "error", "message_error": desc}
 
 
-	def update_topology(self, t, id_child, mac, id_parent='NULL', child_port='NULL', parent_port='NULL'):
-		print(f"id_child: {id_child} | id_parent: {id_parent} | child_port: {child_port} | parent_port: {parent_port};")
+	def update_topology(self, t, id_child, mac, status, id_parent='NULL', child_port='NULL', parent_port='NULL'):
+		print(f"id_child: {id_child} | id_parent: {id_parent} | child_port: {child_port} | parent_port: {parent_port} | mac: {mac};")
 		print(f"SELECT parent, child_port, parent_port FROM guspk.topology WHERE child={id_child};")
 		print('======================================================================================')
 		match = t.sql_select(f'SELECT parent, child_port, parent_port FROM guspk.topology WHERE child={id_child};', 'full')
@@ -76,8 +76,8 @@ class getTopology(object):
 				print(f"UPDATE guspk.topology SET parent_port='{parent_port}' WHERE child={id_child};")
 				print('======================================================================================')
 				t.sql_update(f"UPDATE guspk.topology SET parent_port='{parent_port}' WHERE child={id_child};")
-
-			# t.sql_update(f"UPDATE guspk.host SET mac = '{mac}' WHERE DEVICEID = {id_child}")
+			if status == 'end_device':
+				t.sql_update(f"UPDATE guspk.host SET mac = '{mac}' WHERE DEVICEID = {id_child}")
 		else:
 			if child_port != 'NULL':
 				child_port = f"'{child_port}'"
@@ -391,25 +391,35 @@ class getTopology(object):
 				result[next_num] = {'desc': check[0]}
 
 			# Определяем IP адрес шлюза
-			com_show_route = "show ip route | include gateway"
-			if re.search(r'3750|3400|3600' ,result[num]['model']):
-				com_show_route = "show ip route static"
-			if re.search(r'2950|2960' ,result[num]['model']):
-				com_show_route = "show running-config | include default-gateway"
+			# com_show_route = "show ip route | include gateway"
+			# if re.search(r'3750|3400|3600', result[num]['model']):
+			# 	com_show_route = "show ip route static"
+			# if re.search(r'2950|2960', result[num]['model']):
+			# 	com_show_route = "show running-config | include default-gateway"
 
-			check = self.check_search(t, com_show_route, r"[is|via|way]\s+(\d+\.\d+\.\d+\.\d+)", f"cisco {result[num]['ip']}|не найден gateway")
-			if type(check) == dict:
-				result.update(check)
-				return result
-			print(check)
+			def get_gateway_cisco(self):
+				check = self.check_search(t, com_show_route, r"[is|via|way]\s+(\d+\.\d+\.\d+\.\d+)", f"cisco {result[num]['ip']}|не найден gateway")
+				return check
+
+			gw_commands = ['show ip route static', 'show running-config | include default-gateway']
+			for idx, com_show_route in enumerate(gw_commands):
+				check = get_gateway_cisco(self)	
+				if type(check) == dict:
+					if idx == 1:
+						result.update(check)
+						return result
+					else:
+						continue
+
+			print(f"check - {check}")
 			gateway = check[0]
 
 			# определяем mac gateway и vlan управления
-			com_show_ip_arp = f"show ip arp | include {gateway}"
+			com_show_ip_arp = f"show ip arp | include {gateway} "
 			if re.search(r'2950' ,result[num]['model']):
 				com_show_ip_arp = "show ip arp"
 
-			check = self.check_search(t, f"show ip arp | include {gateway}", r"([\w\.]+)\s+ARPA\s+Vlan(\d+)", f"cisco {result[num]['ip']}|не найден arp")
+			check = self.check_search(t, f"show ip arp | include {gateway} ", r"([\w\.]+)\s+ARPA\s+Vlan(\d+)", f"cisco {result[num]['ip']}|не найден arp")
 			if type(check) == dict:
 				result.update(check)
 				return result
@@ -826,7 +836,7 @@ class getTopology(object):
 		if 'port_uplink' in result[num]:
 			port_uplink = result[num]['port_uplink']
 
-		self.update_topology(t, result[num]['id'], result['mac'], id_parent=result[num - 1]['id'], child_port=port_uplink, parent_port=result[num - 1]['port'])
+		self.update_topology(t, result[num]['id'], result['mac'], result['status'], id_parent=result[num - 1]['id'], child_port=port_uplink, parent_port=result[num - 1]['port'])
 		
 		t.disconnect()
 

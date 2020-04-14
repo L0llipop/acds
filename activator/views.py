@@ -178,11 +178,17 @@ def get_acds_id_deactivator(request):
 							VALUES ('{comment}', '{mip}', '{uplink}', '{model}', '{serial}', '{address}', '{acswnodeid}', 'del', 0, 2, '{email}', 'removing')""")
 			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip,  status, user, message) VALUES ('{acds_id}', '{ip}', 'del', '{user}', 'Инициирована заявка на вывод оборудования {model}. {comment}. {mip}')""")
 			# t.ws_send_message(f"acds_id - {acds_id}")
-			mail_admins(f"""Заявка {acds_id} [DEL]""", f"""Пришла заявка на вывод оборудования {ip}""")
-			time.sleep(2)
-			send_mail(f"""Заявка на вывод в Аргус № {acds_id}""", f"""Поступила новая заявка № {acds_id}.""", 'acds@ural.rt.ru', ['zaripova-ak@ural.rt.ru'])
-			time.sleep(2)
-			send_mail(f"""Ваша заявка на вывод оборудования {acds_id}""", f"""Здравствуй {user}!\n\n Ваша заявка № {acds_id} выполняется, вы получите уведомление по завершению работ""", 'acds@ural.rt.ru', [f'{email}'])
+			mail_sender(f"""Заявка {acds_id} [DEL]""", 
+						f"""Пришла заявка на вывод оборудования {ip}""",
+						admins=True)
+
+			mail_sender(f"""Заявка на вывод в Аргус № {acds_id}""", 
+						f"""Поступила новая заявка № {acds_id}.""",
+						'zaripova-ak@ural.rt.ru')
+
+			mail_sender(f"""Ваша заявка на вывод оборудования {acds_id}""", 
+						f"""Здравствуй {user}!\n\n Ваша заявка № {acds_id} выполняется, вы получите уведомление по завершению работ""", 
+						f'{email}')
 			device_info = {'id': acds_id}
 
 		# t.ws_close()
@@ -242,11 +248,14 @@ def get_device_move(request):
 							VALUES ('{comment}', 'other', '{uplink}', '{model}', '{serial}', '{address}', '{acswnodeid}', 'other', 0, 0, '{email}', '{comment}')""")
 			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', 'del', '{user}', 'Инициирована заявка внесение изменений. {comment}.')""")
 			# t.ws_send_message(f"acds_id - {acds_id}")
-			mail_admins(f"""Заявка {acds_id} [OTHER]""", f"""Пришла заявка, читайте комментарий""")
-			time.sleep(2)
-			# send_mail(f"""Заявка № {acds_id}""", f"""Поступила новая заявка № {acds_id}.""", 'acds@ural.rt.ru', ['zaripova-ak@ural.rt.ru'])
-			# time.sleep(2)
-			send_mail(f"""Ваша заявка № {acds_id}""", f"""Здравствуй {user}!\n\n Ваша заявка № {acds_id} выполняется, вы получите уведомление по завершению работ""", 'acds@ural.rt.ru', [f'{email}'])
+			mail_sender(f"""Заявка {acds_id} [OTHER]""", 
+						f"""Пришла заявка, читайте комментарий""",
+						admins=True)
+
+			mail_sender(f"""Ваша заявка № {acds_id}""",
+					f"""Здравствуй {user}!\n\n Ваша заявка № {acds_id} выполняется, вы получите уведомление по завершению работ""",
+					f'{email}')
+
 			device_info = {'id': acds_id}
 
 		# t.ws_close()
@@ -459,7 +468,9 @@ def device_configure(request):
 			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', '{status}', '{user}', 'Все работы по вводу завершены')""")
 			t.sql_update(f"""UPDATE guspk.acds SET status = 'closed' WHERE id like '{acds_id}'""")
 			t.sql_update(f"""UPDATE guspk.ahot SET DEVICESTATUSID = '3' WHERE IPADDMGM = '{ip}'""")
-			send_mail(f"""Заявка на ввод № {acds_id}""", f"""Оборудование по заявке № {acds_id} введено в эксплуатацию.""", 'acds@ural.rt.ru', [f'{email}'])
+			mail_sender(f"""Заявка на ввод № {acds_id}""", 
+						f"""Оборудование по заявке № {acds_id} введено в эксплуатацию.""", 
+						f'{email}')
 		elif status == 'ok' and argus == 0:
 				values.update({'status': 'ok'})
 				values.update({'badge': 'success'})
@@ -482,7 +493,9 @@ def device_configure(request):
 					t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('device_configure', '{ip}', '{user}', "acds_id {acds_id} configure error {conf_routing_run}")""")
 					t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'error(c)', '{user}', '{conf_routing_run}')""")
 					t.sql_update(f"""UPDATE guspk.acds SET status = '{values['status']}', report = '{values['report']}' WHERE id like '{acds_id}'""")
-					mail_admins(f"""Заявка {acds_id} [ERROR]""", f"""Конфигурирование не выполнено {conf_routing_run}""")
+					mail_sender(f"Заявка {acds_id} [ERROR]", 
+								f"Конфигурирование не выполнено {conf_routing_run}",
+								admins=True)
 				elif conf_routing_run == 'ok':
 					values.update({'status': 'ok'})
 					values.update({'badge': 'success'})
@@ -491,9 +504,12 @@ def device_configure(request):
 					t.sql_update(f"""INSERT INTO guspk.acds_logs (id, status, user, message) VALUES ('{acds_id}', 'ok', '{user}', 'Конфигурирование выполнено успешно, передано в Аргус')""")
 					t.sql_update(f"""UPDATE guspk.acds SET status = '{values['status']}', report = '{values['report']}' WHERE id like '{acds_id}'""")
 					# mail_admins(f"""Заявка {acds_id} [OK]""", f"""Конфигурирование выполнено успешно""")
-					send_mail(f"""Заявка на ввод № {acds_id}""", f"""Поступила новая заявка № {acds_id}.""", 'acds@ural.rt.ru', ['zaripova-ak@ural.rt.ru'])
-					time.sleep(4)
-					send_mail(f"""Заявка на ввод в Аргус № {acds_id}""", f"""Ваша заявка № {acds_id} передана в Аргус.""", 'acds@ural.rt.ru', [f'{email}'])
+					mail_sender(f"""Заявка на ввод № {acds_id}""", 
+								f"""Поступила новая заявка № {acds_id}.""",
+								'zaripova-ak@ural.rt.ru')
+					mail_sender(f"""Заявка на ввод в Аргус № {acds_id}""",
+								f"""Ваша заявка № {acds_id} передана в Аргус.""",
+								f'{email}')
 		elif status == 'del' and argus == 3:
 			values.update({'status': 'finished'})
 			t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('device_configure', '{ip}', '{user}', 'device status changed 3->6 acds_id {acds_id} ip {ip}')""")
@@ -501,16 +517,22 @@ def device_configure(request):
 			t.sql_update(f"""UPDATE guspk.acds SET status = 'closed', report = 'removed' WHERE id like '{acds_id}'""")
 			t.sql_update(f"""DELETE from guspk.host WHERE DEVICEID = '{deviceid}'""")
 			# mail_admins(f"""Заявка {acds_id} [DEL]""", f"""Выведено успешно""")
-			send_mail(f"""Заявка на вывод оборудования из Аргус № {acds_id}""", f"""Устройство по заявке № {acds_id} выведено из эксплуатации.""", 'acds@ural.rt.ru', [f'{email}'])
-			time.sleep(2)
-			send_mail(f"""Удалить из ИНИТИ""", f"""Устройство выведено из эксплуатации, прошу удалить из ИНИТИ. ip - {ip}.""", 'acds@ural.rt.ru', [f'monitoring@ural.rt.ru'])
+			mail_sender(f"""Заявка на вывод оборудования из Аргус № {acds_id}""", 
+					f"""Устройство по заявке № {acds_id} выведено из эксплуатации.""", 
+					f'{email}')
+			mail_sender(f"""Удалить из ИНИТИ""", 
+					f"""Устройство выведено из эксплуатации, прошу удалить из ИНИТИ. ip - {ip}.""", 
+					f'monitoring@ural.rt.ru')
 		elif status == 'other': 
 			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', '{status}', '{user}', 'Работы в ЗО ГУСД завершены, передана в Аргус.')""")
 			t.sql_update(f"""UPDATE guspk.acds SET argus = '4' WHERE id like '{acds_id}'""")
 			values.update({'status': 'finished'})
-			send_mail(f"""Заявка № {acds_id}""", f"""Поступила новая заявка № {acds_id}.""", 'acds@ural.rt.ru', ['zaripova-ak@ural.rt.ru'])
-			time.sleep(4)
-			send_mail(f"""Заявка № {acds_id}""", f"""Работы по заявке {acds_id} в ЗО ГУСД завершены, передана в Аргус.""", 'acds@ural.rt.ru', [f'{email}'])
+			mail_sender(f"""Заявка № {acds_id}""", 
+					f"""Поступила новая заявка № {acds_id}.""", 
+					'zaripova-ak@ural.rt.ru')
+			mail_sender(f"""Заявка № {acds_id}""",
+					f"""Работы по заявке {acds_id} в ЗО ГУСД завершены, передана в Аргус.""",
+					f'{email}')
 		else:
 			values.update({'status': status})
 			values.update({'badge': 'danger'})
@@ -636,7 +658,10 @@ def get_acds_id_remove(request):
 		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', 'removed', '{user}', 'Заявка аннулирована')""")
 		t.sql_update(f"""DELETE FROM guspk.acds WHERE id = {acds_id}""")
 		t.sql_update(f"""DELETE FROM guspk.host WHERE IPADDMGM = '{ip}'""")
-		send_mail(f"""Заявка на ввод в эксплуатацию № {acds_id}""", f"""Ваша заявка № {acds_id} аннулирована.""", 'acds@ural.rt.ru', [f'{email}'])
+		mail_sender(f"""Заявка на ввод в эксплуатацию № {acds_id}""", 
+				f"""Ваша заявка № {acds_id} аннулирована.""",
+				f'{email}')
+
 		answer = {'answer': 'deleted'}
 	elif status == 'other' or status == 'error(f)' or status == 'error(c)':
 		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_id_remove', '{acds_id}', '{user}', 'delete acds_id {acds_id} ip {ip} in status {status}')""")
@@ -683,22 +708,29 @@ def get_acds_argus_status(request):
 		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', '{status}', '{user}', 'Все работы по вводу завершены')""")
 		t.sql_update(f"""UPDATE guspk.acds SET status = 'closed', argus = '1' WHERE id like '{acds_id}'""")
 		t.sql_update(f"""UPDATE guspk.host SET DEVICESTATUSID = '3' WHERE IPADDMGM like '{ip}'""")
-		send_mail(f"""Заявка на ввод № {acds_id}""", f"""Оборудование по заявке № {acds_id} введено в эксплуатацию.""", 'acds@ural.rt.ru', [f'{email}'])
+		mail_sender(f"""Заявка на ввод № {acds_id}""",
+				f"""Оборудование по заявке № {acds_id} введено в эксплуатацию.""",
+				f'{email}')
 
 	elif status == 'del':
 		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_argus_status', '{ip}', '{user}', 'device deleted {acds_id} ip {ip}')""")
 		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', '{status}', '{user}', 'Устройство выведено из эксплуатации')""")
 		t.sql_update(f"""DELETE FROM guspk.host WHERE IPADDMGM = '{ip}'""")
 		# mail_admins(f"""Заявка {acds_id} [DEL]""", f"""Выведено успешно""")
-		send_mail(f"""Удалить из ИНИТИ""", f"""Устройство выведено из эксплуатации, прошу удалить из ИНИТИ. ip - {ip}.""", 'acds@ural.rt.ru', [f'monitoring@ural.rt.ru'])
-		time.sleep(4)
-		send_mail(f"""Заявка на вывод оборудования из Аргус № {acds_id}""", f"""Устройство по заявке № {acds_id} выведено из эксплуатации.""", 'acds@ural.rt.ru', [f'{email}'])
+		mail_sender(f"""Удалить из ИНИТИ""", 
+					f"""Устройство выведено из эксплуатации, прошу удалить из ИНИТИ. ip - {ip}.""",
+					f'monitoring@ural.rt.ru')
+		mail_sender(f"""Заявка на вывод оборудования из Аргус № {acds_id}""",
+					f"""Устройство по заявке № {acds_id} выведено из эксплуатации.""", 
+					f'{email}')
 
 	elif status == 'other':
 		t.sql_update(f"""INSERT into guspk.logs (scr_name, DEVICEID, WHO, message) VALUES ('get_acds_argus_status', '{acds_id}', '{user}', 'argus status changed to 5 acds_id {acds_id}')""")
 		t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', 'other', '{user}', 'Изменения внесены в Аргус, заявка закрыта')""")
 		t.sql_update(f"""UPDATE guspk.acds SET argus = 5, status = 'closed' WHERE id = {acds_id}""")
-		mail_admins(f"""Заявка {acds_id} [OTHER]""", f"""Устройство изменено в Аргус, заявка закрыта""")		
+		mail_sender(f"""Заявка {acds_id} [OTHER]""",
+					f"""Устройство изменено в Аргус, заявка закрыта""",
+					admins=True)
 
 	t.sql_connect('disconnect')
 	answer = {'answer': 'ok'}
@@ -850,7 +882,7 @@ def mail_generator(acds_id):
 	Сетевое имя {networkname}
 	Для настройки управления cкопировать и вставить в консоль эти команды."""
 
-	footer = f"""Если что-то совсем не получается? то можно позвонить нам
+	footer = f"""Если что-то совсем не получается, то можно позвонить нам
 	Борисов Сергей  +7(3452)599233
 	Южаков Дмитрий  +7(3452)599357"""
 
@@ -952,7 +984,7 @@ def mail_generator(acds_id):
 
 def mail_sender(*args, admins=False):
 	"""
-	if need send to any user (['header', 'body', ['recipient1', 'recipient2'])
+	if need send to any user (['header', 'body', 'recipient1', 'recipient2')
 	if send only admins (['header', 'body', admins=True])
 	"""
 	def send_status(error):

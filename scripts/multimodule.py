@@ -32,15 +32,15 @@ class FastModulAut:
 		self.timeout = timeout
 		self.temp_data = ''
 		self.hash_promt = {
-			'AAM1212-51' : ['> ?$', 'nopause'], 
+			'AAM1212' : ['> ?$', 'nopause'], 
 			'DSL IES-1248-51' : ['> ?$', 'nopause'],
-			'DSL IES-1248' : ['> ?$', 'nopause'],
+			'IES-1248' : ['> ?$', 'nopause'],
 			'BC9569x-024' : ['# ?$', 'More|continue'],
 			'BC9569x-012' : ['# ?$', 'More|continue'],
 			'BC95645-024' : ['# ?$', 'More|continue'],
 			'BCM-56519' : ['# ?$', 'More|continue'],
 			'Lumia' : ['# ?$', 'More|continue'],
-			'AAM1008-61' : ['> ?$'],
+			'AAM1008' : ['> ?$'],
 			'ePMP 1000' : ['>'],
 			'7324' : ['> ?$'],
 			'7324 Pizza Box' : ['> ?$'],
