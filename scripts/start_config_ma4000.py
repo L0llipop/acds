@@ -94,7 +94,7 @@ def authorization_in_eltex(t, reply, data_olt):
 		return error
 
 
-	if model == 'MA-4000':
+	if model == 'MA4000':
 		path = getattr(configuration, 'JN_PATH')+'template_commands_ma4000.jn2'
 	elif model == 'LTP-8X':
 		path = getattr(configuration, 'JN_PATH')+'template_commands_ltp-8x.jn2'
