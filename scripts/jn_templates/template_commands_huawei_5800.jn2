@@ -279,7 +279,7 @@ quit
 
 "RON:TR+IPTV_1,2,3,4+VOIP / ID 102"
 
-ont-srvprofile gpon profile-id 102 profile-name "RON:TR+IPTV_1,2,3,4+VOIP"
+ont-srvprofile gpon profile-id 102 profile-name "RON:TR+IPTV_1,2,3,4_MMMM+VOIP"
 ont-port pots 2 eth 4
 port vlan iphost translation {{tr069['vlan']}} user-vlan {{tr069['vlan']}}
 commit
