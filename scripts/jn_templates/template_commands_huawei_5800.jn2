@@ -257,7 +257,7 @@ commit
 quit
 
 
-ont-lineprofile gpon profile-id 101 profile-name "RON:TR+L2_HSI_1+IPTV_2,3,4__IMMM+VOIP"
+ont-lineprofile gpon profile-id 101 profile-name "RON:L2_HSI_1+IPTV_234_IMMM+VOIP"
 mapping-mode port-vlan
 tcont 1 dba-profile-id 11
 tcont 2 dba-profile-id 12
