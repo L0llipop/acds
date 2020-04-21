@@ -1,7 +1,9 @@
 configure terminal
 
 management ip {{ ipaddmgm }} {{ mask }}
+
 management gateway {{ gw }}
+
 management vlan {{ mgmvlan }}
 
 
