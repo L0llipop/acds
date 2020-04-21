@@ -705,7 +705,7 @@ ont-lineprofile gpon profile-id 208 profile-name "ERIC:L3_TR+0MM0+VOIP"
   gem add 0 eth tcont 1
   gem add 1 eth tcont 2
   gem add 2 eth tcont 3
-  gem add 5 eth tcont 1
+  gem add 5 eth tcont 6
   gem mapping 0 0 iphost vlan {{pppoe['vlan']}}
   gem mapping 1 1 eth-bundle 1
   gem mapping 2 2 ippath 0
