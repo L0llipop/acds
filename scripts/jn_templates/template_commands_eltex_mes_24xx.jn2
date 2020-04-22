@@ -50,8 +50,7 @@ interface range {{ port_downlink }}
  no lldp transmit 
  no lldp receive 
  loopback-detection enable
- ip igmp snooping leavemode fastLeave
- ip igmp snooping ratelimit 30
+ ip igmp snooping leavemode exp-hosttrack
  dcs agent-circuit-identifier "%h eth %u/%s/%i:%v"
  dcs remote-agent-identifier "%M"
  spanning-tree disable
@@ -118,7 +117,7 @@ snmp notify 1 tag inity2016 type Trap
 no ip routing
 
 set switch maximum RAM threshold     95
-set switch maximum CPU threshold     95
+set switch maximum CPU threshold     55
 set ip http disable
 !
 
