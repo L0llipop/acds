@@ -4,7 +4,14 @@ download firmware_fromTFTP {{ ftp_server }} src_file FTP/FTTb/DES3200R_4.51.B004
 show boot_file
 dir
 config firmware image c:/DES3200R_4.46.B008_revC1.had boot_up
+ревизия А B 
 
+download firmware_fromTFTP 10.228.63.237 FTP/FTTb/DES-3200_Runtime_V1.91.B07.had image_id 1
+
+show firmware information 
+
+config firmware image_id 1 boot_up
+---------
 
 DGS-3120-24SC
 download firmware_fromTFTP {{ ftp_server }}  src_file FTP/FTTb/DGS3120_Run_3_12_R012.had boot_up
