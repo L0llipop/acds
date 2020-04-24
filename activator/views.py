@@ -41,8 +41,6 @@ def get_acds_id(request): #УБРАТЬ КОСТЫЛИ С ТАИМАУТОМ О�
 	user = request.user.username
 	email = request.user.email
 	acds_id = {}
-	mail_error_user = 'error'
-	mail_error_admin = 'error'
 
 	if request.GET:
 		mip = ''.join(list(request.GET.get('mip', str(False))))

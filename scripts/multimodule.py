@@ -226,17 +226,21 @@ class FastModulAut:
 			if errors == True:
 				print ('{:45}{:20}'.format(' == check_telnet_connect_Other == ', self.ip))
 
-	def check_authentication(self, i):
+	def check_authentication(self, i, errors = True):
 		""" Проверка авторизации """
 		# print ('check_authentication {}'.format(i))
 		if i == 1:
-			print ('{:45}{:20}'.format(' == check_authentication_Login incorrect == ', self.ip))
+			if errors == True:
+				print ('{:45}{:20}'.format(' == check_authentication_Login incorrect == ', self.ip))
 		elif i == 2:
-			print ('{:45}{:20}'.format(' == check_authentication_Timeout == ', self.ip))
+			if errors == True:
+				print ('{:45}{:20}'.format(' == check_authentication_Timeout == ', self.ip))
 		elif i == 3:
-			print ('{:45}{:20}'.format(' == check_authentication_Connection_closed == ', self.ip))
+			if errors == True:
+				print ('{:45}{:20}'.format(' == check_authentication_Connection_closed == ', self.ip))
 		elif i != 0:
-			print ('{:45}{:20}'.format(' == check_authentication_Other == ', self.ip))
+			if errors == True:
+				print ('{:45}{:20}'.format(' == check_authentication_Other == ', self.ip))
 		# 	print ('------> before:\n{}\n<------'.format(self.new_telnet.before))
 		# 	print ('------> after:\n{}\n<------'.format(self.new_telnet.after))
 
@@ -406,8 +410,8 @@ class FastModulAut:
 		prompt_2 = self.config.get(self.model_ini, 'prompt_2')
 
 		# print ("login: {}\npassword: {}\nexpect_login: {}\nexpect_password: {}\nprompt_1: {}\nprompt_2: {}".format(login, password, expect_login, expect_password, prompt_1, prompt_2))
-
-		i = self.new_telnet.expect([expect_login, 'Connection closed', pexpect.TIMEOUT, '[Nn]o route to host', '[Cc]onnection refused'], timeout=self.timeout)
+		expects = [expect_login, 'Connection closed', pexpect.TIMEOUT, '[Nn]o route to host', '[Cc]onnection refused']
+		i = self.new_telnet.expect(expects, timeout=self.timeout)
 		# print(f"*****----- I - {i} -----*****")
 		self.check_telnet_connect(i, errors)
 		if i != 0:
@@ -432,7 +436,7 @@ class FastModulAut:
 
 		if i == 0: # это условие добавлено для того что бы авторизовываться на оборудование которое не требует ввода пароля
 			i = self.new_telnet.expect([prompt_1, prompt_2, pexpect.TIMEOUT, 'Connection closed'])
-			self.check_authentication(i)
+			self.check_authentication(i, errors)
 
 
 		if mes31xx_21xx_11xx == 'no pass': # добавлено для того что бы авторизовываться на оборудование которое не требует ввода пароля
