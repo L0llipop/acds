@@ -1,7 +1,7 @@
 configure
 admin-password Cdbnx0AA Cdbnx0AA
 tacacs-server host 1 10.184.121.4 key wpS29slv
-tacacs-accounting host 1 10.178.199.4 key wpS29slv
+tacacs-accounting host 1 10.184.121.4 key wpS29slv
 aaa authentication login tacacs+ local
 aaa authorization exec tacacs+
 service-control ftp 21
