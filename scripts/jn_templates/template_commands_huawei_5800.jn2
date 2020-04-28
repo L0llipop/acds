@@ -1058,6 +1058,25 @@ ont-lineprofile gpon profile-id 222 profile-name "ERIC_L3+0AAA+VOIP"
   commit
   quit
 
+ont-lineprofile gpon profile-id 236 profile-name "ERIC_L2+ABII+VOIP"
+ qos-mode gem-car
+ mapping-mode port-vlan
+ tcont 3 dba-profile-id 13
+ tcont 4 dba-profile-id 11
+ tcont 5 dba-profile-id 11
+ tcont 8 dba-profile-id 11
+ port-bundle eth 0 port 3,4
+ gem add 2 eth tcont 3
+ gem add 3 eth tcont 4
+ gem add 4 eth tcont 5
+ gem add 7 eth tcont 8
+ gem mapping 7 7 eth-bundle 0
+ gem mapping 2 2 ippath 0
+ gem mapping 3 3 eth 1
+ gem mapping 4 4 eth 2
+ commit
+ quit
+
  ont-lineprofile gpon profile-id 238 profile-name "ERIC:IPTV_1,2,3,4+VOIP"
    qos-mode gem-car
    mapping-mode port-vlan
