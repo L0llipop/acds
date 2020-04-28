@@ -1273,6 +1273,21 @@ commit
 quit
 
 
+"ont-lineprofile gpon profile-id 1001 profile-name ""RON+000M+VOIP""
+mapping-mode port-vlan
+tcont 1 dba-profile-id 11
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+gem add 0 eth tcont 1
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem mapping 0 0 iphost
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 eth 4
+commit
+quit"
+
 
 sysname {{ hostname }}
 
