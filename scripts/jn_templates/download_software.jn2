@@ -45,7 +45,7 @@ reload
 
 {% elif model == 'x3xx' %}boot system tftp://{{ ftp_server }}/FTP/FTTb/mes3300-4013-3R1.ros
 
-{% elif model == 'MA-4000' %}tftp://{{ ftp_server }}/FTP/FTTh/firmware.3.26.3.2.ma4k fs://firmware 
+{% elif model == 'MA-4000' %}tftp://{{ ftp_server }}/FTP/FTTh/firmware.3.30.0.207.ma4k fs://firmware 
 copy tftp://{{ ftp_server }}/FTP/license_ma4000.lic fs://license 
 show firmware
 firmware select image-alternate
