@@ -97,7 +97,7 @@ def firelist(request):
         query_fire = f"""select fl.fireid, fl.type, fl.serial, fl.inventory, fl.room, fl.fullweight, fl.status, fl.comandor, fl.address, fl.ClassList 
         from FireSupressor.FireList as fl
 			  LEFT JOIN FireSupressor.FireFias as ff on fl.fireid = ff.fireid
-			  WHERE {fi_region}  OR  {fi_area} OR {fi_city} OR {fi_sett} OR {fi_street} OR {fi_house}"""
+			  WHERE {fi_region}  and  {fi_area} and {fi_city} and {fi_sett} and {fi_street} and {fi_house}"""
         sqldata = db_model_search(query_fire)
         for iii in sqldata:
              querycheck =  "select fc.chargeid, fc.Chargedata, fc.Checkdata, fc.weight, fc.userwho from FireCheck as fc where fc.fireid = " + str(iii[0])
