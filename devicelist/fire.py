@@ -72,12 +72,6 @@ def firelist(request):
         query_fire = f"""select fl.fireid, fl.type, fl.serial, fl.inventory, fl.room, fl.fullweight, fl.status, fl.comandor, fl.address, fl.ClassList 
         from FireSupressor.FireList as fl
 			  LEFT JOIN FireSupressor.FireFias as ff on fl.fireid = ff.fireid
-        LEFT JOIN FireSupressor.FireFias_region as fr on ff.region_fias_id = fr.region_fias_id
-        LEFT JOIN FireSupressor.FireFias_area as far ON ff.area_fias_id = far.area_fias_id
-        LEFT JOIN FireSupressor.FireFias_city as fc ON ff.city_fias_id = fc.city_fias_id
-        LEFT JOIN FireSupressor.FireFias_settlement as fs ON ff.settlement_fias_id = fs.settlement_fias_id
-        LEFT JOIN FireSupressor.FireFias_street as fst ON ff.street_fias_id = fst.street_fias_id
-        LEFT JOIN FireSupressor.FireFias_house as fh ON ff.house_fias_id = fh.house_fias_id
 			  WHERE (ff.region_fias_id LIKE '%{fii["region_fias_id"]}%'  OR  ff.region_fias_id is NULL) OR 
               (ff.area_fias_id LIKE '%{fii["area_fias_id"]}%'  OR  ff.area_fias_id is NULL)  OR
               (ff.city_fias_id LIKE '%{fii["city_fias_id"]}%'  OR  ff.city_fias_id is NULL)  OR
