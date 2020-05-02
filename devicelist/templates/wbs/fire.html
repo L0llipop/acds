@@ -6,7 +6,7 @@
 	<style>
 		h6 {
 		font-family: 'Times New Roman', Times, serif; /* Гарнитура текста */ 
-		font-size: 20%%; /* Размер шрифта в процентах */ 
+		font-size: 20%; /* Размер шрифта в процентах */ 
 		}
 		.close:hover,
 		.close:focus {color: black; text-decoration: none; cursor: pointer;}
@@ -15,6 +15,9 @@
 		.close_edit:hover,
 		.close_edit:focus {color: black; text-decoration: none; cursor: pointer;}
 	</style>
+	<script>
+    var fireidlist = {{ firedic.keys }};
+	</script>
 
 <table class="table table-sm">
 	<tr>
@@ -23,7 +26,7 @@
 		<th style="width: 70%"><input class="form-control fire_dadata" placeholder="адрес" type="text"></td>
 		<!--<th style="width: 4"><input class="form-control" placeholder="Заводской №" type="number" name="fire_serial" maxlength="50" id="fire_serial"></td> -->
 		<!--<th style="width: 9%"><input class="form-control" placeholder="Инвентарный №" type="text" name="fire_inventory" maxlength="50" id="fire_inventory"></td>-->
-		<th style="width: 3%" id="commitfield"><input class="btn btn-dark" style='' id="fire_submit" type="submit" value="fire_find"></td>
+		<th style="width: 3%" id="commitfield"><input class="btn btn-dark" id="fire_submit" type="submit" value="fire_find"></td>
 		<input type="hidden" name="fire_fias"  id="fire_fias">
 		</form>
 	</tr>
