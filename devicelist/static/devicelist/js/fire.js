@@ -66,7 +66,7 @@ function editfire(){ // нужно дописать
    fail: function(){alert('что-то подгорело');},
    success: function(data) {
      console.log(data['result']);
-     if (data['insert'] == 'ok'){
+     if (data['edit'] == 'ok'){
        document.getElementById("editfire_modal").setAttribute('style', 'color: green');
        function nothing(){
          document.getElementById("editfire_modal").setAttribute('style', 'color: wight');
