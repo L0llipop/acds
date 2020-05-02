@@ -182,8 +182,8 @@ def set_fire_data(request):
           insertcheck = "INSERT INTO FireSupressor.FireCheck (fireid, Chargedata, userwho, weight) VALUES ('"+fireid+"', '"+data_check+"', '"+comandor+"', '"+weight+"')"
         else:
           insertcheck = "INSERT INTO FireSupressor.FireCheck (fireid, Checkdata, userwho, weight) VALUES ('"+fireid+"', '"+data_check+"', '"+comandor+"', '"+weight+"')"
-    eecheck=db_insert(insertcheck)
-    return JsonResponse({'insert': 'ok', "last_id":eecheck}, safe=False)
+      eecheck=db_insert(insertcheck)
+      return JsonResponse({'insert': 'ok', "last_id":eecheck}, safe=False)
 
   if request.method == 'GET':
     all_data = json.loads(request.GET['all_data'])
