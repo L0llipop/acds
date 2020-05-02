@@ -68,17 +68,36 @@ def firelist(request):
 #fire_fias={"region_fias_id":"54049357-326d-4b8f-b224-3c6dc25d6dd3","area_fias_id":null,"city_fias_id":"9ae64229-9f7b-4149-b27a-d1f6ec74b5ce","settlement_fias_id":null,"street_fias_id":"b5701907-1537-4e52-b93a-d566a47086f7","house_fias_id":"76bedc4e-a5cb-42d3-bbea-8b2765bdd14c"}
     firedic={} # потом сделаю поиск по серийнику и инвентарному номеру, может быть
     if (fi_fi) :
-        fii = json.loads(fi_fi)
+        fii = json.loads(fi_fi)  # составляем sql запрос адреса географического. Если есть значение задаём его в явном виде в запрос
+        if fii["region_fias_id"] =="null":
+           fi_region = "ff.region_fias_id is NULL"
+        else:
+           fi_region = "ff.region_fias_id LIKE '%"+fii["region_fias_id"]+"%'"
+        if fii["area_fias_id"] == "null":
+           fi_area = "ff.area_fias_id is NULL"
+        else:
+           fi_area = "ff.area_fias_id LIKE '%"+fii["area_fias_id"]+"%'"
+        if fii["city_fias_id"] == "null":
+           fi_city = "ff.city_fias_id is NULL"
+        else:
+           fi_city = "ff.city_fias_id LIKE '%"+fii["city_fias_id"]+"%'"
+        if fii["settlement_fias_id"] == "null":
+            fi_sett = "ff.settlement_fias_id is NULL"
+        else:
+            fi_sett = "ff.settlement_fias_id LIKE '%"+fii["settlement_fias_id"] +"%'"
+        if fii["street_fias_id"] =="null":
+            fi_street = "ff.street_fias_id is NULL"
+        else:
+            fi_street = "ff.street_fias_id LIKE '%"+fii["street_fias_id"]+"%'"
+        if fii["house_fias_id"] =="null":
+            fi_house = "ff.house_fias_id is NULL"
+        else:
+            fi_house = "ff.house_fias_id LIKE '%"+fii["house_fias_id"]+"%'"
+           
         query_fire = f"""select fl.fireid, fl.type, fl.serial, fl.inventory, fl.room, fl.fullweight, fl.status, fl.comandor, fl.address, fl.ClassList 
         from FireSupressor.FireList as fl
 			  LEFT JOIN FireSupressor.FireFias as ff on fl.fireid = ff.fireid
-			  WHERE (ff.region_fias_id LIKE '%{fii["region_fias_id"]}%'  OR  ff.region_fias_id is NULL) OR 
-              (ff.area_fias_id LIKE '%{fii["area_fias_id"]}%'  OR  ff.area_fias_id is NULL)  OR
-              (ff.city_fias_id LIKE '%{fii["city_fias_id"]}%'  OR  ff.city_fias_id is NULL)  OR
-              (ff.settlement_fias_id LIKE '%{fii["settlement_fias_id"]}%'  OR  ff.settlement_fias_id is NULL)  OR
-              (ff.street_fias_id LIKE '%{fii["street_fias_id"]}%'  OR  ff.street_fias_id is NULL)  OR
-              (ff.house_fias_id LIKE '%{fii["house_fias_id"]}%'  OR  ff.house_fias_id is NULL)
-	       """
+			  WHERE {fi_region}  OR  {fi_area} OR {fi_city} OR {fi_sett} OR {fi_street} OR {fi_house}"""
         sqldata = db_model_search(query_fire)
         for iii in sqldata:
              querycheck =  "select fc.chargeid, fc.Chargedata, fc.Checkdata, fc.weight, fc.userwho from FireCheck as fc where fc.fireid = " + str(iii[0])
