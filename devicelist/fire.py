@@ -69,27 +69,27 @@ def firelist(request):
     firedic={} # потом сделаю поиск по серийнику и инвентарному номеру, может быть
     if (fi_fi) :
         fii = json.loads(fi_fi)  # составляем sql запрос адреса географического. Если есть значение задаём его в явном виде в запрос
-        if fii["region_fias_id"] =="null":
+        if fii["region_fias_id"]:
            fi_region = "ff.region_fias_id is NULL"
         else:
            fi_region = "ff.region_fias_id LIKE '%"+fii["region_fias_id"]+"%'"
-        if fii["area_fias_id"] == "null":
+        if fii["area_fias_id"]:
            fi_area = "ff.area_fias_id is NULL"
         else:
            fi_area = "ff.area_fias_id LIKE '%"+fii["area_fias_id"]+"%'"
-        if fii["city_fias_id"] == "null":
+        if fii["city_fias_id"] :
            fi_city = "ff.city_fias_id is NULL"
         else:
            fi_city = "ff.city_fias_id LIKE '%"+fii["city_fias_id"]+"%'"
-        if fii["settlement_fias_id"] == "null":
+        if fii["settlement_fias_id"]:
             fi_sett = "ff.settlement_fias_id is NULL"
         else:
             fi_sett = "ff.settlement_fias_id LIKE '%"+fii["settlement_fias_id"] +"%'"
-        if fii["street_fias_id"] =="null":
+        if fii["street_fias_id"]:
             fi_street = "ff.street_fias_id is NULL"
         else:
             fi_street = "ff.street_fias_id LIKE '%"+fii["street_fias_id"]+"%'"
-        if fii["house_fias_id"] =="null":
+        if fii["house_fias_id"]:
             fi_house = "ff.house_fias_id is NULL"
         else:
             fi_house = "ff.house_fias_id LIKE '%"+fii["house_fias_id"]+"%'"
