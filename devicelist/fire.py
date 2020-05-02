@@ -66,14 +66,32 @@ def firelist(request):
     fi_se = request.GET.get("fire_serial", "")
     fi_in = request.GET.get("fire_inventory", "")
 #fire_fias={"region_fias_id":"54049357-326d-4b8f-b224-3c6dc25d6dd3","area_fias_id":null,"city_fias_id":"9ae64229-9f7b-4149-b27a-d1f6ec74b5ce","settlement_fias_id":null,"street_fias_id":"b5701907-1537-4e52-b93a-d566a47086f7","house_fias_id":"76bedc4e-a5cb-42d3-bbea-8b2765bdd14c"}
-    query_dic={}
-    if (fire_fias or fire_serial or fire_inventory) :
+    firedic={} # потом сделаю поиск по серийнику и инвентарному номеру, может быть
+    if (fi_fi) :
         
         query_fire = f"""select fl.fireid, fl.type, fl.serial, fl.inventory, fl.room, fl.fullweight, fl.status, fl.comandor, fl.address, fl.ClassList 
         from FireSupressor.FireList as fl
 			  LEFT JOIN FireSupressor.FireFias as ff on fl.fireid = ff.fireid
-			  WHERE (fl.serial LIKE '%{fire_serial}%' or ) OR fl.inventory = '{fire_inventory}') OR ()
-	 """
+        LEFT JOIN FireSupressor.FireFias_region as fr on ff.region_fias_id = fr.region_fias_id
+        LEFT JOIN FireSupressor.FireFias_area as far ON ff.area_fias_id = far.area_fias_id
+        LEFT JOIN FireSupressor.FireFias_city as fc ON ff.city_fias_id = fc.city_fias_id
+        LEFT JOIN FireSupressor.FireFias_settlement as fs ON ff.settlement_fias_id = fs.settlement_fias_id
+        LEFT JOIN FireSupressor.FireFias_street as fst ON ff.street_fias_id = fst.street_fias_id
+        LEFT JOIN FireSupressor.FireFias_house as fh ON ff.house_fias_id = fh.house_fias_id
+			  WHERE (ff.region_fias_id LIKE '%{fi_fi["region_fias_id"]}%'  OR  ff.region_fias_id is NULL) OR 
+              (ff.area_fias_id LIKE '%{fi_fi["area_fias_id"]}%'  OR  ff.area_fias_id is NULL)  OR
+              (ff.city_fias_id LIKE '%{fi_fi["city_fias_id"]}%'  OR  ff.city_fias_id is NULL)  OR
+              (ff.settlement_fias_id LIKE '%{fi_fi["settlement_fias_id"]}%'  OR  ff.settlement_fias_id is NULL)  OR
+              (ff.street_fias_id LIKE '%{fi_fi["street_fias_id"]}%'  OR  ff.street_fias_id is NULL)  OR
+              (ff.house_fias_id LIKE '%{fi_fi["house_fias_id"]}%'  OR  ff.house_fias_id is NULL)
+	       """
+        sqldata = db_model_search(query_fire)
+        for iii in sqldata:
+             querycheck =  "select fc.chargeid, fc.Chargedata, fc.Checkdata, fc.weight, fc.userwho from FireCheck as fc where fc.fireid = " + str(iii[0])
+             checklist = db_model_search(querycheck)
+             firedic[iii[0]]=({"fire":iii, "check":checklist})
+        return render(request, 'wbs/fire.html', locals())
+        
 			
 
   firedic={}
