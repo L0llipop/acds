@@ -71,7 +71,7 @@ function editfire(){ // нужно дописать
        function nothing(){
          document.getElementById("editfire_modal").setAttribute('style', 'color: wight');
          //document.forms.addfire_modal.reset();
-         document.forms.namedItem("editfire_modal").reset();
+         document.forms.namedItem("editfireform").reset();
          modal.style.display = "none";
          }
        setTimeout(nothing,1000);
