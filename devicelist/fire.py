@@ -201,7 +201,7 @@ def set_fire_data(request):
       updatequery = "UPDATE FireSupressor.FireSupressor SET serial='"+serial+"', inventory='"+inventory+"', type='"+firetype+"',  room='"+room+"', comandor='"+comandor+"', status='"+firestatus+"') WHERE fireid="+fireid+""
       lastid_ee=db_insert(updatequery)
       fias_rez=fire_fias.fire_fias_update(fireid,address)  
-      return JsonResponse({'edit': 'ok'}, safe=False)    
+      return JsonResponse({'edit': 'ok',"result":lastid_ee}, safe=False)    
 
   return JsonResponse({'update': 'unknown'}, safe=False)
   
