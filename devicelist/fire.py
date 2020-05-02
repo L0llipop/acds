@@ -184,7 +184,24 @@ def set_fire_data(request):
           insertcheck = "INSERT INTO FireSupressor.FireCheck (fireid, Checkdata, userwho, weight) VALUES ('"+fireid+"', '"+data_check+"', '"+comandor+"', '"+weight+"')"
     eecheck=db_insert(insertcheck)
     return JsonResponse({'insert': 'ok', "last_id":eecheck}, safe=False)
-    
+
+  if request.method == 'GET':
+    all_data = json.loads(request.GET['all_data'])
+    if all_data['action'] =="editfire":
+      fireid = all_data['fireid']
+      address = all_data['address']
+      room = all_data['room']
+      comandor = all_data['comandor']
+      serial = all_data['serial']
+      inventory = all_data['inventory']
+      weight = all_data['weight']
+      firetype = firedic[all_data['firetype']]
+      firestatus = firedic[all_data['firestatus']]
+      fireclass = all_data['fireclass'].split(',')
+      updatequery = "UPDATE FireSupressor.FireSupressor SET serial='"+serial+"', inventory='"+inventory+"', type='"+firetype+"',  room='"+room+"', comandor='"+comandor+"', status='"+firestatus+"') WHERE fireid="+fireid+""
+      lastid_ee=db_insert(updatequery)
+      fias_rez=fire_fias.fire_fias_update(fireid,address)  
+      return JsonResponse({'edit': 'ok'}, safe=False)    
 
   return JsonResponse({'update': 'unknown'}, safe=False)
   

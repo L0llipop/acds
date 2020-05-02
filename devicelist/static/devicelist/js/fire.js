@@ -43,12 +43,49 @@ function editfire(){ // нужно дописать
  all_data = {
    'action': "editfire",
    'fireid': document.forms["editfireform"].elements["fireid"].value,
-   'room':document.forms["editfireform"].elements["room_modal"].value
-//onclick="document.getElementById('personlist').getElementsByTagName('option')[11].selected = 'selected';">change</a>
-
-
+   'address': document.forms["editfireform"].elements["addres_modal"].value,
+   'room': document.forms["editfireform"].elements["room_modal"].value,
+   'comandor': document.forms["editfireform"].elements["comandor_modal"].value,
+   'serial': document.forms["editfireform"].elements["serial_modal"].value,
+   'inventory': document.forms["editfireform"].elements["inventory_modal"].value,
+   'weight': document.forms["editfireform"].elements["weight_modal"].value,
+   'firetype': document.forms["editfireform"].elements["firetype_modal"].value,
+   'firestatus': document.forms["editfireform"].elements["firestatus_modal"].value,
+   'fireclass':fireclasslist
  }
 
+ let json_data = JSON.stringify(all_data);
+
+  
+
+ $.ajax('set_fire_data/',{
+   method: "GET",
+   data: {all_data: json_data},
+   cache: false,
+   fail: function(){alert('что-то подгорело');},
+   success: function(data) {
+     console.log(data['result']);
+     if (data['insert'] == 'ok'){
+       document.getElementById("editfire_modal").setAttribute('style', 'color: green');
+       function nothing(){
+         document.getElementById("editfire_modal").setAttribute('style', 'color: wight');
+         //document.forms.addfire_modal.reset();
+         document.forms.namedItem("editfire_modal").reset();
+         modal.style.display = "none";
+         }
+       setTimeout(nothing,1000);
+      
+       }
+     if (data['error'] !== undefined) {
+       document.getElementById("editfire_modal").setAttribute('style', 'color: red');
+       function nothing(){
+         document.getElementById("editfire_modal").setAttribute('style', 'color: wight');
+         }
+       setTimeout(nothing,2000);
+       console.log(data['error']);
+       }
+   }
+ });
 
 }
 
