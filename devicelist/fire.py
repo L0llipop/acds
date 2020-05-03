@@ -233,7 +233,19 @@ def firejornal(request):
       checklist = db_model_search(querycheck)
       if checklist:
         for kkk in checklist:
-          sheet1.cell(column=1, row=5+cellnn, value=str(iii[2])+" "+str(iii[3]) + " тип:" + str(iii[1]))
+          if str(iii[1]).isspace : 
+            fire_type = ""
+          else:
+            fire_type = str(iii[1])
+          if str(iii[2]).isspace :
+            fire_serial = ""
+          else:
+            fire_serial = str(iii[2])
+          if str(iii[3]).isspace :
+            fire_inventory = ""
+          else:
+            fire_inventory = str(iii[3])
+          sheet1.cell(column=1, row=5+cellnn, value=fire_serial+" "+fire_inventory + " тип:" + fire_type)
           sheet1.cell(column=7, row=5+cellnn, value=str(iii[6]))
           sheet1.cell(column=5, row=5+cellnn, value=str(kkk[1])) # дата заправки
           sheet1.cell(column=2, row=5+cellnn, value=str(kkk[2])) # дата проверки
@@ -241,7 +253,7 @@ def firejornal(request):
           cellnn+=1
       else:
         sheet1.cell(column=1, row=5+cellnn, value=str(iii[2])+" "+str(iii[3]) + " тип:" + str(iii[1]))
-        sheet1.cell(column=7, row=5+cellnn, value=str(iii[6]))
+        sheet1.cell(column=7, row=5+cellnn, value=str(iii[6])) # статус
         cellnn+=1
   wb1.save(buffer)
   buffer.seek(0)
