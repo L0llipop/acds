@@ -227,12 +227,13 @@ def firejornal(request):
   #firedic={}
   sqldata= db_model_search(sqlselect1)
   cellnn=0
-  for iii in sqldata:
-    querycheck =  "select fc.chargeid, fc.Chargedata, fc.Checkdata, fc.weight, fc.userwho from FireCheck as fc where fc.fireid = " + str(iii[0])
-    checklist = db_model_search(querycheck)
-    sheet1.cell(column=1, row=5+cellnn, value=str(iii[2])+str(iii[3]))
-    sheet1.cell(column=5, row=5+cellnn, value=str(checklist))
-    cellnn+=1
+  if sqldata:
+    for iii in sqldata:
+      querycheck =  "select fc.chargeid, fc.Chargedata, fc.Checkdata, fc.weight, fc.userwho from FireCheck as fc where fc.fireid = " + str(iii[0])
+      checklist = db_model_search(querycheck)
+      sheet1.cell(column=1, row=5+cellnn, value=str(iii[2])+" "+str(iii[3])) + " тип:" + str(iii[1])
+      sheet1.cell(column=5, row=5+cellnn, value=str(checklist))
+      cellnn+=1
   wb1.save(buffer)
   buffer.seek(0)
   
