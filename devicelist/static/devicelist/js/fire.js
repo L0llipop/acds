@@ -248,7 +248,7 @@ var btnexcel = document.getElementById("Btnfirejornal");
 
 btnexcel.onclick = function() {
   var link = document.createElement("a");
-  link.download = "firejornal.xlsx";
+  link.download = "firejornal2.xlsx";
   link.href = "http://10.180.7.34/devicelist/fire/firejornal/?firelist="+fireidlist;
   document.body.appendChild(link);
   link.click();
