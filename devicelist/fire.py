@@ -236,7 +236,7 @@ def firejornal(request):
   wb1.save(buffer)
   buffer.seek(0)
   
-  return JsonResponse({'sqlselect': str(sqlselect1)}, safe=False)
+  return JsonResponse({'sqlselect': str(sqldata)}, safe=False)
   #return FileResponse(buffer,as_attachment=True, filename='firejornal.xlsx')
 
   
