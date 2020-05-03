@@ -203,9 +203,9 @@ def set_fire_data(request):
       lastid_ee=db_insert(updatequery) # пишем в базу реквизиты
       fias_rez=fire_fias.fire_fias_update(fireid,address)  # пишем в базу адрес
       # обновление данных о классах огнетушителя
+      clearclass = "DELETE * FROM FireSupressor.FireClassAndFireID  WHERE fireid="+fireid
+      db_insert(clearclass)
       for hhh in fireclass:
-        clearclass = "DELETE * FROM FireSupressor.FireClassAndFireID  WHERE fireid="+fireid
-        db_insert(clearclass)
         insertclass = "INSERT INTO FireSupressor.FireClassAndFireID (fireid, classid) VALUES ('"+fireid+"', '"+firedic[hhh]+"')"
         db_insert(insertclass)
       return JsonResponse({'edit': 'ok',"result":lastid_ee}, safe=False)    
