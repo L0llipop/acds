@@ -200,9 +200,14 @@ def set_fire_data(request):
       firestatus = firedic[all_data['firestatus']]
       fireclass = all_data['fireclass'].split(',')
       updatequery = "UPDATE FireSupressor.FireSupressor SET serial='"+serial+"', inventory='"+inventory+"', type='"+firetype+"',  room='"+room+"', comandor='"+comandor+"', status='"+firestatus+"' WHERE fireid="+fireid+" "
-      lastid_ee=db_insert(updatequery)
-      fias_rez=fire_fias.fire_fias_update(fireid,address)  
-      # дописать обновление данных о классах огнетушителя
+      lastid_ee=db_insert(updatequery) # пишем в базу реквизиты
+      fias_rez=fire_fias.fire_fias_update(fireid,address)  # пишем в базу адрес
+      # обновление данных о классах огнетушителя
+      for hhh in fireclass:
+        clearclass = "DELETE * FROM FireSupressor.FireClassAndFireID  WHERE fireid="+fireid
+        db_insert(clearclass)
+        insertclass = "INSERT INTO FireSupressor.FireClassAndFireID (fireid, classid) VALUES ('"+fireid+"', '"+firedic[hhh]+"')"
+        db_insert(insertclass)
       return JsonResponse({'edit': 'ok',"result":lastid_ee}, safe=False)    
 
   return JsonResponse({'update': 'unknown'}, safe=False)
