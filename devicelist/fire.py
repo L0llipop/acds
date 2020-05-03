@@ -217,7 +217,7 @@ def firejornal(request):
     sqlselect1 = "select fireid, type, serial, inventory, room, fullweight, status, comandor, address, ClassList from FireSupressor.FireList WHERE fireid IN "+firelist3
 
   try:
-    wb1 = load_workbook('static/devicelist/firejornal.xlsx')
+    wb1 = load_workbook('static/devicelist/firejornal2.xlsx')
   except Exception as e:
     return JsonResponse({'error': str(e)}, safe=False)
 
