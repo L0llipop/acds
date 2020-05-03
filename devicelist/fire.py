@@ -239,7 +239,7 @@ def firejornal(request):
         cellnn+=1
       else:
         sheet1.cell(column=1, row=5+cellnn, value=str(iii[2])+" "+str(iii[3]) + " тип:" + str(iii[1]))
-        sheet1.cell(column=7, row=5+cellnn, value=str(iii[2])+" "+str(iii[3]) + " тип:" + str(iii[1]))
+        sheet1.cell(column=7, row=5+cellnn, value=str(iii[6]))
         cellnn+=1
       cellnn+=1
   wb1.save(buffer)
