@@ -234,26 +234,42 @@ def firejornal(request):
       if iii[1]: 
             fire_type = str(iii[1])
       else:
-            fire_type = " "
+            fire_type = ""
       if iii[2] :
             fire_serial = str(iii[2])
       else:
-            fire_serial = " "
+            fire_serial = ""
       if iii[3] :
             fire_inventory = str(iii[3])
       else:
-            fire_inventory = " "
+            fire_inventory = ""
+      if iii[6]:
+         fire_status = str(iii[6])
+      else:
+         fire_status = ""
       if checklist:
+        if kkk[1]:
+          charge_data = str(kkk[1])
+        else:
+          charge_data =""
+        if kkk[2]:
+          check_data = str(kkk[2])
+        else:
+          check_data = ""
+        if kkk[4]:
+          user_who = str(kkk[4])
+        else:
+          user_who =""
         for kkk in checklist:
           sheet1.cell(column=1, row=5+cellnn, value=fire_serial+" "+fire_inventory + " тип:" + fire_type)
-          sheet1.cell(column=7, row=5+cellnn, value=str(iii[6]))
-          sheet1.cell(column=5, row=5+cellnn, value=str(kkk[1])) # дата заправки
-          sheet1.cell(column=2, row=5+cellnn, value=str(kkk[2])) # дата проверки
-          sheet1.cell(column=9, row=5+cellnn, value=str(kkk[4])) # ответственный
+          sheet1.cell(column=7, row=5+cellnn, value=fire_status)
+          sheet1.cell(column=5, row=5+cellnn, value=charge_data) # дата заправки
+          sheet1.cell(column=2, row=5+cellnn, value=check_data) # дата проверки
+          sheet1.cell(column=9, row=5+cellnn, value=user_who) # ответственный
           cellnn+=1
       else:
         sheet1.cell(column=1, row=5+cellnn, value=fire_serial+" "+fire_inventory + " тип:" + fire_type)
-        sheet1.cell(column=7, row=5+cellnn, value=str(iii[6])) # статус
+        sheet1.cell(column=7, row=5+cellnn, value=fire_status) # статус
         cellnn+=1
   wb1.save(buffer)
   buffer.seek(0)
