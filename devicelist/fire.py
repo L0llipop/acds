@@ -234,15 +234,15 @@ def firejornal(request):
       if str(iii[1]).isspace : 
             fire_type = str(iii[1])
       else:
-            fire_type = ""
+            fire_type = " "
       if str(iii[2]).isspace :
             fire_serial = str(iii[2])
       else:
-            fire_serial = ""
+            fire_serial = " "
       if str(iii[3]).isspace :
             fire_inventory = str(iii[3])
       else:
-            fire_inventory = ""
+            fire_inventory = " "
       if checklist:
         for kkk in checklist:
           sheet1.cell(column=1, row=5+cellnn, value=fire_serial+" "+fire_inventory + " тип:" + fire_type)
