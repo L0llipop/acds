@@ -209,6 +209,12 @@ def set_fire_data(request):
 def firejornal(request):
   if not request.user.is_authenticated:
     return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+  if request.method == 'GET':
+    fireliststr = request.GET.get("firelist", "")  #"dict_keys([6, 3, 9, 4, 10, 7, 12, 5, 14])"
+    firelist1 = fireliststr.replace("dict_keys","")
+    firelist2 = firelist1.replace("[","")
+    firelist3 = firelist2.replace("]","")
+    sqlselect1 = "select fireid, type, serial, inventory, room, fullweight, status, comandor, address, ClassList from FireSupressor.FireList WHERE fireid IN "+firelist3
 
   try:
     wb1 = load_workbook('static/devicelist/firejornal.xlsx')
@@ -219,7 +225,7 @@ def firejornal(request):
 
   sheet1 = wb1['fire1']
   #firedic={}
-  sqldata= db_model_search("select fireid, type, serial, inventory, room, fullweight, status, comandor, address, ClassList from FireSupressor.FireList")
+  sqldata= db_model_search(sqlselect1)
   cellnn=0
   for iii in sqldata:
     querycheck =  "select fc.chargeid, fc.Chargedata, fc.Checkdata, fc.weight, fc.userwho from FireCheck as fc where fc.fireid = " + str(iii[0])
