@@ -40,7 +40,7 @@ $(document).on('click','.edit_fire', function () {//показывает мод�
 
 function editfire(){ // нужно дописать
   event.preventDefault();
-  var fireclasslist = $('#fireclass_modal option:selected').toArray().map(item => item.value).join();
+  var fireclasslist = $('#fireclass_modal_edit option:selected').toArray().map(item => item.value).join();
  all_data = {
    'action': "editfire",
    'fireid': document.forms["editfireform"].elements["fireid"].value,
