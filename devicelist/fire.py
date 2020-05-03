@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.core.mail import mail_admins
 from django.http import JsonResponse, FileResponse
 from openpyxl import load_workbook
+from openpyxl.styles.borders import Border, Side
 
 import sys, os, re, time, io
 import datetime
@@ -224,6 +225,8 @@ def firejornal(request):
   buffer = io.BytesIO()
 
   sheet1 = wb1['fire1']
+  thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+
   #firedic={}
   sqldata= db_model_search(sqlselect1)
   cellnn=0
@@ -261,15 +264,15 @@ def firejornal(request):
             user_who = str(kkk[4])
           else:
             user_who =""
-          sheet1.cell(column=1, row=5+cellnn, value=fire_serial+" "+fire_inventory + " тип:" + fire_type)
-          sheet1.cell(column=7, row=5+cellnn, value=fire_status)
-          sheet1.cell(column=5, row=5+cellnn, value=charge_data) # дата заправки
-          sheet1.cell(column=2, row=5+cellnn, value=check_data) # дата проверки
-          sheet1.cell(column=9, row=5+cellnn, value=user_who) # ответственный
+          sheet1.cell(column=1, row=5+cellnn, value=fire_serial+" "+fire_inventory + " тип:" + fire_type).border = thin_border
+          sheet1.cell(column=7, row=5+cellnn, value=fire_status).border = thin_border
+          sheet1.cell(column=5, row=5+cellnn, value=charge_data).border = thin_border
+          sheet1.cell(column=2, row=5+cellnn, value=check_data).border = thin_border
+          sheet1.cell(column=9, row=5+cellnn, value=user_who).border = thin_border
           cellnn+=1
       else:
-        sheet1.cell(column=1, row=5+cellnn, value=fire_serial+" "+fire_inventory + " тип:" + fire_type)
-        sheet1.cell(column=7, row=5+cellnn, value=fire_status) # статус
+        sheet1.cell(column=1, row=5+cellnn, value=fire_serial+" "+fire_inventory + " тип:" + fire_type).border = thin_border
+        sheet1.cell(column=7, row=5+cellnn, value=fire_status).border = thin_border
         cellnn+=1
   wb1.save(buffer)
   buffer.seek(0)
