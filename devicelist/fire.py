@@ -232,11 +232,12 @@ def firejornal(request):
       querycheck =  "select fc.chargeid, fc.Chargedata, fc.Checkdata, fc.weight, fc.userwho from FireCheck as fc where fc.fireid = " + str(iii[0])
       checklist = db_model_search(querycheck)
       if checklist:
-        sheet1.cell(column=1, row=5+cellnn, value=str(iii[2])+" "+str(iii[3]) + " тип:" + str(iii[1]))
-        sheet1.cell(column=5, row=5+cellnn, value=str(checklist[1])) # дата заправки
-        sheet1.cell(column=2, row=5+cellnn, value=str(checklist[2])) # дата проверки
-        sheet1.cell(column=9, row=5+cellnn, value=str(checklist[2])) # ответственный
-        cellnn+=1
+        for kkk in checklist:
+          sheet1.cell(column=1, row=5+cellnn, value=str(iii[2])+" "+str(iii[3]) + " тип:" + str(iii[1]))
+          sheet1.cell(column=5, row=5+cellnn, value=str(kkk[1])) # дата заправки
+          sheet1.cell(column=2, row=5+cellnn, value=str(kkk[2])) # дата проверки
+          sheet1.cell(column=9, row=5+cellnn, value=str(kkk[2])) # ответственный
+          cellnn+=1
       else:
         sheet1.cell(column=1, row=5+cellnn, value=str(iii[2])+" "+str(iii[3]) + " тип:" + str(iii[1]))
         sheet1.cell(column=7, row=5+cellnn, value=str(iii[6]))
