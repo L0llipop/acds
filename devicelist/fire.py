@@ -248,19 +248,19 @@ def firejornal(request):
       else:
          fire_status = ""
       if checklist:
-        if kkk[1]:
-          charge_data = str(kkk[1])
-        else:
-          charge_data =""
-        if kkk[2]:
-          check_data = str(kkk[2])
-        else:
-          check_data = ""
-        if kkk[4]:
-          user_who = str(kkk[4])
-        else:
-          user_who =""
         for kkk in checklist:
+          if kkk[1]:
+            charge_data = str(kkk[1])
+          else:
+            charge_data =""
+          if kkk[2]:
+            check_data = str(kkk[2])
+          else:
+            check_data = ""
+          if kkk[4]:
+            user_who = str(kkk[4])
+          else:
+            user_who =""
           sheet1.cell(column=1, row=5+cellnn, value=fire_serial+" "+fire_inventory + " тип:" + fire_type)
           sheet1.cell(column=7, row=5+cellnn, value=fire_status)
           sheet1.cell(column=5, row=5+cellnn, value=charge_data) # дата заправки
