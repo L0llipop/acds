@@ -231,15 +231,15 @@ def firejornal(request):
     for iii in sqldata:
       querycheck =  "select fc.chargeid, fc.Chargedata, fc.Checkdata, fc.weight, fc.userwho from FireCheck as fc where fc.fireid = " + str(iii[0])
       checklist = db_model_search(querycheck)
-      if str(iii[1]): 
+      if iii[1]: 
             fire_type = str(iii[1])
       else:
             fire_type = " "
-      if str(iii[2]) :
+      if iii[2] :
             fire_serial = str(iii[2])
       else:
             fire_serial = " "
-      if str(iii[3]) :
+      if iii[3] :
             fire_inventory = str(iii[3])
       else:
             fire_inventory = " "
