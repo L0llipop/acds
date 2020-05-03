@@ -250,6 +250,7 @@ btnexcel.onclick = function() {
   var link = document.createElement("a");
   link.download = "firejornal2.xlsx";
   link.href = "http://10.180.7.34/devicelist/fire/firejornal/?firelist="+fireidlist;
+  console.log(link.href);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
