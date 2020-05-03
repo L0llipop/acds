@@ -231,20 +231,20 @@ def firejornal(request):
     for iii in sqldata:
       querycheck =  "select fc.chargeid, fc.Chargedata, fc.Checkdata, fc.weight, fc.userwho from FireCheck as fc where fc.fireid = " + str(iii[0])
       checklist = db_model_search(querycheck)
+      if str(iii[1]).isspace : 
+            fire_type = str(iii[1])
+      else:
+            fire_type = ""
+      if str(iii[2]).isspace :
+            fire_serial = str(iii[2])
+      else:
+            fire_serial = ""
+      if str(iii[3]).isspace :
+            fire_inventory = str(iii[3])
+      else:
+            fire_inventory = ""
       if checklist:
         for kkk in checklist:
-          if str(iii[1]).isspace : 
-            fire_type = ""
-          else:
-            fire_type = str(iii[1])
-          if str(iii[2]).isspace :
-            fire_serial = ""
-          else:
-            fire_serial = str(iii[2])
-          if str(iii[3]).isspace :
-            fire_inventory = ""
-          else:
-            fire_inventory = str(iii[3])
           sheet1.cell(column=1, row=5+cellnn, value=fire_serial+" "+fire_inventory + " тип:" + fire_type)
           sheet1.cell(column=7, row=5+cellnn, value=str(iii[6]))
           sheet1.cell(column=5, row=5+cellnn, value=str(kkk[1])) # дата заправки
