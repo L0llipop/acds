@@ -252,7 +252,7 @@ def firejornal(request):
           sheet1.cell(column=9, row=5+cellnn, value=str(kkk[4])) # ответственный
           cellnn+=1
       else:
-        sheet1.cell(column=1, row=5+cellnn, value=str(iii[2])+" "+str(iii[3]) + " тип:" + str(iii[1]))
+        sheet1.cell(column=1, row=5+cellnn, value=fire_serial+" "+fire_inventory + " тип:" + fire_type)
         sheet1.cell(column=7, row=5+cellnn, value=str(iii[6])) # статус
         cellnn+=1
   wb1.save(buffer)
