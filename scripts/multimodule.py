@@ -210,39 +210,52 @@ class FastModulAut:
 	def check_telnet_connect(self, i, errors = True):
 		""" Проверка telnet подключения """
 		# print ('check_telnet_connect {}'.format(i))
+		error = ""
 		if i == 1:
 			if errors == True:
 				print ('{:45}{:20}'.format(' == check_telnet_connect_No telnet == ', self.ip))
+				error = "telnet_connect_No telnet"
 		elif i == 2:
 			if errors == True:
-				print ('{:45}{:20}'.format(' == check_telnet_connect_Timeout == ', self.ip))
+				# print ('{:45}{:20}'.format(' == check_telnet_connect_Timeout == ', self.ip))
+				error = "telnet_connect_Timeout"
 		elif i == 3:
 			if errors == True:
-				print ('{:45}{:20}'.format(' == check_telnet_connect_No_route_to_host == ', self.ip))
+				# print ('{:45}{:20}'.format(' == check_telnet_connect_No_route_to_host == ', self.ip))
+				error = "telnet_connect_No_route_to_host"
 		elif i == 4:
 			if errors == True:
-				print ('{:45}{:20}'.format(' == check_telnet_connect_Connection_refused == ', self.ip))
+				# print ('{:45}{:20}'.format(' == check_telnet_connect_Connection_refused == ', self.ip))
+				error = "telnet_connect_Connection_refused"
 		elif i != 0:
 			if errors == True:
-				print ('{:45}{:20}'.format(' == check_telnet_connect_Other == ', self.ip))
+				# print ('{:45}{:20}'.format(' == check_telnet_connect_Other == ', self.ip))
+				error = "telnet_connect_Other"
+
+		return error
 
 	def check_authentication(self, i, errors = True):
 		""" Проверка авторизации """
 		# print ('check_authentication {}'.format(i))
+		error = ""
 		if i == 1:
 			if errors == True:
-				print ('{:45}{:20}'.format(' == check_authentication_Login incorrect == ', self.ip))
+				# print ('{:45}{:20}'.format(' == check_authentication_Login incorrect == ', self.ip))
+				error = "authentication_Login incorrect"
 		elif i == 2:
 			if errors == True:
-				print ('{:45}{:20}'.format(' == check_authentication_Timeout == ', self.ip))
+				# print ('{:45}{:20}'.format(' == check_authentication_Timeout == ', self.ip))
+				error = "authentication_Timeout"
 		elif i == 3:
 			if errors == True:
-				print ('{:45}{:20}'.format(' == check_authentication_Connection_closed == ', self.ip))
+				# print ('{:45}{:20}'.format(' == check_authentication_Connection_closed == ', self.ip))
+				error = "authentication_Connection_closed"
 		elif i != 0:
 			if errors == True:
-				print ('{:45}{:20}'.format(' == check_authentication_Other == ', self.ip))
-		# 	print ('------> before:\n{}\n<------'.format(self.new_telnet.before))
-		# 	print ('------> after:\n{}\n<------'.format(self.new_telnet.after))
+				# print ('{:45}{:20}'.format(' == check_authentication_Other == ', self.ip))
+				error = "authentication_Other"
+
+		return error
 
 	def new_send(self, command):
 		self.new_telnet.send(command)
@@ -413,9 +426,9 @@ class FastModulAut:
 		expects = [expect_login, 'Connection closed', pexpect.TIMEOUT, '[Nn]o route to host', '[Cc]onnection refused']
 		i = self.new_telnet.expect(expects, timeout=self.timeout)
 		# print(f"*****----- I - {i} -----*****")
-		self.check_telnet_connect(i, errors)
+		error_con = self.check_telnet_connect(i, errors)
 		if i != 0:
-			return i
+			return error_con
 
 		self.dop = ''
 		if self.model_ini == 'Ericsson' or self.model == 'LTP-8X' or self.model == 'LTP-4X': # костыль для Ericsson, потому что он требует ввода дополнительного символа "\r" для работоспособности скрипта
@@ -436,14 +449,14 @@ class FastModulAut:
 
 		if i == 0: # это условие добавлено для того что бы авторизовываться на оборудование которое не требует ввода пароля
 			i = self.new_telnet.expect([prompt_1, prompt_2, pexpect.TIMEOUT, 'Connection closed'])
-			self.check_authentication(i, errors)
+			error_aut = self.check_authentication(i, errors)
 
 
 		if mes31xx_21xx_11xx == 'no pass': # добавлено для того что бы авторизовываться на оборудование которое не требует ввода пароля
 			i = 0
 
 		if i != 0:
-			return i
+			return error_aut
 
 		if self.model_ini == '1008' or self.model_ini == 'MSAN_FAIBER' or self.model_ini == 'Ericsson':
 			self.new_telnet.sendline(self.config.get(self.model_ini, 'comm_1')+self.dop)
