@@ -404,16 +404,18 @@ class getTopology(object):
 
 			gw_commands = ['show ip route static', 'show running-config | include default-gateway']
 			for idx, com_show_route in enumerate(gw_commands):
-				check = get_gateway_cisco(self)	
+				check = get_gateway_cisco(self)
+				print(f"-----\n{check}")
 				if type(check) == dict:
 					if idx == 1:
 						result.update(check)
 						return result
 					else:
 						continue
-
-			print(f"check - {check}")
-			gateway = check[0]
+				else:
+					print(f"check - {check}")
+					gateway = check[0]
+					break
 
 			# определяем mac gateway и vlan управления
 			com_show_ip_arp = f"show ip arp | include {gateway} "
