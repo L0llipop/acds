@@ -38,8 +38,8 @@ qos map 1 32-33,35-39 to 4 pp
 qos map 1 40-47 to 5 pp
 qos map 1 48-63 to 6 pp
 
-qos wrr queues 1 1 1 1 15 25 25 35
-qos wrr enable 4
+qos wrr queues 1 1 1 15 25 25 35 slot 0-15
+qos wrr enable slot 0-15
 
 vlan 1
  forbidden front-port 1/0
