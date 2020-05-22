@@ -1146,6 +1146,1721 @@ ont-lineprofile gpon profile-id 240 profile-name ERIC_L2+IMIA+VOIP
    commit
    quit
 
+ont-lineprofile gpon profile-id 2000 profile-name "ERIC_L2+MMMM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+port-bundle eth 1 port 1,2,3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2001 profile-name "ERIC_L2+MMMI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 1,2,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2002 profile-name "ERIC_L2+MMMA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 1,2,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 4
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2003 profile-name "ERIC_L2+MMIM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 1,2,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 3
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2004 profile-name "ERIC_L2+MMII+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 3,4
+port-bundle eth 1 port 1,2
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2005 profile-name "ERIC_L2+MMIA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 1,2
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 3
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 4
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2006 profile-name "ERIC_L2+MMAM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 1,2,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 3
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2007 profile-name "ERIC_L2+MMAI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 1,2
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 3
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2008 profile-name "ERIC_L2+MMAA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 1,2
+port-bundle eth 2 port 3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2009 profile-name "ERIC_L2+MIMM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 1,3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 2
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2010 profile-name "ERIC_L2+MIMI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,4
+port-bundle eth 1 port 1,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2011 profile-name "ERIC_L2+MIMA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 1,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 2
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 4
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2012 profile-name "ERIC_L2+MIIM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,3
+port-bundle eth 1 port 1,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2013 profile-name "ERIC_L2+MIII+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 eth 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2014 profile-name "ERIC_L2+MIIA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 4
+multicast gemport tcont 2 eth 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2015 profile-name "ERIC_L2+MIAM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 1,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 2
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 3
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2016 profile-name "ERIC_L2+MIAI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 3
+multicast gemport tcont 2 eth 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2017 profile-name "ERIC_L2+MIAA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 2
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2018 profile-name "ERIC_L2+MAMM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 1,3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2019 profile-name "ERIC_L2+MAMI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 1,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2020 profile-name "ERIC_L2+MAMA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 1,3
+port-bundle eth 2 port 2,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2021 profile-name "ERIC_L2+MAIM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 1,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 3
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2022 profile-name "ERIC_L2+MAII+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+multicast gemport tcont 2 eth 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2023 profile-name "ERIC_L2+MAIA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 2,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 3
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2024 profile-name "ERIC_L2+MAAM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 1,4
+port-bundle eth 2 port 2,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2025 profile-name "ERIC_L2+MAAI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 2,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 4
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 1
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2026 profile-name "ERIC_L2+MAAA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 2 port 2,3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 1
+commit
+quit
+
+
+
+
+ont-lineprofile gpon profile-id 2037 profile-name "ERIC_L2+IIMI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,2,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 3
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 eth 3
+commit
+quit"
+
+ont-lineprofile gpon profile-id 2038 profile-name "ERIC_L2+IIMA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,2
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 3
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 4
+multicast gemport tcont 2 eth 3
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2039 profile-name "ERIC_L2+IIIM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,2,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+multicast gemport tcont 2 eth 4
+commit
+quit
+
+
+
+ont-lineprofile gpon profile-id 2042 profile-name "ERIC_L2+IIAM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,2
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 3
+multicast gemport tcont 2 eth 4
+commit
+quit
+
+ont-lineprofile gpon profile-id 2043 profile-name "ERIC_L2+IIAI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,2,4
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 3
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2044 profile-name "ERIC_L2+IIAA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,2
+port-bundle eth 2 port 3,4
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+commit
+quit
+
+ont-lineprofile gpon profile-id 2045 profile-name "ERIC_L2+IAMM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 1
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2046 profile-name "ERIC_L2+IAMI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 3
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+multicast gemport tcont 2 eth 3
+commit
+quit
+
+ont-lineprofile gpon profile-id 2047 profile-name "ERIC_L2+IAMA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 2,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 1
+gem mapping 1 1 eth 3
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 3
+commit
+quit
+
+ont-lineprofile gpon profile-id 2048 profile-name "ERIC_L2+IAIM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+multicast gemport tcont 2 eth 4
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2049 profile-name "ERIC_L2+IAII+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,3,4
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+commit
+quit
+
+ont-lineprofile gpon profile-id 2050 profile-name "ERIC_L2+IAIA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,3
+port-bundle eth 2 port 2,4
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+commit
+quit
+
+ont-lineprofile gpon profile-id 2051 profile-name ""ERIC_L2+IAAM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 2,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 1
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 4
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2055 profile-name "ERIC_L2+AMMI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 2,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2056 profile-name "ERIC_L2+AMMA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 2,3
+port-bundle eth 2 port 1,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2057 profile-name "ERIC_L2+AMIM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 2,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 3
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2058 profile-name "ERIC_L2+AMII+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 2
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+multicast gemport tcont 2 eth 2
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2059 profile-name "ERIC_L2+AMIA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 1,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 3
+gem mapping 1 1 eth 2
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 2
+commit
+quit
+
+ont-lineprofile gpon profile-id 2060 profile-name "ERIC_L2+AMAM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 2,4
+port-bundle eth 2 port 1,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2061 profile-name "ERIC_L2+AMAI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 1,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 4
+gem mapping 1 1 eth 2
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 2
+commit
+quit
+
+ont-lineprofile gpon profile-id 2062 profile-name "ERIC_L2+AMAA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 2 port 1,3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth 2
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 2
+commit
+quit
+
+ont-lineprofile gpon profile-id 2063 profile-name "ERIC_L2+AIMM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 1 port 3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 2
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+ont-lineprofile gpon profile-id 2064 profile-name "ERIC_L2+AIMI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 3
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+multicast gemport tcont 2 eth 3
+commit
+quit
+
+ont-lineprofile gpon profile-id 2065 profile-name "ERIC_L2+AIMA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 1,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 2
+gem mapping 1 1 eth 3
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 3
+commit
+quit
+
+ont-lineprofile gpon profile-id 2066 profile-name "ERIC_L2+AIIM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+multicast gemport tcont 2 eth 4
+commit
+quit
+
+ont-lineprofile gpon profile-id 2067 profile-name "ERIC_L2+AIII+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,3,4
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2068 profile-name "ERIC_L2+AIIA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,3
+port-bundle eth 2 port 1,4
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+commit
+quit
+
+ont-lineprofile gpon profile-id 2069 profile-name "ERIC_L2+AIAM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 1,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 2
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 4
+commit
+quit
+
+ont-lineprofile gpon profile-id 2070 profile-name "ERIC_L2+AIAI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,4
+port-bundle eth 2 port 1,3
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+commit
+quit
+
+ont-lineprofile gpon profile-id 2071 profile-name "ERIC_L2+AIAA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 1,3,4
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 2
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+commit
+quit
+
+ont-lineprofile gpon profile-id 2072 profile-name "ERIC_L2+AAMM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 1 port 3,4
+port-bundle eth 2 port 1,2
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2073 profile-name "ERIC_L2+AAMI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 1,2
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 4
+gem mapping 1 1 eth 3
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 3
+commit
+quit
+
+ont-lineprofile gpon profile-id 2074 profile-name "ERIC_L2+AAMA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 2 port 1,2,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth 3
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 3
+commit
+quit
+
+ont-lineprofile gpon profile-id 2075 profile-name "ERIC_L2+AAIM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 1,2
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 3
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 4
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2077 profile-name "ERIC_L2+AAIA+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 1,2,4
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 3
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+commit
+quit
+
+ont-lineprofile gpon profile-id 2078 profile-name "ERIC_L2+AAAM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+port-bundle eth 2 port 1,2,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+multicast gemport tcont 2 eth 4
+commit
+quit
+
+ont-lineprofile gpon profile-id 2079 profile-name "ERIC_L2+AAAI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 2 port 1,2,3
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 4
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth-bundle 2
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2081 profile-name "ERIC_L2+MMAB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+port-bundle eth 1 port 1,2
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 3
+gem mapping 4 4 eth 4
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2082 profile-name "ERIC_L2+MIAB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 2
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 3
+gem mapping 4 4 eth 4
+multicast gemport tcont 2 eth 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2083 profile-name "ERIC_L2+IMAB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 1
+gem mapping 1 1 eth 2
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 3
+gem mapping 4 4 eth 4
+multicast gemport tcont 2 eth 2
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2084 profile-name "ERIC_L2+IIAB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 3
+gem mapping 4 4 eth 4
+commit
+quit
+
+ont-lineprofile gpon profile-id 2085 profile-name "ERIC_L2+MAMB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+port-bundle eth 1 port 1,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+gem mapping 4 4 eth 4
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2086 profile-name "ERIC_L2+MAIB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 3
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+gem mapping 4 4 eth 4
+multicast gemport tcont 2 eth 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2087 profile-name "ERIC_L2+IAMB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 1
+gem mapping 1 1 eth 3
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+gem mapping 4 4 eth 4
+multicast gemport tcont 2 eth 3
+commit
+quit
+
+ont-lineprofile gpon profile-id 2088 profile-name "ERIC_L2+IAIB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,3
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+gem mapping 4 4 eth 4
+commit
+quit
+
+ont-lineprofile gpon profile-id 2089 profile-name "ERIC_L2+MABM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+port-bundle eth 1 port 1,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+gem mapping 4 4 eth 3
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2090 profile-name "ERIC_L2+MABI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 4
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+gem mapping 4 4 eth 3
+multicast gemport tcont 2 eth 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2091 profile-name "ERIC_L2+IABM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 1
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+gem mapping 4 4 eth 3
+multicast gemport tcont 2 eth 4
+commit
+quit
+
+ont-lineprofile gpon profile-id 2092 profile-name "ERIC_L2+IABI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 1,4
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+gem mapping 4 4 eth 3
+commit
+quit
+
+ont-lineprofile gpon profile-id 2093 profile-name "ERIC_L2+AMBM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+port-bundle eth 1 port 2,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+gem mapping 4 4 eth 3
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2094 profile-name "ERIC_L2+AMBI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 4
+gem mapping 1 1 eth 2
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+gem mapping 4 4 eth 3
+multicast gemport tcont 2 eth 2
+commit
+quit
+
+
+ont-lineprofile gpon profile-id 2095 profile-name "ERIC_L2+AIBM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 2
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+gem mapping 4 4 eth 3
+multicast gemport tcont 2 eth 4
+commit
+quit
+
+ont-lineprofile gpon profile-id 2096 profile-name "ERIC_L2+AIBI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,4
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+gem mapping 4 4 eth 3
+commit
+quit
+
+ont-lineprofile gpon profile-id 2097 profile-name "ERIC_L2+ABMM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+port-bundle eth 1 port 3,4
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+gem mapping 4 4 eth 2
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2098 profile-name "ERIC_L2+ABMI+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 4
+gem mapping 1 1 eth 3
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+gem mapping 4 4 eth 2
+multicast gemport tcont 2 eth 3
+commit
+quit
+
+ont-lineprofile gpon profile-id 2099 profile-name "ERIC_L2+ABIM+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 3
+gem mapping 1 1 eth 4
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+gem mapping 4 4 eth 2
+multicast gemport tcont 2 eth 4
+commit
+quit
+
+
+
+
+ont-lineprofile gpon profile-id 2101 profile-name "ERIC_L2+AMMB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+port-bundle eth 1 port 2,3
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem mapping 1 1 eth-bundle 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+gem mapping 4 4 eth 4
+multicast gemport tcont 2 port-bundle 1
+commit
+quit
+
+ont-lineprofile gpon profile-id 2102 profile-name "ERIC_L2+AMIB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 3
+gem mapping 1 1 eth 2
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+gem mapping 4 4 eth 4
+multicast gemport tcont 2 eth 2
+commit
+quit
+
+ont-lineprofile gpon profile-id 2103 profile-name "ERIC_L2+AIMB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth 2
+gem mapping 1 1 eth 3
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+gem mapping 4 4 eth 4
+multicast gemport tcont 2 eth 3
+commit
+quit
+
+ont-lineprofile gpon profile-id 2104 profile-name "ERIC_L2+AIIB+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 8 dba-profile-id 11
+port-bundle eth 0 port 2,3
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 7 eth tcont 8
+gem mapping 7 7 eth-bundle 0
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 1
+gem mapping 4 4 eth 4
+commit
+quit
+
+ont-lineprofile gpon profile-id 2105 profile-name "ERIC_L2+MABC+VOIP"
+qos-mode gem-car
+mapping-mode port-vlan
+tcont 2 dba-profile-id 12
+tcont 3 dba-profile-id 13
+tcont 4 dba-profile-id 11
+tcont 5 dba-profile-id 11
+tcont 7 dba-profile-id 11
+gem add 1 eth tcont 2
+gem add 2 eth tcont 3
+gem add 3 eth tcont 4
+gem add 4 eth tcont 5
+gem add 6 eth tcont 7
+gem mapping 1 1 eth 1
+gem mapping 2 2 ippath 0
+gem mapping 3 3 eth 2
+gem mapping 4 4 eth 3
+gem mapping 6 6 eth 4
+multicast gemport tcont 2 eth 1
+commit
+quit
+
 
 "ECI:L2_HSI_1,2+IPTV_3,4+VOIP/ ID 300"
 
