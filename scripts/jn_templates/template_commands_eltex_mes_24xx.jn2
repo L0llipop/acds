@@ -146,6 +146,7 @@ password validate symbols 0
 username admin password Cdbnx0AA privilege 15
 dcs information option enable
 dcs agent-circuit-id format-type identifier-string "" option sp delimiter slash 
+no ip dhcp snooping  verify mac-address
 
 hostname {{ hostname }}
 end
