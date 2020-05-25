@@ -403,7 +403,7 @@ def free_ip_refresh(request):
 				mail_data = '\n'.join(mail_data)
 
 				mail_sender(f"""Ваша заявка на ввод оборудования {acds_id}""",
-							f"""Здравствуй {user}!\n\n Реквизиты по вашей заявке № {acds_id}.\nОжидается установка на сеть.\n{header}\n{mail_data}\n{footer}""",
+							f"""Реквизиты по вашей заявке № {acds_id}.\nОжидается установка на сеть.\n{header}\n{mail_data}\n{footer}""",
 							f'{email}')
 				mail_sender(f"""Заявка {acds_id} [INIT]""", 
 							f"""Отработано успешно\nIP\t{data_settings['ipaddmgm']}\nnetname\t{data_settings['networkname']}\nGW\t{data_settings['gw']}\nMASK\t{data_settings['mask']}\nmgmvlan\t{data_settings['mgmvlan']}\nvlans\t	{data_settings['vlans']}\noffice\t{data_settings['office']}\nserial\t{data_settings['serial']}\nmodel\t{data_settings['model']}""",
@@ -519,7 +519,7 @@ def device_configure(request):
 					f"""Устройство по заявке № {acds_id} выведено из эксплуатации.""", 
 					f'{email}')
 			mail_sender(f"""Удалить из ИНИТИ""", 
-					f"""Устройство выведено из эксплуатации, прошу удалить из ИНИТИ. ip - {ip}.""", 
+					f"""Устройство выведено из эксплуатации, прошу удалить из ИНИТИ. ip - {ip}""", 
 					f'monitoring@ural.rt.ru')
 		elif status == 'other': 
 			t.sql_update(f"""INSERT INTO guspk.acds_logs (id, ip, status, user, message) VALUES ('{acds_id}', '{ip}', '{status}', '{user}', 'Работы в ЗО ГУСД завершены, передана в Аргус.')""")

@@ -87,6 +87,7 @@ class getTopology(object):
 
 			print(f"INSERT INTO guspk.topology (child, parent, child_port, parent_port) VALUES ({id_child}, {id_parent}, {child_port}, {parent_port});")
 			print('======================================================================================')
+			t.sql_update(f"DELETE FROM guspk.topology WHERE child = '{id_child}'")
 			t.sql_update(f"INSERT INTO guspk.topology (child, parent, child_port, parent_port) VALUES ({id_child}, {id_parent}, {child_port}, {parent_port});")
 
 
