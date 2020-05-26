@@ -60,7 +60,8 @@ interface range {{ port_downlink }}
 
 interface {{ port_uplink }}
  description ${{ uplink_and_port }}$
- switchport mode trunk
+ switchport mode general
+ switchport general allowed vlan add 
  port-security-state trusted 
  no shutdown
   set port-role uplink 
