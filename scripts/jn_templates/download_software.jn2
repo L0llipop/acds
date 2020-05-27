@@ -61,5 +61,6 @@ copy tftp://{{ ftp_server }}/FTP/FTTh/license/license_for_ltp.lic fs://license
 {% elif model == '24xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1021-R2.boot boot
 copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1021-R2.iss image
 
+//УЦН 10.221.0.3
 
 {% endif %}
