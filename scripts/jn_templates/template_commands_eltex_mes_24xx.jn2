@@ -79,7 +79,7 @@ interface {{ port_uplink }}
 !
 
 logging buffered 200
-logging severity debugging
+logging severity informational
 user-defined offset 2 ethtype 0  
 
 
