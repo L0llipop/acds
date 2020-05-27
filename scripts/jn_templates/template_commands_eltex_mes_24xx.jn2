@@ -60,7 +60,8 @@ interface range {{ port_downlink }}
 
 interface {{ port_uplink }}
  description ${{ uplink_and_port }}$
- switchport mode trunk
+ switchport mode general
+ switchport general allowed vlan add 
  port-security-state trusted 
  no shutdown
   set port-role uplink 
@@ -78,7 +79,7 @@ interface {{ port_uplink }}
 !
 
 logging buffered 200
-logging severity debugging
+logging severity informational
 user-defined offset 2 ethtype 0  
 
 
@@ -146,6 +147,7 @@ password validate symbols 0
 username admin password Cdbnx0AA privilege 15
 dcs information option enable
 dcs agent-circuit-id format-type identifier-string "" option sp delimiter slash 
+no ip dhcp snooping  verify mac-address
 
 hostname {{ hostname }}
 end

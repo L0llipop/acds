@@ -712,7 +712,7 @@ def get_acds_argus_status(request):
 		t.sql_update(f"""DELETE FROM guspk.host WHERE IPADDMGM = '{ip}'""")
 		# mail_admins(f"""Заявка {acds_id} [DEL]""", f"""Выведено успешно""")
 		mail_sender(f"""Удалить из ИНИТИ""", 
-					f"""Устройство выведено из эксплуатации, прошу удалить из ИНИТИ. ip - {ip}.""",
+					f"""Устройство выведено из эксплуатации, прошу удалить из ИНИТИ. ip - {ip}""",
 					f'monitoring@ural.rt.ru')
 		mail_sender(f"""Заявка на вывод оборудования из Аргус № {acds_id}""",
 					f"""Устройство по заявке № {acds_id} выведено из эксплуатации.""", 

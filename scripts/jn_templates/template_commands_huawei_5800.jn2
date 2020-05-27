@@ -1889,7 +1889,7 @@ gem mapping 3 3 eth-bundle 2
 commit
 quit
 
-ont-lineprofile gpon profile-id 2051 profile-name ""ERIC_L2+IAAM+VOIP"
+ont-lineprofile gpon profile-id 2051 profile-name "ERIC_L2+IAAM+VOIP"
 qos-mode gem-car
 mapping-mode port-vlan
 tcont 2 dba-profile-id 12
