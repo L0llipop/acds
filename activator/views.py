@@ -638,7 +638,6 @@ def get_acds_id_remove(request):
 
 	t = multimodule.FastModulAut()
 	t.sql_connect('connect')
-	t.oracle_connect('connect')
 	user = request.user.username
 	acds_id = ''.join(list(request.GET.get('id', str(False))))
 	# ipaddmgm = ''.join(list(request.GET.get('ip', str(False))))
@@ -670,9 +669,6 @@ def get_acds_id_remove(request):
 		answer = {'answer': 'error'}
 
 	t.sql_connect('disconnect')
-	t.oracle_connect('disconnect')
-
-
 
 	return JsonResponse(answer, safe=False)
 

@@ -175,7 +175,7 @@ def create_hostname(id_acds, ip_uplink, search_type, vrf, free_ip, t):
 	else:
 		error_free_ip = 'Error id_111: region code and city not found'
 		t.ws_send_message(f"{error_free_ip}")
-		return final_hostname, error_free_ip, None
+		return final_hostname, error_free_ip
 
 	if not city_en:
 		city_en = translate_to_en(city_ru)

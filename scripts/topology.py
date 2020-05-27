@@ -237,7 +237,7 @@ class getTopology(object):
 
 			if result['status'] != 'end_device':
 				if 'tunnel_vlan' in result:
-					print(f"=== RESULT ==={result}")
+					print(f"=== RESULT ===\n{result}")
 					com_show_vlan = f"show vlans vlan_{result['tunnel_vlan']}"
 					if re.search(r'ACX2100' ,result[num]['model']):
 						com_show_vlan = f"show bridge domain vlan{result['tunnel_vlan']}"
@@ -256,7 +256,11 @@ class getTopology(object):
 					elif len(check) > 2 or len(check) < 2 or not check:
 						com_show_mac = f"show ethernet-switching table vlan | match {result['mac']}" #vlan_{result['tunnel_vlan']}
 						check = self.check_search(t, com_show_mac, rf"\s+{result['mac']}.+?([\w\/-]+)\.\d+", f"bbagg_upe_juniper {result[num]['ip']}|не найден mac(1)", prompt='@', time=60)
-						result = find_port(check[0], num, next_num, result, t)
+						if check['status'] == 'error':
+							result.update(check)
+							return result
+
+						result = find_port(check, num, next_num, result, t)
 					else:
 						result.update({'status': "error", 'message_error': "bbagg_upe_juniper|Cant find description"})
 
@@ -768,6 +772,10 @@ class getTopology(object):
 			check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
 
 			if check_aut != 0:
+				if check_aut == 'authentication_Timeout':
+					result.update({'status': 'error', 'message_error': f"{check_aut} {result[result['count']]['ip']}"})
+					return result
+					
 				login, password = 'tum_support', 'hEreR2Mu3E'
 				check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}", proxy = True)
 				if check_aut != 0:
@@ -784,7 +792,7 @@ class getTopology(object):
 					check_aut = t.aut(ip=result[num]['ip'], model=result[num]['model'], login = login, password = password, logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}", proxy = True)
 					
 					if check_aut != 0:
-						result.update({'status': 'error','message_error': f"Cant connect {result[result['count']]['ip']}"})
+						result.update({'status': 'error', 'message_error': f"Cant connect {result[result['count']]['ip']}"})
 						return result
 
 
