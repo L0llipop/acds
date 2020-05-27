@@ -87,31 +87,6 @@ class VPNConsumer(AsyncWebsocketConsumer):
 				},
 			}
 			temp_count = 1
-			while True and not online:
-
-				temp = t.sql_select(f"""SELECT t.parent, h.IPADDMGM, h.NETWORKNAME, m.DEVICEMODELNAME, t.parent_port, t.child_port
-										FROM guspk.topology t
-										LEFT JOIN guspk.host h ON h.DEVICEID = t.parent
-										LEFT JOIN guspk.host_model m ON m.MODELID = h.MODELID
-										WHERE t.child={temp_topology[temp_count]['id']};
-										""", 'full')
-
-				if temp:
-					temp_topology[temp_count + 1] = {
-						'id': temp[0][0],
-						'ip': temp[0][1],
-						'desc': temp[0][2],
-						'model': temp[0][3],
-						'port': temp[0][4],
-					}
-					if temp[0][5]:
-						temp_topology[temp_count].update({'port_uplink': temp[0][5]})
-
-					temp_count += 1
-
-				else:
-					break
-
 
 			# Берём все сети, по адресу сети и маске определяем нужную
 			query = """SELECT n.NETWORK_ID, CONCAT(n.NETWORK, "/", n.MASK), n.VRF, n.VLAN, h.IPADDMGM, h.NETWORKNAME, m.DEVICEMODELNAME, h.DEVICEID
