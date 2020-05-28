@@ -61,7 +61,7 @@ interface range {{ port_downlink }}
 interface {{ port_uplink }}
  description ${{ uplink_and_port }}$
  switchport mode general
- switchport general allowed vlan add 
+ switchport general allowed vlan add {{ tr069['vlan'] }},{{ ims['vlan'] }},{{ iptv['vlan'] }},{{ pppoe['vlan'] }}
  port-security-state trusted 
  no shutdown
   set port-role uplink 
