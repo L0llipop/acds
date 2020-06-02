@@ -118,13 +118,19 @@ def get_devicelist(request):
 			if data_req[key] == 'null':		
 				column_name.append(f"""{table}.{data_table_null[key]} IS NULL""")
 
-					# Есди поле было заполнено какими то данными
-			elif data_req[key]:														
-				column_name.append(f"""{table}.{data_table_null[key]} LIKE '%{data_req[key]}%'""")
+					# Если поле было заполнено какими то данными
+			elif data_req[key]:
+				if key == 'uplink':
+					column_name.append(f"""(top.parent = (SELECT deviceid from guspk.host WHERE NETWORKNAME like '%{data_req[key]}%' or IPADDMGM like '%{data_req[key]}%'))""")
+				else:
+					column_name.append(f"""{table}.{data_table_null[key]} LIKE '%{data_req[key]}%'""")
 
-					# Если поле остальсь пустым
-			else:																					
-				column_name.append(f"""{table}.{data_table_null[key]} LIKE '%%' or {table}.{data_table_null[key]} IS NULL""")
+					# Если поле осталось пустым
+			else:
+				if key == 'uplink':
+					column_name.append(f"""top.parent like '%%'""")
+				else:
+					column_name.append(f"""{table}.{data_table_null[key]} LIKE '%%' or {table}.{data_table_null[key]} IS NULL""")
 
 
 		query_astu = f"""SELECT h.DEVICEID, h.IPADDMGM, h.NETWORKNAME, hm.DEVICEMODELNAME, h.DEVICEDESCR, h.OFFICE, h.DATEMODIFY, hs.status_name, CONCAT((SELECT NETWORKNAME FROM guspk.host WHERE DEVICEID = top.parent), ' ', top.parent_port, COALESCE(CONCAT(' ← ', top.child_port), '')), h.MAC, h.SERIALNUMBER, 
@@ -146,14 +152,14 @@ def get_devicelist(request):
 			AND ({column_name[0]})
 			AND ({column_name[1]})
 			AND hs.status_name LIKE '%{data_req['status']}%'
+			AND ({column_name[2]})
 			AND ({column_name[3]})
-			AND (({column_name[4]})
+				AND (({column_name[4]})
 				AND ({column_name[5]})
 				AND ({column_name[6]})
 				AND ({column_name[7]})
 				AND ({column_name[8]})
-				AND ({column_name[9]})
-			)
+				AND ({column_name[9]}))
 			ORDER BY INET_ATON(IPADDMGM)
 			LIMIT {limit};
 			"""
