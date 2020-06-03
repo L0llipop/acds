@@ -128,7 +128,7 @@ def get_devicelist(request):
 					# Если поле осталось пустым
 			else:
 				if key == 'uplink':
-					column_name.append(f"""top.parent like '%%'""")
+					column_name.append(f"""(h.IPADDMGM like '%%')""")
 				else:
 					column_name.append(f"""{table}.{data_table_null[key]} LIKE '%%' or {table}.{data_table_null[key]} IS NULL""")
 
