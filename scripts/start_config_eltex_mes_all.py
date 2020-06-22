@@ -266,7 +266,7 @@ def authorization_in_eltex(t, data_mes, vlans_mng_list):					# id	hostname	model
 				break
 
 		if i != 0:
-			error = "Error id_203 = Can't log in"
+			error = "Error id_203 = Cant log in"
 			t.ws_send_message(error)
 			return error
 		t.ws_send_message("success")
