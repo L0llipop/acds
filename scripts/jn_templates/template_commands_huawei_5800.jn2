@@ -3040,7 +3040,7 @@ undo monitor uplink-port pppoe port 0/9/2
 undo monitor uplink-port pppoe port 0/9/3
 
 
-
+ont autofind timeout 100
 
 autosave time on
 autosave time 04:00:00              
