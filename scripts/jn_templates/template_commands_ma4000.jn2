@@ -3,6 +3,7 @@ hostname {{ hostname }}
 clock timezone hours 05 minutes 00
 ip sntp poll-period 1440
 ip sntp server {{ default_gateway }}
+ip sntp server 10.228.63.254
 ip sntp client
 ip igmp snooping pp4x enable
 ip igmp unregistered ip4-mc drop

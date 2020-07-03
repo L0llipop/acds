@@ -3189,6 +3189,7 @@ y
  
 ntp-service source-interface vlanif{{ mgmvlan }}
 ntp-service unicast-server {{ default_gateway }}
+ntp-service unicast-server 10.228.63.254
 timezone GMT+ 05:00
 
 ntp-service unicast-server {{ default_gateway }} source-interface vlanif{{ mgmvlan }}

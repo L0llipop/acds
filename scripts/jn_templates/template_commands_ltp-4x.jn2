@@ -13,6 +13,7 @@ logging system loglevel "info"
 logging buffer "150000"
 
 ip ntp ip "{{ default_gateway }}"
+ip ntp ip "10.228.63.254"
 ip ntp timezone "5"
 
 alarm ont-config out false

@@ -102,6 +102,7 @@ set sntp client enabled
 set sntp client time-zone +05:00
 set sntp unicast-poll-interval 16
 set sntp unicast-server ipv4 {{ default_gateway }}
+set sntp unicast-server ipv4 10.228.63.254
 !
 
 clock time source ntp 
