@@ -97,6 +97,7 @@ description ${{ hostname_port }}$
 
 switchport mode trunk
 switchport trunk allowed vlan add {{ mgmvlan }},{{ pppoe['vlan'] }},{{ iptv['vlan'] }},{{ ims['vlan'] }},{{ tr069['vlan'] }}
+no switchport trunk native vlan
 exit
 exit
 

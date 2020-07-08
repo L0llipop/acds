@@ -94,7 +94,7 @@ def peagg_nokia(t, answer):
 		answer['results'].update({'intvlan': match_vlan[0]})
 	else:
 		return error_handler(f'intvlan not found', answer)
-	t.new_sendline(f"show router 3{answer['vrf']['vrfid']} interface IFL{answer['results']['intvlan']}")
+	t.new_sendline(f"show router 30{answer['vrf']['vrfid']} interface IFL{answer['results']['intvlan']}")
 	runvlan = t.data_split("list")
 	for vline in runvlan:
 		# print(vline)
@@ -107,7 +107,7 @@ def peagg_nokia(t, answer):
 				answer['results'].update({'gw': vlan_network[1]})
 				break
 	if not answer['results'].get('gw'):
-		return error_handler(f'network not found on {match_intvlan[0]}', answer)
+		return error_handler(f'network not found on {match_vlan[0]}', answer)
 			
 	return answer
 
@@ -254,14 +254,14 @@ def peagg_data(answer):
 
 	elif model == 'Nokia-7750-SR-7':
 		if answer.get('vrf'):
-			t.new_sendline(f"""show service service-using vprn | match 3{answer['vrf']['vrfid']}""")
+			t.new_sendline(f"""show service service-using vprn | match 30{answer['vrf']['vrfid']}""")
 			vrf = t.data_split('list')
 			match_vrf = re.search(rf"""Up\s+Up\s+\d+\s+(\S+)""", vrf[1])
 			if match_vrf:
 				answer['vrf'].update({'vrfname': match_vrf[1]})
 			else:
 				return error_handler(f'vrfname not found', answer)
-			t.new_sendline(f"show router 3{answer['vrf']['vrfid']}  arp {answer['ip']}")
+			t.new_sendline(f"show router 30{answer['vrf']['vrfid']}  arp {answer['ip']}")
 			answer = peagg_nokia(t, answer)
 		else:
 			t.new_sendline(f"show router arp {answer['ip']}")
@@ -300,5 +300,5 @@ def start(ip):
 
 
 if __name__ == "__main__":
-	a = start("10.222.58.24")
+	a = start("10.228.52.7")
 	print(a)
