@@ -256,11 +256,10 @@ class getTopology(object):
 					elif len(check) > 2 or len(check) < 2 or not check:
 						com_show_mac = f"show ethernet-switching table vlan | match {result['mac']}" #vlan_{result['tunnel_vlan']}
 						check = self.check_search(t, com_show_mac, rf"\s+{result['mac']}.+?([\w\/-]+)\.\d+", f"bbagg_upe_juniper {result[num]['ip']}|не найден mac(1)", prompt='@', time=60)
-						if check['status'] == 'error':
+						if type(check) == 'dict':
 							result.update(check)
 							return result
-
-						result = find_port(check, num, next_num, result, t)
+						result = find_port(check[0], num, next_num, result, t)
 					else:
 						result.update({'status': "error", 'message_error': "bbagg_upe_juniper|Cant find description"})
 
