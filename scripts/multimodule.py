@@ -213,7 +213,7 @@ class FastModulAut:
 		error = ""
 		if i == 1:
 			if errors == True:
-				print ('{:45}{:20}'.format(' == check_telnet_connect_No telnet == ', self.ip))
+				# print ('{:45}{:20}'.format(' == check_telnet_connect_No telnet == ', self.ip))
 				error = "telnet_connect_No telnet"
 		elif i == 2:
 			if errors == True:
@@ -261,7 +261,7 @@ class FastModulAut:
 		self.new_telnet.send(command)
 
 	def new_sendline(self, command, **hash_prompt):
-		""" Ввод комад в telnet сеансе
+		""" Ввод комманд в telnet сеансе
 		Команды sendline и expect обеденены в одну функцию, для упрощения написания основного скрипта
 		"""
 		if 'timeout' in hash_prompt:
@@ -447,10 +447,13 @@ class FastModulAut:
 				# print ('{:45}{:20}'.format(' == password_Timeout == ', self.ip))
 				return i
 
-		if i == 0: # это условие добавлено для того что бы авторизовываться на оборудование которое не требует ввода пароля
+		if i == 0: # проверка авторизации
 			i = self.new_telnet.expect([prompt_1, prompt_2, pexpect.TIMEOUT, 'Connection closed'])
 			error_aut = self.check_authentication(i, errors)
-
+			if re.search(r'MA5800', self.model):
+				self.new_sendline('enable')
+				self.new_sendline('undo smart')
+				self.new_sendline('scroll')
 
 		if mes31xx_21xx_11xx == 'no pass': # добавлено для того что бы авторизовываться на оборудование которое не требует ввода пароля
 			i = 0
