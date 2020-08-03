@@ -49,7 +49,7 @@ def createParser ():
 def upgrade(t, model, ip, hostname):
 
 	image_33 = 'mes3300-4013-3R1.ros'
-	version_33 = '4.0.13.3'
+	version_33 = '4.0.14'
 
 	image_21 = 'mes2000-11486.ros'
 	version_21 = '1.1.48.6'
@@ -95,7 +95,7 @@ def upgrade(t, model, ip, hostname):
 
 			# Сравниваем активную версию с эталонной
 			if activ_version != version_33:
-				download_command = (f"boot system tftp://{ip_ftp}/FTP/FTTb/{image_33}") # boot system tftp://10.224.62.2/FTP/FTTb/mes3300-4012-R183.ros
+				download_command = (f"boot system tftp://{ip_ftp}/FTP/FTTb/{image_33}") # boot system tftp://10.224.62.2/FTP/FTTb/mes3300-4014-R5.ros
 			else:
 				t.ws_send_message("software is up to date")
 				return 'end_version'
