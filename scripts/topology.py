@@ -862,5 +862,5 @@ class getTopology(object):
 
 		elif result['count'] >= 2:
 			result = self.switch(result, t, dir_name)
-		# print(result)
+
 		return result
