@@ -56,6 +56,9 @@ interface range {{ port_downlink }}
  spanning-tree disable
  spanning-tree bpdu-receive disabled
  spanning-tree bpdu-transmit disabled
+ storm-control broadcast level pps 100
+ storm-control multicast level pps 100  
+
 !
 
 interface {{ port_uplink }}
@@ -65,6 +68,9 @@ interface {{ port_uplink }}
  port-security-state trusted 
  no shutdown
   set port-role uplink 
+ storm-control broadcast level pps 2500
+ storm-control multicast level pps 100000   
+
  
  lldp tlv-select basic-tlv port-descr
  lldp tlv-select basic-tlv sys-name
