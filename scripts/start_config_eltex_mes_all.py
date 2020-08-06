@@ -48,11 +48,7 @@ def createParser ():
 
 def upgrade(t, model, ip, hostname):
 
-<<<<<<< HEAD
-	image_33 = 'mes3300-4013-3R1.ros'
-=======
 	image_33 = 'mes3300-4014-R5.ros'
->>>>>>> d3f3321f8327dedfea4735d1938bae833af7f7b9
 	version_33 = '4.0.14'
 
 	image_21 = 'mes2000-11486.ros'
