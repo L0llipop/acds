@@ -164,7 +164,7 @@ no ip routing
 clock source sntp
 sntp unicast client enable
 sntp unicast client poll
-sntp server {{ default_gateway }} poll
+sntp server 10.228.63.254 poll
 clock timezone ekb +5
 
 loopback-detection enable
