@@ -1,6 +1,6 @@
 configure terminal
 
-management ip {{ ipaddmgm }} {{ mask }}
+management ip {{ ipaddmgm }} mask {{ mask }}
 management vid {{ mgmvlan }}
 management gateway {{ gw }}
 exit
