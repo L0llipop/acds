@@ -6,6 +6,14 @@ snooping multicast-forwarding-mode ip
 snooping leave-process config-level port
 ip igmp snooping
 
+
+ip mcast profile 1
+  permit
+  range 224.0.1.0 239.255.255.0
+  profile active
+!
+
+
 map protocol other 88:63 Enet-v2 protocols-group 1
 map protocol other 88:64 Enet-v2 protocols-group 1
 
