@@ -87,6 +87,7 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 				},
 			}
 			temp_count = 1
+			#опрос текущей топологии из базы, заполняем временный словарь, остановка при отсутствии записи в таблице(PEAGG)
 			while True and not online:
 
 				temp = t.sql_select(f"""SELECT t.parent, h.IPADDMGM, h.NETWORKNAME, m.DEVICEMODELNAME, t.parent_port, t.child_port
@@ -113,7 +114,7 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 					break
 
 
-			# Берём все сети, по адресу сети и маске определяем нужную
+			# Берём все сети, по адресу сети и маске определяем нужную, формируем первый хоп в итоговом словаре
 			query = """SELECT n.NETWORK_ID, CONCAT(n.NETWORK, "/", n.MASK), n.VRF, n.VLAN, h.IPADDMGM, h.NETWORKNAME, m.DEVICEMODELNAME, h.DEVICEID
 								FROM guspk.host_networks n, guspk.host h, guspk.host_model m
 								WHERE n.DEVICEID = h.DEVICEID

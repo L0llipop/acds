@@ -73,3 +73,9 @@ def loop(ip):
 	multi.sql_connect('disconnect')
 
 	return result
+
+
+if __name__ == "__main__":
+	# ''
+	# loop('10.228.130.6')
+	loop('10.228.62.9')

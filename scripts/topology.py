@@ -182,9 +182,67 @@ class getTopology(object):
 			result.update({"mac": mac, "vlan": vlan})
 			result[1].update({"port": port_pe})
 			result[2] = {"desc": peportdesc}
+
 			return result
 
+		def find_in_nokia(result, t):
 
+			t.new_sendline('environment no more')
+
+			#определяем id сервиса
+			if result.get('vrf') and result['vrf'] != 'CORE':
+				check = self.check_search(t, f"show service service-using | match {result['vrf']} ", r'(\d+)\s+VPRN', 'ar_nokia|не найден service id')
+				if type(check) == dict:
+					result.update(check)
+					return result
+				serv_id = check[0]
+
+			# в арп записи берем mac и vlan
+			if result.get('vrf') and result['vrf'] != 'CORE':
+				check = self.check_search(t, f"show service id {serv_id} arp {result['ip']}", r'((?:\w{2}:)+\w{2}).*IFL(\d+)', 'ar_nokia|не найден arp')
+			else:
+				check = self.check_search(t, f"show router arp {result['ip']}", r'((?:\w{2}:)+\w{2}).*IFL(\d+)', 'ar_nokia|не найден arp')
+
+			if type(check) == dict:
+				result.update(check)
+				return result
+			mac, vlan = check
+
+			# VPLS Name
+			if result.get('vrf') and result['vrf'] != 'CORE':
+				check = self.check_search(t, f"show service id {serv_id} interface IFL{vlan} detail | match VPLS", r':\s+(\w+)', 'ar_nokia|не найден VPLS Name')
+			else:
+				check = self.check_search(t, f"show router interface IFL{vlan} detail | match VPLS", r':\s+(\w+)', 'ar_nokia|не найден VPLS Name')
+
+			if type(check) == dict:
+				result.update(check)
+				return result
+			vplsname = check[0]
+
+			# downlink port
+			check = self.check_search(t, f"show service id {vplsname} fdb mac {mac}", rf'sap:(.*):{vlan}\.', 'ar_nokia|не найден downlink port')
+			if type(check) == dict:
+				result.update(check)
+				return result
+			port_pe = check[0]
+
+			# port_pe description
+			if 'lag' in port_pe:
+				lag = port_pe.replace('-', ' ')
+				check = self.check_search(t, f"show {lag} detail | match Description ", rf'(\d{2}-[-\da-z]+)', 'ar_nokia|не найден downlink port description', re.I)
+			else:
+				check = self.check_search(t, f"show port description {port_pe} ", rf'(\d{2}-[-\da-z]+)', 'ar_nokia|не найден downlink port description', re.I)
+			if type(check) == dict:
+				result.update(check)
+				return result
+			peportdesc = check[0]	
+			
+
+			result.update({"mac": mac, "vlan": vlan})
+			result[1].update({"port": f"{port_pe}"})
+			result[2] = {"desc": peportdesc}
+			
+			return result
 
 		check_aut = t.aut(ip = result[1]['ip'], model = result[1]['model'], login = 'tum_support', password = 'hEreR2Mu3E', logs_dir = f"{getattr(configuration, 'LOGS_DIR')}/{dir_name}")
 		if check_aut != 0:
@@ -198,6 +256,8 @@ class getTopology(object):
 				result = find_in_cisco(result, t)
 			elif re.search(r'MX480|QFX', result[1]['model']):
 				result = find_in_juniper(result, t)
+			elif re.search(r'7750', result[1]['model']):
+				result = find_in_nokia(result, t)				
 			else:
 				result.update({'status': 'error','message_error': "def peagg | no algorithm for this model"})
 		else:
@@ -206,12 +266,14 @@ class getTopology(object):
 		if result['status'] != 'wait':
 			return result
 
-		if 2 in result and 'desc' in result[2]:
+		if result.get(2) and result[2].get('desc'):
 			data = t.sql_select(f"SELECT h.IPADDMGM, m.DEVICEMODELNAME, h.DEVICEID FROM guspk.host h, guspk.host_model m WHERE h.MODELID = m.MODELID AND NETWORKNAME = '{result[2]['desc']}'", 'full')
-			if data[0][0] != result[1]['ip']:
+			if data and data[0][0] != result[1]['ip']:
 				result[2].update({"ip": data[0][0], "model": data[0][1], 'id': data[0][2]})
+			else:
+				result.update({'status': 'error', 'message_error': f"def peagg | {result[1]['port']} {result[2]['desc']} desc not found"})
 		else:
-			result.update({'status': 'error','message_error': 'def peagg | not desc'})
+			result.update({'status': 'error', 'message_error': 'def peagg | not desc'})
 
 		return result
 
@@ -523,6 +585,14 @@ class getTopology(object):
 					result.update(check)
 					return result
 				port_uplink = check[0].replace(' ', '')
+				result[num].update({'port_uplink': port_uplink})
+
+			elif re.search(r'3526', result[num]['model']):
+				check = self.check_findall(t, f"show mac-address-table vlan {result['vlan']}", rf"Eth\s(.*)\sL", f"edgecore {result[num]['ip']}|не найден uplink")
+				if type(check) == dict or len(check) != 1:
+					result.update(check)
+					return result
+				port_uplink = check[0]
 				result[num].update({'port_uplink': port_uplink})
 
 			return result
