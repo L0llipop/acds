@@ -5,7 +5,7 @@ no spanning-tree
 snooping multicast-forwarding-mode ip
 snooping leave-process config-level port
 ip igmp snooping
-
+ip igmp snooping multicast-vlan enable
 
 ip mcast profile 1
   permit
@@ -29,6 +29,7 @@ vlan {{ pppoe['vlan'] }}
 ip mcast profile 1
   permit
   range 224.0.1.0 239.255.255.0
+  profile active
 !
 ! 
 {%- endif %}
