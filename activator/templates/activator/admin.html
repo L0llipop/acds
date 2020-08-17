@@ -92,7 +92,7 @@
     		<!-- <div class="col-md-8"><p id="modal-comm"></p></div> -->
     		<div class="col-md-8"><textarea style="height: 100px; padding: 2px" class="col-md-8" type="comment" class="textarea" id="comment"></textarea></div>
     	</div>    	
-    	{% if request.user.groups.all.0.name == 'admins' %}
+    	{% if request.user.groups.all.0.name == 'admins' or request.user.groups.all.0.name == 'engineers' or request.user.groups.all.1.name == 'engineers' %}
     		<div id="select_templates">	
 			</div>
 		{% endif %}
