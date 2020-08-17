@@ -180,14 +180,12 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 		if result['status'] != 'error':
 			while True and data:
 				count = result['count']
-				if count > 12:
+				if count >= 11:
 					result.update({'status': 'error', 'message_error': 'loop detected'})
-					return result
-				# if result['status'] == 'error':
-				# 	await self.send(text_data=json.dumps({
-				# 		'message': json.dumps(result)
-				# 	}))
-				# 	break
+					await self.send(text_data=json.dumps({
+						'message': json.dumps(result)
+					}))
+					break
 
 				if not online and temp_count in temp_topology and result[count]['id'] == temp_topology[temp_count]['id'] and result['status'] != 'full_topology':
 					# заполняет словарь данными из базы
