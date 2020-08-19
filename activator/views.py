@@ -593,7 +593,7 @@ def get_acsw_node_id_update(request):
 	if not request.user.is_authenticated:
 		return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 	group = [ x.name for x in request.user.groups.all()]
-	if not 'admins' in group:
+	if not 'admins' in group and not 'engineers' in group:
 		return render(request, 'activator/access.html')
 
 	t = multimodule.FastModulAut()
