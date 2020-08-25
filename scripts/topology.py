@@ -411,7 +411,7 @@ class getTopology(object):
 				result[num].update({'port': check[0]})
 
 				# Определяем имя устройтсва
-				check = self.check_search(t, f"""show interfaces description | grep "{result[num]['port']} " """, rf"{result[num]['port']}.+\$((\d+|[A-Z]+-UCN)-[A-Z0-9-]+)", 'eltex_24xx|не найден description')
+				check = self.check_search(t, f"""show interfaces description | grep "{result[num]['port']} " """, rf"{result[num]['port']}.+up\s+\$?((\d+|[A-Z]+-UCN)-[A-Z0-9-]+)", 'eltex_24xx|не найден description')
 				if type(check) == dict:
 					result.update(check)
 					return result

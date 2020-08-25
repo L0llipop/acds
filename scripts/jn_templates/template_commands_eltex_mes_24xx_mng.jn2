@@ -5,7 +5,7 @@ vlan {{ mgmvlan }}
 !
 interface {{ port_uplink }}
 switchport mode general
-switchport general allowed vlan add {{ mgmvlan }}
+switchport general allowed vlan {{ mgmvlan }}
 switchport acceptable-frame-type all
 set port-role uplink 
 !
