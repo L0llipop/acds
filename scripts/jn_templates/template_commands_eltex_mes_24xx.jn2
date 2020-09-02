@@ -500,7 +500,6 @@ cpu rate limit queue 5 maxrate 300
 cpu rate limit queue 6 maxrate 300
 cpu rate limit queue 7 maxrate 300
 cpu rate limit queue 8 maxrate 300
-end
 
 sntp
 set sntp client enabled
