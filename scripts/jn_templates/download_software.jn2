@@ -58,8 +58,8 @@ copy tftp://{{ ftp_server }}/FTP/FTTh/ltp-8x-revb-3.38.0.1489.fw.bin fs://firmwa
 update system FTP/FTTh/ltp-8x-revb-3.38.0.1489.fw.bin 10.228.63.237
 copy tftp://{{ ftp_server }}/FTP/FTTh/license/license_for_ltp.lic fs://license
 
-{% elif model == '24xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1022-R4.boot boot
-copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1022-R4.iss image
+{% elif model == '24xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1023-R1.boot boot
+copy tftp://{{ ftp_server }}/FTP/FTTb/mes24xx/mes2400-1023-R1.iss image
 
 //УЦН 10.221.0.3
 
