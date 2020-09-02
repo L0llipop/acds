@@ -25,12 +25,6 @@ vlan {{ pppoe['vlan'] }}
  pppoe-ia snooping
  pppoe-ia snooping session timeout 120
  pppoe passthrough  
-
-ip mcast profile 1
-  permit
-  range 224.0.1.0 239.255.255.0
-  profile active
-!
 ! 
 {%- endif %}
 
