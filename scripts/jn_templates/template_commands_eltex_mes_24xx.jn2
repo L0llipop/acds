@@ -521,7 +521,7 @@ snmp notify 1 tag inity2016 type Trap
 no ip routing
 
 set switch maximum RAM threshold     95
-set switch maximum CPU threshold     55
+set switch maximum CPU threshold     95
 set ip http disable
 !
 
