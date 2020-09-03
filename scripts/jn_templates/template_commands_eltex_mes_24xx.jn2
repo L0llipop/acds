@@ -2,17 +2,19 @@ config terminal
 ip dhcp snooping
 no spanning-tree
 
-snooping multicast-forwarding-mode ip
-snooping leave-process config-level port
+shutdown qos
+no shutdown qos
+
 ip igmp snooping
 ip igmp snooping multicast-vlan enable
+ip igmp snooping mrouter-time-out 240
+ip igmp snooping port-purge-interval 480
 
 ip mcast profile 1
   permit
   range 224.0.1.0 239.255.255.0
   profile active
 !
-
 
 map protocol other 88:63 Enet-v2 protocols-group 1
 map protocol other 88:64 Enet-v2 protocols-group 1
@@ -36,7 +38,9 @@ vlan {{ iptv['vlan'] }}
  ip igmp snooping
  ip igmp snooping version v2
  ip igmp snooping blocked-router gigabitethernet 0/1-24
- ip igmp snooping cos 4  
+ ip igmp snooping sparse-mode enable
+ #Sibitex
+ #ip igmp snooping multicast-vlan profile 1   
 ! 
 {%- endif %}
 
@@ -68,8 +72,9 @@ interface range {{ port_downlink }}
  spanning-tree bpdu-receive disabled
  spanning-tree bpdu-transmit disabled
  storm-control broadcast level pps 100
- storm-control multicast level pps 100  
-
+ storm-control multicast level pps 50
+ ip igmp snooping leavemode normalleave 
+ no ip igmp snooping ratelimit 
 !
 
 interface {{ port_uplink }}
@@ -77,20 +82,17 @@ interface {{ port_uplink }}
  switchport mode general
  switchport general allowed vlan add {{ tr069['vlan'] }},{{ ims['vlan'] }},{{ iptv['vlan'] }},{{ pppoe['vlan'] }}
  port-security-state trusted 
- qos trust cos-dscp
  no shutdown
-  set port-role uplink 
+ set port-role uplink 
  storm-control broadcast level pps 2500
- storm-control multicast level pps 100000   
-
- 
+ storm-control multicast level pps 100000
  lldp tlv-select basic-tlv port-descr
  lldp tlv-select basic-tlv sys-name
  lldp tlv-select basic-tlv sys-descr
  lldp tlv-select basic-tlv sys-capab
  lldp tlv-select basic-tlv mgmt-addr ipv4 {{ ipaddmgm }}
  lldp tlv-select dot3tlv max-framesize
-  qos trust cos-dscp
+ qos trust dscp
  spanning-tree disable
  spanning-tree bpdu-receive disabled
  spanning-tree bpdu-transmit disabled
@@ -115,376 +117,57 @@ snmp-server enable traps cpu rate-limit 6
 snmp-server enable traps cpu rate-limit 7
 snmp-server enable traps cpu rate-limit 8
 
-
-scheduler 1 interface gigabitethernet 0/1 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/2 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/3 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/4 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/5 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/6 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/7 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/8 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/9 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/10 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/11 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/12 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/13 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/14 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/15 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/16 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/17 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/18 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/19 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/20 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/21 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/22 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/23 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/24 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/25 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/26 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/27 sched-algo strict-wrr 
-!
-scheduler 1 interface gigabitethernet 0/28 sched-algo strict-wrr 
-!
-queue 1 interface gigabitethernet 0/1 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/1 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/1 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/1 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/1 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/1 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/1 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/1 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/2 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/2 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/2 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/2 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/2 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/2 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/2 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/2 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/3 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/3 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/3 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/3 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/3 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/3 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/3 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/3 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/4 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/4 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/4 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/4 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/4 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/4 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/4 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/4 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/5 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/5 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/5 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/5 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/5 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/5 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/5 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/5 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/6 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/6 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/6 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/6 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/6 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/6 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/6 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/6 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/7 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/7 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/7 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/7 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/7 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/7 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/7 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/7 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/8 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/8 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/8 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/8 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/8 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/8 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/8 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/8 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/9 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/9 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/9 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/9 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/9 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/9 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/9 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/9 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/10 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/10 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/10 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/10 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/10 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/10 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/10 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/10 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/11 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/11 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/11 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/11 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/11 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/11 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/11 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/11 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/12 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/12 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/12 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/12 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/12 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/12 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/12 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/12 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/13 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/13 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/13 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/13 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/13 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/13 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/13 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/13 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/14 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/14 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/14 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/14 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/14 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/14 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/14 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/14 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/15 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/15 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/15 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/15 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/15 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/15 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/15 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/15 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/16 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/16 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/16 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/16 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/16 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/16 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/16 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/16 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/17 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/17 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/17 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/17 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/17 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/17 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/17 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/17 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/18 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/18 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/18 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/18 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/18 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/18 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/18 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/18 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/19 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/19 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/19 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/19 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/19 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/19 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/19 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/19 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/20 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/20 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/20 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/20 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/20 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/20 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/20 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/20 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/21 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/21 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/21 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/21 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/21 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/21 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/21 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/21 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/22 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/22 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/22 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/22 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/22 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/22 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/22 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/22 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/23 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/23 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/23 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/23 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/23 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/23 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/23 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/23 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/24 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/24 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/24 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/24 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/24 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/24 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/24 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/24 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/25 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/25 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/25 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/25 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/25 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/25 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/25 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/25 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/26 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/26 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/26 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/26 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/26 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/26 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/26 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/26 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/27 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/27 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/27 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/27 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/27 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/27 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/27 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/27 scheduler 1 weight 0 
-!
-queue 1 interface gigabitethernet 0/28 scheduler 1 weight 35 
-queue 2 interface gigabitethernet 0/28 scheduler 1 weight 25 
-queue 3 interface gigabitethernet 0/28 scheduler 1 weight 25 
-queue 4 interface gigabitethernet 0/28 scheduler 1 weight 15 
-queue 5 interface gigabitethernet 0/28 scheduler 1 weight 0 
-queue 6 interface gigabitethernet 0/28 scheduler 1 weight 0 
-queue 7 interface gigabitethernet 0/28 scheduler 1 weight 0 
-queue 8 interface gigabitethernet 0/28 scheduler 1 weight 0 
-!
-queue-map regn-priority vlanPri 2 queue-id 2 
-queue-map regn-priority vlanPri 4 queue-id 3 
-queue-map regn-priority vlanPri 5 queue-id 4 
-queue-map regn-priority vlanPri 6 queue-id 4 
-queue-map regn-priority vlanPri 7 queue-id 4 
-queue-map regn-priority ipDscp 8 queue-id 2 
-queue-map regn-priority ipDscp 9 queue-id 2 
-queue-map regn-priority ipDscp 10 queue-id 2 
-queue-map regn-priority ipDscp 11 queue-id 2 
-queue-map regn-priority ipDscp 12 queue-id 2 
-queue-map regn-priority ipDscp 13 queue-id 2 
-queue-map regn-priority ipDscp 14 queue-id 2 
-queue-map regn-priority ipDscp 15 queue-id 2 
-queue-map regn-priority ipDscp 16 queue-id 3 
-queue-map regn-priority ipDscp 17 queue-id 3 
-queue-map regn-priority ipDscp 18 queue-id 3 
-queue-map regn-priority ipDscp 19 queue-id 3 
-queue-map regn-priority ipDscp 20 queue-id 3 
-queue-map regn-priority ipDscp 21 queue-id 3 
-queue-map regn-priority ipDscp 22 queue-id 3 
-queue-map regn-priority ipDscp 23 queue-id 3 
-queue-map regn-priority ipDscp 24 queue-id 4 
-queue-map regn-priority ipDscp 25 queue-id 4 
-queue-map regn-priority ipDscp 26 queue-id 4 
-queue-map regn-priority ipDscp 27 queue-id 4 
-queue-map regn-priority ipDscp 28 queue-id 4 
-queue-map regn-priority ipDscp 29 queue-id 4 
-queue-map regn-priority ipDscp 30 queue-id 4 
-queue-map regn-priority ipDscp 31 queue-id 4 
-queue-map regn-priority ipDscp 32 queue-id 3 
-queue-map regn-priority ipDscp 33 queue-id 3 
-queue-map regn-priority ipDscp 34 queue-id 2 
-queue-map regn-priority ipDscp 35 queue-id 3 
-queue-map regn-priority ipDscp 36 queue-id 3 
-queue-map regn-priority ipDscp 37 queue-id 3 
-queue-map regn-priority ipDscp 38 queue-id 3 
-queue-map regn-priority ipDscp 39 queue-id 3 
-queue-map regn-priority ipDscp 40 queue-id 4 
-queue-map regn-priority ipDscp 41 queue-id 4 
-queue-map regn-priority ipDscp 42 queue-id 4 
-queue-map regn-priority ipDscp 43 queue-id 4 
-queue-map regn-priority ipDscp 44 queue-id 4 
-queue-map regn-priority ipDscp 45 queue-id 4 
-queue-map regn-priority ipDscp 46 queue-id 4 
-queue-map regn-priority ipDscp 47 queue-id 4 
-queue-map regn-priority ipDscp 48 queue-id 4 
-queue-map regn-priority ipDscp 49 queue-id 4 
-queue-map regn-priority ipDscp 50 queue-id 4 
-queue-map regn-priority ipDscp 51 queue-id 4 
-queue-map regn-priority ipDscp 52 queue-id 4 
-queue-map regn-priority ipDscp 53 queue-id 4 
-queue-map regn-priority ipDscp 54 queue-id 4 
-queue-map regn-priority ipDscp 55 queue-id 4 
+snooping multicast-forwarding-mode ip
+snooping leave-process config-level vlan 
+queue-map regn-priority ipDscp 0 queue-id 1
+queue-map regn-priority ipDscp 1 queue-id 1 
+queue-map regn-priority ipDscp 2 queue-id 1 
+queue-map regn-priority ipDscp 4 queue-id 1 
+queue-map regn-priority ipDscp 5 queue-id 1 
+queue-map regn-priority ipDscp 6 queue-id 1 
+queue-map regn-priority ipDscp 7 queue-id 1 
+queue-map regn-priority ipDscp 8 queue-id 3 
+queue-map regn-priority ipDscp 16 queue-id 2 
+queue-map regn-priority ipDscp 24 queue-id 1 
+queue-map regn-priority ipDscp 25 queue-id 1 
+queue-map regn-priority ipDscp 26 queue-id 1 
+queue-map regn-priority ipDscp 27 queue-id 1 
+queue-map regn-priority ipDscp 28 queue-id 1 
+queue-map regn-priority ipDscp 29 queue-id 1 
+queue-map regn-priority ipDscp 30 queue-id 1 
+queue-map regn-priority ipDscp 31 queue-id 1 
+queue-map regn-priority ipDscp 32 queue-id 4 
+queue-map regn-priority ipDscp 33 queue-id 2 
+queue-map regn-priority ipDscp 34 queue-id 4 
+queue-map regn-priority ipDscp 35 queue-id 2 
+queue-map regn-priority ipDscp 36 queue-id 2 
+queue-map regn-priority ipDscp 37 queue-id 2 
+queue-map regn-priority ipDscp 38 queue-id 2 
+queue-map regn-priority ipDscp 39 queue-id 2 
+queue-map regn-priority ipDscp 40 queue-id 1 
+queue-map regn-priority ipDscp 41 queue-id 1 
+queue-map regn-priority ipDscp 42 queue-id 1 
+queue-map regn-priority ipDscp 43 queue-id 1 
+queue-map regn-priority ipDscp 44 queue-id 1 
+queue-map regn-priority ipDscp 45 queue-id 1 
+queue-map regn-priority ipDscp 46 queue-id 3 
+queue-map regn-priority ipDscp 47 queue-id 1 
+queue-map regn-priority ipDscp 48 queue-id 1 
+queue-map regn-priority ipDscp 49 queue-id 1 
+queue-map regn-priority ipDscp 50 queue-id 1 
+queue-map regn-priority ipDscp 51 queue-id 1 
+queue-map regn-priority ipDscp 52 queue-id 1 
+queue-map regn-priority ipDscp 53 queue-id 1 
+queue-map regn-priority ipDscp 54 queue-id 1 
+queue-map regn-priority ipDscp 55 queue-id 1 
 queue-map regn-priority ipDscp 56 queue-id 4 
-queue-map regn-priority ipDscp 57 queue-id 4 
-queue-map regn-priority ipDscp 58 queue-id 4 
-queue-map regn-priority ipDscp 59 queue-id 4 
-queue-map regn-priority ipDscp 60 queue-id 4 
-queue-map regn-priority ipDscp 61 queue-id 4 
-queue-map regn-priority ipDscp 62 queue-id 4 
-queue-map regn-priority ipDscp 63 queue-id 4   
+queue-map regn-priority ipDscp 57 queue-id 1 
+queue-map regn-priority ipDscp 58 queue-id 1 
+queue-map regn-priority ipDscp 59 queue-id 1 
+queue-map regn-priority ipDscp 60 queue-id 1 
+queue-map regn-priority ipDscp 61 queue-id 1 
+queue-map regn-priority ipDscp 62 queue-id 1 
+queue-map regn-priority ipDscp 63 queue-id 1
 !
 cpu rate limit queue 1 maxrate 300
 cpu rate limit queue 2 maxrate 300
