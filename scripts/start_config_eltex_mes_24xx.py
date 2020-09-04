@@ -46,9 +46,9 @@ def createParser ():
 
 def upgrade(t, model, ip, hostname):
 
-	image_24_boot = 'mes2400-1022-R4.boot'
-	image_24 = 'mes2400-1022-R4.iss'
-	version_24 = '10.2.2'
+	image_24_boot = 'mes2400-1023-R1.boot'
+	image_24 = 'mes2400-1023-R1.iss'
+	version_24 = '10.2.3'
 
 	ip_ftp = '10.224.62.2'
 
