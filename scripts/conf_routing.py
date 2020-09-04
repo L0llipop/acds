@@ -43,6 +43,9 @@ def start(acds_id, ip, model):
 		answer = 'ok'
 	elif re.search(r'C300|C350', model):
 		t.ws_send_message(f"conf_routing: ADSL ZTE - no script to configure")
+		answer = 'ok'
+	elif re.search(r'MA5603', model):
+		t.ws_send_message(f"conf_routing: ADSL Huawei - no script to configure")
 		answer = 'ok'		
 	elif re.search(r'DES-3200-18|DES-3200-28|DES-3200-58', model):
 		# t.ws_send_message(f"conf_routing: start_config_dlinksw_all")
