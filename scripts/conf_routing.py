@@ -61,7 +61,7 @@ def start(acds_id, ip, model):
 	elif re.search(r'ES3528M|ES3526XA', model):
 		t.ws_send_message(f"conf_routing: Edge-Core SW - no script to configure")
 		answer = 'ok'
-	elif re.search(r'3400|3600|3560|2950|2960', model):
+	elif re.search(r'3400|3600|3560|2950|WS-C2960-8TC-L', model):
 		t.ws_send_message(f"conf_routing: Cisco SW - no script to configure")
 		answer = 'ok'
 	elif re.search(r'ACX2100', model):
