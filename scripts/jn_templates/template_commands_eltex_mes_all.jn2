@@ -165,6 +165,7 @@ clock source sntp
 sntp unicast client enable
 sntp unicast client poll
 sntp server 10.228.63.254 poll
+sntp server 10.234.128.21 poll
 clock timezone ekb +5
 
 loopback-detection enable
