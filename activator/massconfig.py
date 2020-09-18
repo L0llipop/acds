@@ -31,6 +31,7 @@ def configsend(request):
    net_login = request.GET.get('net_login', str(False))
    net_password = request.GET.get('net_password', str(False))
    iplist =  request.GET.get('ip_list', str(False)).split('\n')
+   findtext = request.GET.get('findtext', str(False))
    command_list = request.GET.get('command_list', str(False)).split('\n')
    ipmodel = {}
    t = multimodule.FastModulAut()
@@ -47,6 +48,8 @@ def configsend(request):
    t.login = request.GET.get('net_login', str(False))
    t.password = request.GET.get('net_password', str(False))
    t.ws_connect('chat/massconfig/')
+   findtextyes = []
+   findtextno = []
    for key, items in ipmodel.items():
      i = t.aut(key, items, False, timeout=5)
      if i != 0:
@@ -56,10 +59,16 @@ def configsend(request):
      for command in command_list:
        t.new_sendline(command)
        ipshow = t.data_split()
+       if ipshow.find(findtext) == -1:
+           findtextyes.append(key)
+       else:
+           findtextno.append(key)
        t.ws_send_message(f"{ipshow}")
      t.disconnect(False)
      t.ws_send_message("================================")
    values.update({"Результат работы смотри ": "http://10.180.7.34/chat/massconfig/"})
+   values.update({"Строка найдена ": findtextyes })
+   values.update({"Строка не найдена ": findtextno })
    t.ws_close() 
    
   return JsonResponse(values, safe=False)
