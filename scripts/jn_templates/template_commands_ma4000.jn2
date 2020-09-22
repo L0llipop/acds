@@ -327,3 +327,8 @@ exit
 commit
 confirm
 exit
+
+## включить поддержку не стандартных SFP
+##interface gpon-port 4/0-7
+##optics use-custom
+
