@@ -6,7 +6,7 @@ exit
 
 interface vlan {{ mgmvlan }}
 name MNG
-ip address {{ ipaddmgm }} /{{ mask }}
+ip address {{ ipaddmgm }} {{ mask }}
 exit
 ip default-gateway {{ gw }}
 
