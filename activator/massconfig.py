@@ -67,8 +67,10 @@ def configsend(request):
      t.disconnect(False)
      t.ws_send_message("================================")
    values.update({"Результат работы смотри ": "http://10.180.7.34/chat/massconfig/"})
-   values.update({"Строка не найдена ": "\\n".join(findtextyes) })
-   values.update({"Строка найдена ": "\\n".join(findtextno) })
+   stryes = "\\n".join(findtextyes)
+   strno =  "\\n".join(findtextno)
+   values.update({"Строка не найдена ": stryes.replace("\\n","\n") })
+   values.update({"Строка найдена ":  strno.replace("\\n","\n") })
    t.ws_close() 
    
   return JsonResponse(values, safe=False)
