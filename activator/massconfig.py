@@ -60,9 +60,9 @@ def configsend(request):
        t.new_sendline(command)
        ipshow = t.data_split()
        if ipshow.find(findtext) == -1:
-           findtextyes = findtextyes + " \n " + key
+           findtextyes = findtextyes + ' \n ' + key
        else:
-           findtextno =  findtextno + " \n " + key
+           findtextno =  findtextno + ' \n ' + key
        t.ws_send_message(f"{ipshow}")
      t.disconnect(False)
      t.ws_send_message("================================")
