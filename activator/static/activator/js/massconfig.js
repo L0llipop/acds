@@ -19,7 +19,7 @@ function get_massconfig() {
    cache: false,
    fail: function(){document.getElementById("command_output").value = "что-то пошло не так";},
    success: function(data1){
-				console.log(data1)
+				console.log(data1);
 				document.getElementById("command_output").value = JSON.parse(data1);
 		}
 	});
