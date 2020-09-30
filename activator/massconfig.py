@@ -66,7 +66,7 @@ def configsend(request):
        t.ws_send_message(f"{ipshow}")
      t.disconnect(False)
      t.ws_send_message("================================")
-   values.update({"Результат работы \n смотри ": "http://10.180.7.34/chat/massconfig/"})
+   values.update({"Результат работы смотри ": "http://10.180.7.34/chat/massconfig/"})
 
    values.update({"Строка не найдена ": findtextyes })
    values.update({"Строка найдена ":  findtextno })

@@ -20,9 +20,8 @@ function get_massconfig() {
    fail: function(){document.getElementById("command_output").value = "что-то пошло не так";},
    success: function(data1){
         console.log(data1);
-        let outtext;
-        outtex = JSON.parse(data1)
-				document.getElementById("command_output").value = outtext["Строка не найдена "];
+				document.getElementById("command_output").value = data1.toString()
+        ;
 		}
 	});
   
