@@ -48,8 +48,8 @@ def configsend(request):
    t.login = request.GET.get('net_login', str(False))
    t.password = request.GET.get('net_password', str(False))
    t.ws_connect('chat/massconfig/')
-   findtextyes = []
-   findtextno = []
+   findtextyes = ""
+   findtextno = ""
    for key, items in ipmodel.items():
      i = t.aut(key, items, False, timeout=5)
      if i != 0:
@@ -60,17 +60,16 @@ def configsend(request):
        t.new_sendline(command)
        ipshow = t.data_split()
        if ipshow.find(findtext) == -1:
-           findtextyes.append(key)
+           findtextyes = " \n "+findtextyes + key
        else:
-           findtextno.append(key)
+           findtextno = " \n " +  findtextno + key
        t.ws_send_message(f"{ipshow}")
      t.disconnect(False)
      t.ws_send_message("================================")
    values.update({"Результат работы смотри ": "http://10.180.7.34/chat/massconfig/"})
-   stryes = " \\n ".join(findtextyes)
-   strno =  " \\n ".join(findtextno)
-   values.update({"Строка не найдена ": stryes })
-   values.update({"Строка найдена ":  strno })
+
+   values.update({"Строка не найдена ": findtextyes })
+   values.update({"Строка найдена ":  findtextno })
    t.ws_close() 
    
   return JsonResponse(values, safe=False)
