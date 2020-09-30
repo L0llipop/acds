@@ -5,9 +5,10 @@ vlan {{ mgmvlan }}
 !
 interface {{ port_uplink }}
 switchport mode trunk
+switchport general allowed vlan add {{ mgmvlan }}
 switchport acceptable-frame-type all
-set port-role uplink 
 port-security-state trusted
+set port-role uplink 
 !
 interface vlan {{ mgmvlan }}
  no shutdown
