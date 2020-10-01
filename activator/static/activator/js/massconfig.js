@@ -20,7 +20,7 @@ function get_massconfig() {
    fail: function(){document.getElementById("command_output").value = "что-то пошло не так";},
    success: function(data1){
         console.log(data1);
-				document.getElementById("command_output").value = data1['result']+ "Строка найдена\n" + data1['strfinded'] + "\n \nСтрока не найдена\n"+data1['strnotfind'] + "\n Login fail: " +data1['fail'] ;
+				document.getElementById("command_output").value = data1['result']+ "\nСтрока найдена\n" + data1['strfinded'] + "\n \nСтрока не найдена\n"+data1['strnotfind'] + "\n \n Login fail: " +data1['fail'] ;
 		}
 	});
   
