@@ -19,8 +19,8 @@ function get_massconfig() {
    cache: false,
    fail: function(){document.getElementById("command_output").value = "что-то пошло не так";},
    success: function(data1){
-				console.log(data1)
-				document.getElementById("command_output").value = JSON.sparse(data1);
+        console.log(data1);
+				document.getElementById("command_output").value = data1['result']+ "\nСтрока не найдена\n" + data1['strfinded'] + "\n \nСтрока найдена\n"+data1['strnotfind'] + "\n \n Login fail: " +data1['fail'] ;
 		}
 	});
   

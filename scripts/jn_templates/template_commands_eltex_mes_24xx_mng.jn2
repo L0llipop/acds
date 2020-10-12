@@ -4,9 +4,10 @@ vlan {{ mgmvlan }}
  vlan active
 !
 interface {{ port_uplink }}
-switchport mode general
-switchport general allowed vlan {{ mgmvlan }}
+switchport mode trunk
+switchport general allowed vlan add {{ mgmvlan }}
 switchport acceptable-frame-type all
+port-security-state trusted
 set port-role uplink 
 !
 interface vlan {{ mgmvlan }}

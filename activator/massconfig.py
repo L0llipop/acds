@@ -53,23 +53,23 @@ def configsend(request):
    for key, items in ipmodel.items():
      i = t.aut(key, items, False, timeout=5)
      if i != 0:
-       values.update({key: "Login fail"})
+       values.update({key: "fail"})
        continue
      t.ws_send_message(f"================= START {key} =====================")
      for command in command_list:
        t.new_sendline(command)
        ipshow = t.data_split()
        if ipshow.find(findtext) == -1:
-           findtextyes = findtextyes + ' \n ' + key
+           findtextyes = findtextyes + '\n' + key
        else:
-           findtextno =  findtextno + ' \n ' + key
+           findtextno =  findtextno + '\n' + key
        t.ws_send_message(f"{ipshow}")
      t.disconnect(False)
      t.ws_send_message("================================")
-   values.update({"Результат работы \n смотри ": "http://10.180.7.34/chat/massconfig/"})
+   values.update({"result": "http://10.180.7.34/chat/massconfig/"})
 
-   values.update({"Строка не найдена ": findtextyes })
-   values.update({"Строка найдена ":  findtextno })
+   values.update({"strfinded": findtextyes })
+   values.update({"strnotfind":  findtextno })
    t.ws_close() 
    
   return JsonResponse(values, safe=False)
