@@ -285,6 +285,8 @@ class FastModulAut:
 			prompt.append(pexpect.TIMEOUT)
 
 		# print (f" =============== prompt: {prompt} ================")
+		self.dop = ''
+		
 		if re.search(r'Lumia', self.model): 
 			self.new_telnet.send(command+self.dop)
 		else:
