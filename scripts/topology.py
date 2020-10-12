@@ -229,9 +229,9 @@ class getTopology(object):
 			# port_pe description
 			if 'lag' in port_pe:
 				lag = port_pe.replace('-', ' ')
-				check = self.check_search(t, f"show {lag} detail | match Description ", rf'(\d{2}-[-\da-z]+)', 'ar_nokia|не найден downlink port description', re.I)
+				check = self.check_search(t, f"show {lag} detail | match Description ", r'(\d{2}-[-\da-z]+)', 'ar_nokia|не найден downlink lag port description', re.I)
 			else:
-				check = self.check_search(t, f"show port description {port_pe} ", rf'(\d{2}-[-\da-z]+)', 'ar_nokia|не найден downlink port description', re.I)
+				check = self.check_search(t, f"show port description {port_pe} ", r'(\d{2}-[-\da-z]+)', 'ar_nokia|не найден downlink port description', re.I)
 			if type(check) == dict:
 				result.update(check)
 				return result
