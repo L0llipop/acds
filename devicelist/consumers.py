@@ -162,7 +162,7 @@ class TopologyConsumer(AsyncWebsocketConsumer):
 
 				else:
 					result.update({'status': 'error', 'message_error': res['error']})
-					if res.get['vrf']:
+					if res.get('vrf'):
 						result.update({'vrf': res['vrf']})
 		
 		else:
