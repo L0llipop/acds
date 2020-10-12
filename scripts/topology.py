@@ -12,7 +12,7 @@ try:
 	from acds import configuration
 except:
 	import configuration
-
+# Здесь описана работа с моделями и запись в базу
 class getTopology(object):
 
 	def check_search(self, t, command, regular, desc, key=re.M, prompt='default', time=60):

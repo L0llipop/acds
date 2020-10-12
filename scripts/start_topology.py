@@ -25,14 +25,14 @@ def select_net_template(ip, multi):
 			return router
 
 def main(result, multi, top):
-	loop = asyncio.new_event_loop()
+	loop = asyncio.new_event_loop()   # из-за использования web socket нужно использовать asyncio
 	asyncio.set_event_loop(loop)
 	result = loop.run_until_complete(top.main(result, multi, 'start_topology'))
 
 	return result
 
 # result = main(result)
-# print(f" result - {result}")
+# основной цикл, который опрашивает оборудование
 def loop(ip):
 	multi = multimodule.FastModulAut()
 	top = topology.getTopology()

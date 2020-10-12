@@ -1,4 +1,4 @@
-import getpass
+import getpass  #внешняя
 import sys, os, re, time
 import mysql.connector 
 import cx_Oracle
@@ -55,7 +55,7 @@ class FastModulAut:
 	def file_config(self):
 		""" Читаем индивидуальный файл конфигураций для доступа на оборудоание под своими учётными данными """
 		if self.login == 'default':
-			self.login = getpass.getuser()
+			self.login = getpass.getuser() # от чего имени запущен процесс
 		
 		ini_local = getattr(configuration, 'CONFIG_PATH')+'config_data_local.ini'
 		# pathini = "/home/"+self.login+"/.config/config_data.ini"
@@ -453,7 +453,7 @@ class FastModulAut:
 			if re.search(r'MA5800', self.model):
 				self.new_sendline('enable')
 				self.new_sendline('undo smart')
-				self.new_sendline('scroll')
+				self.new_sendline('scroll 512')
 
 		if mes31xx_21xx_11xx == 'no pass': # добавлено для того что бы авторизовываться на оборудование которое не требует ввода пароля
 			i = 0
