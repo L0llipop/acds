@@ -33,6 +33,10 @@ download firmware_fromTFTP {{ ftp_server }} src_file  FTP/FTTb/DGS36xx_Run_3_00_
 DES-1210-28/ME
 download firmware_fromTFTP 10.221.0.3 FTP/FTTb/DES-1210-28ME-B3-10-05-B020.hex image_id 1
 
+DES-3552
+
+download firmware_fromTFTP 10.221.0.3 FTP/FTTb/DES3552_RUN_3_12_R055.had
+
 {% elif model == '21xx' %}copy tftp://{{ ftp_server }}/FTP/FTTb/mes2000-11486.ros flash://image
 show bootvar 
 boot system image-2
