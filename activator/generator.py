@@ -101,6 +101,7 @@ def get_template(request):
 
 		if re.search(r'MES2124|MES1124|MES3124|MES3324|MES2324|MES2208|MES2308|MES3508', model):
 			model_templite = '21xx'
+			values['mask'] = netmask # меняем формат маски 24 -> 255.255.255.0
 			if re.search(r'2124', model):
 				port_downlink = 'Gi0/1-24'
 				port_uplink = 'Gi0/28'

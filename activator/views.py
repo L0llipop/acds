@@ -877,8 +877,7 @@ def mail_generator(acds_id):
 	Для настройки управления cкопировать и вставить в консоль эти команды."""
 
 	footer = f"""Если что-то совсем не получается, то можно позвонить нам
-	Борисов Сергей  +7(3452)599233
-	Южаков Дмитрий  +7(3452)599357"""
+	Борисов Сергей  +7(3452)599233"""
 
 	# t.ws_send_message(f"email - {email}")
 #SWITCH
@@ -897,6 +896,7 @@ def mail_generator(acds_id):
 		path_file = f"{main_path_template}/template_commands_eltex_mes_all_mng.jn2"
 	elif re.search(r'2324|3324|3124', model):
 		port_uplink = 'te1/0/4'
+		mask = netmask
 		path_file = f"{main_path_template}/template_commands_eltex_mes_all_mng.jn2"
 	elif re.search(r'2428|2408', model):
 		port_uplink = 'Gi 0/28'
